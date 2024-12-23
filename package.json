@@ -1,0 +1,24 @@
+{
+  "name": "privatetutorapi",
+  "version": "1.0.0",
+  "description": "Backend of the private tutor app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stavir-Solutions/privateTutorAPI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Stavir-Solutions/privateTutorAPI/issues"
+  },
+  "homepage": "https://github.com/Stavir-Solutions/privateTutorAPI#readme",
+  "dependencies": {
+    "express": "^4.21.2",
+    "serverless-http": "^3.2.0"
+  }
+}
