@@ -1,15 +1,14 @@
 const express = require('express');
 const serverless = require('serverless-http');
-const index = express();
+const teacherRoutes = require('./routes/teacher');
+const app = express();
 
-index.get('/teachers', (req, res) => {
-    res.send('{"name":"Santhosh"}');
-});
+app.use('/', teacherRoutes);
 
 
-index.get('/', (req, res) => {
+app.get('/', (req, res) => {
     res.send('{"name":"Private tutor apis"}');
 });
 
 
-module.exports.handler = serverless(index);
+module.exports.handler = serverless(app);
