@@ -1,0 +1,19 @@
+service: private-tutor
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+plugins:
+  - serverless-offline
+
+functions:
+  app:
+    handler: index.handler
+    events:
+      - http:
+          path: /
+          method: get
+      - http:
+          path: /teachers
+          method: get
