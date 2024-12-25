@@ -80,6 +80,21 @@ functions:
       - http:
           path: /messages/{id}
           method: delete
+      - http:
+          path: /fee-records/batch/{batchId}/student/{studentId}
+          method: get
+      - http:
+          path: /fee-records/{id}
+          method: get
+      - http:
+          path: /fee-records
+          method: post
+      - http:
+          path: /fee-records/{id}
+          method: patch
+      - http:
+          path: /fee-records/{id}
+          method: delete
 
 
 
