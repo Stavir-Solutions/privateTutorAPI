@@ -18,6 +18,9 @@ functions:
           path: /teachers
           method: get
       - http:
+          path: /teachers/{id}
+          method: get
+      - http:
           path: /teachers
           method: post
       - http:

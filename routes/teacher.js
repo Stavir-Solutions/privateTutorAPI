@@ -1,11 +1,9 @@
 const express = require('express');
+const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
+
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
-
-router.get('/teachers', (req, res) => {
-    res.send('{"name":"Santhosh"}');
-});
 
 const teacherSchema = Joi.object({
     firstName: Joi.string().required(),
@@ -28,30 +26,41 @@ const teacherSchema = Joi.object({
 
 });
 
+var teacher = '{' + '  "firstName": "John",\n' + '  "lastName": "Doe",\n' + '  "userName": "johndoe",\n' + '  "password": "password123",\n' + '  "age": 30,\n' + '  "gender": "male",\n' + '  "addressLine1": "123 Main St",\n' + '  "addressCity": "Anytown",\n' + '  "addressState": "Anystate",\n' + '  "pinCode": 123456,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "email": "john.doe@example.com",\n' + '  "phoneNumber": "1234567890",\n' + '  "upiId": "john@upi",\n' + '  "accountNumber": "1234567890",\n' + '  "accountName": "John Doe",\n' + '  "ifscCode": "IFSC0001234"\n' + '}';
+
+
+router.get('/teachers', (req, res) => {
+    buildSuccessResponse(res, 200, '[' + teacher + ']');
+});
+
+router.get('/teachers/:id', (req, res) => {
+    buildSuccessResponse(res, 200, teacher);
+});
 
 router.post('/teachers', (req, res) => {
     console.log(JSON.stringify(req.body))
     const {error} = teacherSchema.validate(req.body);
     if (error) {
-        return res.status(400).send(error.details[0].message);
+        return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('creating teacher {}', req.body);
-    res.status(200).send('{"id":"550e8400-e29b-41d4-a716-446655440000"}');
+    buildSuccessResponse(res, 200, '{"id":"550e8400-e29b-41d4-a716-446655440000"}')
 });
+
 
 /* API to update the teacher */
 router.put('/teachers/:id', (req, res) => {
     const {error} = teacherSchema.validate(req.body);
     if (error) {
-        return res.status(400).send(error.details[0].message);
+        return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('updating teacher {}', req.body);
-    res.status(200).send('{"message":"Teacher is updated successfully"}');
+    buildSuccessResponse(res, 200, '{}')
 });
 
 router.delete('/teachers/:id', (req, res) => {
     console.log('Deleting teacher with id {}', req.params.id);
-    res.status(200).send('{"message":"Teacher is deleted successfully"}');
+    buildSuccessResponse(res, 200, '{}')
 });
 
 
