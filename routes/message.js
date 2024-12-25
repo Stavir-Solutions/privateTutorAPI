@@ -11,16 +11,24 @@ const messageSchema = Joi.object({
     sender: Joi.string().email().required(),
     receiver: Joi.string().email().required(),
     timestamp: Joi.date().optional(),
+    attachmentUrls: Joi.array().items(Joi.string().uri()).optional(),
     replies: Joi.array().items(Joi.object({
-        content: Joi.string().required(), sender: Joi.string().email().required(), timestamp: Joi.date().required()
+        content: Joi.string().required(),
+        sender: Joi.string().email().required(),
+        timestamp: Joi.date().required(),
+        attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
     })).optional()
 });
 
 const replySchema = Joi.object({
-    content: Joi.string().required(), sender: Joi.string().email().required(), timestamp: Joi.date().required()
+    content: Joi.string().required(),
+    sender: Joi.string().email().required(),
+    timestamp: Joi.date().required(),
+    attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
 });
 
-let message = '{\n' + '        id: \'9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b\',\n' + '        subject: \'Follow Up\',\n' + '        content: \'Just checking in to see how you are doing.\',\n' + '        sender: \'admin@example.com\',\n' + '        receiver: \'user@example.com\',\n' + '        timestamp: \'2024-12-24T12:34:56.789Z,\n' + '        replies: [\n' + '            {\n' + '                content: \'I am doing well, thank you!\',\n' + '                sender: \'user@example.com\',\n' + '                timestamp: \'2024-12-25T12:34:56.789Z \n' + '            }\n' + '            ,{\n' + '                content: \'Good to hear that see you in class soon!\',\n' + '                sender: \'user@example.com\',\n' + '                timestamp: \'2024-12-25T14:34:56.789Z\n' + '            }\n' + '        ]\n' + '    }';
+let message = '[\n' + '  {\n' + '    id: \'9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b\',\n' + '    subject: \'Follow Up\',\n' + '    content: \'Just checking in to see how you are doing.\',\n' + '    sender: \'admin@example.com\',\n' + '    receiver: \'user@example.com\',\n' + '    timestamp: \'2024-12-24T12: 34: 56.789Z,\n' + '    attachmentUrls: [\n' + '      \'http: //example.com/attachment1.txt\',\n' + '      \'http: //example.com/attachment2.pdf\'\n' + '    ],\n' + '    replies: [\n' + '      {\n' + '        content: \'I am doing well, thank you!\',\n' + '        sender: \'user@example.com\',\n' + '        timestamp: \'2024-12-25T12: 34: 56.789Z,\n' + '        attachmentUrls: [\n' + '        ]\n' + '      },\n' + '      {\n' + '        content: \'Good to hear that see you in class soon!\',\n' + '        sender: \'user@example.com\',\n' + '        timestamp: \'2024-12-25T14: 34: 56.789Z,\n' + '        attachmentUrls: [\n' + '          \'http: //example.com/attachment5.png\',\n' + '        ]\n' + '      }\n' + '    ]\n' + '  }\n' + ']'
+
 
 router.get('/batch/:batchId', (req, res) => {
     console.log('getting messages for batch {}', req.params.batchId);
