@@ -119,6 +119,9 @@ functions:
       - http:
           path: /login/student
           method: post
+      - http:
+          path: /uploads
+          method: post
 
 
 
