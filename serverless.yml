@@ -113,6 +113,12 @@ functions:
       - http:
           path: /assignments/{id}
           method: delete
+      - http:
+          path: /login/teacher
+          method: post
+      - http:
+          path: /login/student
+          method: post
 
 
 
