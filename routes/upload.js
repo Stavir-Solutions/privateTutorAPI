@@ -3,6 +3,7 @@ const multer = require('multer');
 const multerS3 = require('multer-s3');
 const AWS = require('aws-sdk');
 const router = express.Router();
+router.use(express.json());
 
 // Configure AWS SDK
 // AWS.config.update({

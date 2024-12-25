@@ -122,6 +122,18 @@ functions:
       - http:
           path: /uploads
           method: post
+      - http:
+          path: /notifications/teachers/{teacherId}
+          method: get
+      - http:
+          path: /notifications/teachers/{notificationId}/seen
+          method: patch
+      - http:
+          path: /notifications/students/{studentId}
+          method: get
+      - http:
+          path: /notifications/students/{notificationId}/seen
+          method: patch
 
 
 
