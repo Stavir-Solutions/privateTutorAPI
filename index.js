@@ -2,6 +2,7 @@ const express = require('express');
 const serverless = require('serverless-http');
 const teacherRoutes = require('./routes/teacher');
 const batchRoutes = require('./routes/batch');
+const studentRoutes = require('./routes/student');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 
@@ -20,6 +21,7 @@ const swaggerDocs = swaggerJsdoc(swaggerOptions);
 index.use('/api-docs', swaggerUi.serveWithOptions({ redirect: false }), swaggerUi.setup(swaggerDocs));
 index.use('/teachers', teacherRoutes);
 index.use('/batches', batchRoutes);
+index.use('/students', studentRoutes);
 
 index.get('/', (req, res) => {
     res.send('{"name":"Private tutor apis"}');

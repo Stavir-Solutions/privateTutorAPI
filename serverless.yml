@@ -47,6 +47,21 @@ functions:
       - http:
           path: /batches/{id}
           method: delete
+      - http:
+          path: /students
+          method: get
+      - http:
+          path: /students/{id}
+          method: get
+      - http:
+          path: /students
+          method: post
+      - http:
+          path: /students/{id}
+          method: put
+      - http:
+          path: /students/{id}
+          method: delete
 
 
 
