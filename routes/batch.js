@@ -51,6 +51,11 @@ router.put('/:id', (req, res) => {
     buildSuccessResponse(res, 200, '{}')
 });
 
+router.patch('/:batchId/student/:studentId', (req, res) => {
+    console.log('add student', req.params.studentId, ' to batch ', req.params.batchId);
+    buildSuccessResponse(res, 200, '{}')
+});
+
 router.delete('/:id', (req, res) => {
     console.log('Deleting batch with id {}', req.params.id);
     buildSuccessResponse(res, 200, '{}')

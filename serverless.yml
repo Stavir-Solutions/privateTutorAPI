@@ -45,6 +45,9 @@ functions:
           path: /batches/{id}
           method: put
       - http:
+          path: /batches/{batchId}/student/{studentId}
+          method: patch
+      - http:
           path: /batches/{id}
           method: delete
       - http:
@@ -52,6 +55,9 @@ functions:
           method: get
       - http:
           path: /students/{id}
+          method: get
+      - http:
+          path: /students/batch/{batchId}
           method: get
       - http:
           path: /students

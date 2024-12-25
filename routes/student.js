@@ -30,6 +30,12 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
+    console.log('get students by id  ', req.params.id)
+    buildSuccessResponse(res, 200, student);
+});
+
+router.get('/batch/:batchId', (req, res) => {
+    console.log('get students by batch ', req.params.batchId)
     buildSuccessResponse(res, 200, student);
 });
 
