@@ -62,6 +62,24 @@ functions:
       - http:
           path: /students/{id}
           method: delete
+      - http:
+          path: /messages/batch/{batchId}
+          method: get
+      - http:
+          path: /messages/batch/{batchId}/student/{studentId}
+          method: get
+      - http:
+          path: /messages/{id}
+          method: get
+      - http:
+          path: /messages
+          method: post
+      - http:
+          path: /messages/{id}/reply
+          method: patch
+      - http:
+          path: /messages/{id}
+          method: delete
 
 
 
