@@ -95,6 +95,24 @@ functions:
       - http:
           path: /fee-records/{id}
           method: delete
+      - http:
+          path: /assignments/batch/{batchId}
+          method: get
+      - http:
+          path: /assignments/batch/{batchId}/student/{studentId}
+          method: get
+      - http:
+          path: /assignments/{id}
+          method: get
+      - http:
+          path: /assignments
+          method: post
+      - http:
+          path: /assignments/{id}
+          method: put
+      - http:
+          path: /assignments/{id}
+          method: delete
 
 
 
