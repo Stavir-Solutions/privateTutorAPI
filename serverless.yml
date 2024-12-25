@@ -32,3 +32,22 @@ functions:
       - http:
           path: /api-docs
           method: get
+      - http:
+          path: /batches/teacher/{teacherId}
+          method: get
+      - http:
+          path: /batches/{id}
+          method: get
+      - http:
+          path: /batches
+          method: post
+      - http:
+          path: /batches/{id}
+          method: put
+      - http:
+          path: /batches/{id}
+          method: delete
+
+
+
+
