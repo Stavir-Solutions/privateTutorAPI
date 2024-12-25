@@ -4,7 +4,8 @@
   "description": "Backend of the private tutor app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "npx serverless offline --noPrependStageInUrl"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,10 @@
   "homepage": "https://github.com/Stavir-Solutions/privateTutorAPI#readme",
   "dependencies": {
     "express": "^4.21.2",
-    "serverless-http": "^3.2.0"
+    "joi": "^17.13.3",
+    "serverless-http": "^3.2.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "serverless-offline": "^14.4.0"

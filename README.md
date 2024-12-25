@@ -4,7 +4,7 @@ Backend of the private tutor index
 1. Install node
 2. Install npm
 3. Run ```npm install```
-4. Run ```npx serverless offline```
+4. Run ```npx run server```
 
 
 ## Testing APIs Locally
@@ -18,7 +18,7 @@ To test your APIs locally with serverless, you can use the serverless-offline pl
 
 2. Start your server locally using the serverless-offline command:  
    ```bash
-   npx serverless offline
+   npx serverless offline --noPrependStageInUrl
    ```
 3. Test your endpoints using Postman or cURL as previously described, but use the URL http://localhost:3000 (or the port specified in your serverless.yml file).  
    

@@ -17,3 +17,15 @@ functions:
       - http:
           path: /teachers
           method: get
+      - http:
+          path: /teachers
+          method: post
+      - http:
+          path: /teachers/{id}
+          method: put
+      - http:
+          path: /teachers/{id}
+          method: delete
+      - http:
+          path: /api-docs
+          method: get
