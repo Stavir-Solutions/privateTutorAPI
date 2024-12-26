@@ -1,0 +1,44 @@
+name: Deploy to Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js (if applicable for your Lambda runtime)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16' # Use the appropriate version for your Lambda
+
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: Archive the deployment package
+      - name: Create Lambda deployment package
+        run: zip -r function.zip . # Adjust the files included in the zip as needed
+
+      # Step 5: Configure AWS CLI
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{secrets.AKIAYRUCY23SNJP7J3L6}}
+          aws-secret-access-key: ${{secrets.6X9CXL57sWIk1DKLhNilMUXxZfk9xkD0b2C2ybfA}}
+          aws-region: us-east-1 # Replace with your Lambda's region
+
+      # Step 6: Deploy to Lambda
+      - name: Deploy to Lambda
+        run: |
+          aws lambda update-function-code \
+            --function-name privateTutorAPIs \
+            --zip-file fileb://function.zip
