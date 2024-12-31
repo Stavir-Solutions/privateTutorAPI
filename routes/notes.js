@@ -47,9 +47,9 @@ router.put('/:id', (req, res) => {
     console.log('updated notes {}', "550e8400-e29b-41d4-a716-446655440000");
 });
 router.delete('/:id', (req, res) => {
-    console.log('Deleting teacher with id {}', req.params.id);
+    console.log('Deleting notes with id {}', req.params.id);
     buildSuccessResponse(res, 200, {});
-    console.log('deleted feeRecord {}', "550e8400-e29b-41d4-a716-446655440000");
+    console.log('deleted notes{}', "550e8400-e29b-41d4-a716-446655440000");
 
 });
 
