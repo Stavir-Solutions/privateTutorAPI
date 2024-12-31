@@ -15,11 +15,11 @@ var notes = '{' + ' "id": "550e8400-e29b-41d4-a716-446655440000", \n' + ' "publi
     '}';
 
 router.get('/batch/:batchId', (req, res) => {
-    buildSuccessResponse(res, 200, [notes]);
+    buildSuccessResponse(res, 200, '['+ notes +']');
 });
 
 router.get('/student/:id', (req, res) => {
-    buildSuccessResponse(res, 200, [notes]);
+    buildSuccessResponse(res, 200, '['+ notes +']');
 });
 
 
@@ -37,14 +37,14 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-    const {error} = teacherSchema.validate(req.body);
+    const {error} = notesSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
     }
-    console.log('updating teacher {}', req.body);
+    console.log('updating notes {}', req.body);
     buildSuccessResponse(res, 200, '{}')
-    console.log('updated teacher {}', "550e8400-e29b-41d4-a716-446655440000");
+    console.log('updated notes {}', "550e8400-e29b-41d4-a716-446655440000");
 });
 router.delete('/:id', (req, res) => {
     console.log('Deleting teacher with id {}', req.params.id);

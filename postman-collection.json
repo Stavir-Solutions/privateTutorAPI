@@ -1,1076 +1,1250 @@
 {
-  "info": {
-    "_postman_id": "a165f1d0-8252-4919-949c-d96d1ef59358",
-    "name": "Teacher Parent connect API",
-    "description": "API documentation for the Teacher API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "12618812"
-  },
-  "item": [
-    {
-      "name": "Get Teachers",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/teachers",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "teachers"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Teacher",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/teachers/550e8400-e29b-41d4-a716-446655440000",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "teachers",
-            "550e8400-e29b-41d4-a716-446655440000"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create Teacher",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\",\n  \"age\": 30,\n  \"gender\": \"male\",\n  \"addressLine1\": \"123 Main St\",\n  \"addressCity\": \"Anytown\",\n  \"addressState\": \"Anystate\",\n  \"pinCode\": 123456,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"1234567890\",\n  \"upiId\": \"john@upi\",\n  \"accountNumber\": \"1234567890\",\n  \"accountName\": \"John Doe\",\n  \"ifscCode\": \"IFSC0001234\"\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{base_url}}/teachers",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "teachers"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Update Teacher",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\",\n  \"age\": 30,\n  \"gender\": \"male\",\n  \"addressLine1\": \"123 Main St\",\n  \"addressCity\": \"Anytown\",\n  \"addressState\": \"Anystate\",\n  \"pinCode\": 123456,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"1234567890\",\n  \"upiId\": \"john@upi\",\n  \"accountNumber\": \"1234567890\",\n  \"accountName\": \"John Doe\",\n  \"ifscCode\": \"IFSC0001234\"\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/teachers/550e8400-e29b-41d4-a716-446655440000",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "teachers",
-            "550e8400-e29b-41d4-a716-446655440000"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete Teacher",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/teachers/550e8400-e29b-41d4-a716-446655440000",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "teachers",
-            "550e8400-e29b-41d4-a716-446655440000"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Batch by ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/batches/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "batches",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "123e4567-e89b-12d3-a456-426614174000"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Batches by Teacher ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/batches/teacher/:teacherId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "batches",
-            "teacher",
-            ":teacherId"
-          ],
-          "variable": [
-            {
-              "key": "teacherId",
-              "value": "12345"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create Batch",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Math 101\",\n  \"course\": \"Mathematics\",\n  \"subject\": \"Algebra\",\n  \"description\": \"An introductory course to Algebra covering basic concepts and problem-solving techniques.\",\n  \"paymentFrequency\": \"Monthly\",\n  \"paymentAmount\": 150.00,\n  \"paymentDayOfMonth\": 15\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/batches",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "batches"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Update Batch",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"name\": \"Math 101\",\n  \"course\": \"Mathematics\",\n  \"subject\": \"Algebra\",\n  \"description\": \"An introductory course to Algebra covering basic concepts and problem-solving techniques.\",\n  \"paymentFrequency\": \"Monthly\",\n  \"paymentAmount\": 150.00,\n  \"paymentDayOfMonth\": 15\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/batches/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "batches",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "123e4567-e89b-12d3-a456-426614174000"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Add Student to Batch",
-      "request": {
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": ""
-        },
-        "url": {
-          "raw": "{{base_url}}/batches/:batchId/student/:studentId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "batches",
-            ":batchId",
-            "student",
-            ":studentId"
-          ],
-          "variable": [
-            {
-              "key": "batchId",
-              "value": "693c651c-206f-450b-aaa2-a36b5004f7dd"
-            },
-            {
-              "key": "studentId",
-              "value": "ea894b5e-8c13-48c4-902b-8294b88b69f8"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete Batch",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/batches/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "batches",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "123e4567-e89b-12d3-a456-426614174000"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get All Students",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/students",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "students"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Student by ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/students/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "students",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Students by batch ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/students/batch/:batchId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "students",
-            "batch",
-            ":batchId"
-          ],
-          "variable": [
-            {
-              "key": "batchId",
-              "value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create Student",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"age\": 16,\n  \"addressLine1\": \"456 Elm St\",\n  \"addressCity\": \"Othertown\",\n  \"addressState\": \"Otherstate\",\n  \"pinCode\": 654321,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"gender\": \"female\",\n  \"parent1Name\": \"John Doe\",\n  \"parent1Phone\": \"9876543210\",\n  \"parent1Email\": \"john.doe@example.com\",\n  \"parent2Name\": \"Mary Doe\",\n  \"parent2Phone\": \"0123456789\",\n  \"parent2Email\": \"mary.doe@example.com\"\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/students",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "students"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Update Student",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"age\": 16,\n  \"addressLine1\": \"456 Elm St\",\n  \"addressCity\": \"Othertown\",\n  \"addressState\": \"Otherstate\",\n  \"pinCode\": 654321,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"gender\": \"female\",\n  \"parent1Name\": \"John Doe\",\n  \"parent1Phone\": \"9876543210\",\n  \"parent1Email\": \"john.doe@example.com\",\n  \"parent2Name\": \"Mary Doe\",\n  \"parent2Phone\": \"0123456789\",\n  \"parent2Email\": \"mary.doe@example.com\"\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/students/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "students",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete Student",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/students/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "students",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Messages for Batch",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}messages/batch/:batchId",
-          "host": [
-            "{{base_url}}messages"
-          ],
-          "path": [
-            "batch",
-            ":batchId"
-          ],
-          "variable": [
-            {
-              "key": "batchId",
-              "value": ""
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Messages for Student in Batch",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/messages/batch/:batchId/student/:studentId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "messages",
-            "batch",
-            ":batchId",
-            "student",
-            ":studentId"
-          ],
-          "variable": [
-            {
-              "key": "batchId",
-              "value": "1"
-            },
-            {
-              "key": "studentId",
-              "value": "1"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Message by ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/messages/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "messages",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create Message",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"subject\": \"Follow Up\",\n  \"content\": \"Just checking in to see how you are doing.\",\n  \"sender\": \"admin@example.com\",\n  \"receiver\": \"user@example.com\",\n  \"timestamp\": \"2024-12-24T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/messages",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "messages"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Reply to Message",
-      "request": {
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"content\": \"I am doing well, thank you!\",\n  \"sender\": \"user@example.com\",\n  \"timestamp\": \"2024-12-25T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/messages/:id/reply",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "messages",
-            ":id",
-            "reply"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete Message",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/messages/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "messages",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get FeeRecords by Batch and Student",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/fee-records/batch/550e8400-e29b-41d4-a716-446655440000/student/550e8400-e29b-41d4-a716-446655440001",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fee-records",
-            "batch",
-            "550e8400-e29b-41d4-a716-446655440000",
-            "student",
-            "550e8400-e29b-41d4-a716-446655440001"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get FeeRecord by ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fee-records",
-            "d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create FeeRecord",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"batchId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"studentId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"dueDate\": \"2024-12-31T23:59:59.999Z\",\n  \"paymentDate\": \"2024-12-25T12:34:56.789Z\",\n  \"amount\": 1500.00,\n  \"status\": \"paid\",\n  \"notes\": \"Payment received in full.\",\n  \"attachmentUrl\": \"http://example.com/receipt.pdf\",\n  \"teacherAcknowledgement\": true\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/fee-records",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fee-records"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Update FeeRecord",
-      "request": {
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"dueDate\": \"2024-12-31T23:59:59.999Z\",\n  \"paymentDate\": \"2024-12-25T12:34:56.789Z\",\n  \"status\": \"paid\",\n  \"notes\": \"Payment received in full.\",\n  \"attachmentUrl\": \"http://example.com/receipt.pdf\",\n  \"teacherAcknowledgement\": true\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fee-records",
-            "d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete FeeRecord",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "fee-records",
-            "d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Assignment by ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/assignments/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "assignments",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": ""
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Assignments by Batch ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/assignments/batch/:batchId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "assignments",
-            "batch",
-            ":batchId"
-          ],
-          "variable": [
-            {
-              "key": "batchId",
-              "value": ""
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Assignments by Batch ID and Student ID",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/assignments/batch/:batchId/student/:studentId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "assignments",
-            "batch",
-            ":batchId",
-            "student",
-            ":studentId"
-          ],
-          "variable": [
-            {
-              "key": "batchId",
-              "value": ""
-            },
-            {
-              "key": "studentId",
-              "value": ""
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Create Assignment",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"publishDate\": \"2024-01-01T00:00:00.000Z\",\n  \"submissionDate\": \"2024-01-15T23:59:59.999Z\",\n  \"batchId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"studentId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"title\": \"Math Assignment 1\",\n  \"details\": \"Solve the algebra problems in the attached document.\",\n  \"attachmentUrls\": [\n    \"http://example.com/assignment1.pdf\",\n    \"http://example.com/assignment2.pdf\"\n  ]\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/assignments",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "assignments"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Update Assignment",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"publishDate\": \"2024-01-01T00:00:00.000Z\",\n  \"submissionDate\": \"2024-01-15T23:59:59.999Z\",\n  \"batchId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"studentId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"title\": \"Math Assignment 1\",\n  \"details\": \"Solve the algebra problems in the attached document.\",\n  \"attachmentUrls\": [\n    \"http://example.com/assignment1.pdf\",\n    \"http://example.com/assignment2.pdf\"\n  ]\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/assignments/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "assignments",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": ""
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Delete Assignment",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/assignments/:id",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "assignments",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": ""
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Login Teacher",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\"\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/login/teacher",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "login",
-            "teacher"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Login Student",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\"\n}"
-        },
-        "url": {
-          "raw": "{{base_url}}/login/student",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "login",
-            "student"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Upload File",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "multipart/form-data"
-          }
-        ],
-        "body": {
-          "mode": "formdata",
-          "formdata": [
-            {
-              "key": "file",
-              "type": "file",
-              "src": [
-                "",
-                "/Users/sk/Documents/Screenshot 2024-12-24 at 10.26.08 AM.png"
-              ]
-            }
-          ]
-        },
-        "url": {
-          "raw": "{{base_url}}/uploads",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "uploads"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Teacher Notifications",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/notifications/teachers/:teacherId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "notifications",
-            "teachers",
-            ":teacherId"
-          ],
-          "variable": [
-            {
-              "key": "teacherId",
-              "value": "sample-teacher-id"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Mark Teacher Notification as Seen",
-      "request": {
-        "method": "PATCH",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/notifications/teachers/:notificationId/seen",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "notifications",
-            "teachers",
-            ":notificationId",
-            "seen"
-          ],
-          "variable": [
-            {
-              "key": "notificationId",
-              "value": "sample-notification-id"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get Student Notifications",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/notifications/students/:studentId",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "notifications",
-            "students",
-            ":studentId"
-          ],
-          "variable": [
-            {
-              "key": "studentId",
-              "value": "sample-student-id"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Mark Student Notification as Seen",
-      "request": {
-        "method": "PATCH",
-        "header": [],
-        "url": {
-          "raw": "{{base_url}}/notifications/students/:notificationId/seen",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            "notifications",
-            "students",
-            ":notificationId",
-            "seen"
-          ],
-          "variable": [
-            {
-              "key": "notificationId",
-              "value": "sample-notification-id"
-            }
-          ]
-        }
-      },
-      "response": []
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "",
-      "type": "default"
-    }
-  ]
+	"info": {
+		"_postman_id": "7a1f6cd2-f182-4b44-a05b-793e35647c66",
+		"name": "Teacher Parent connect API",
+		"description": "API documentation for the Teacher API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39727898"
+	},
+	"item": [
+		{
+			"name": "Get Teachers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/teachers",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"teachers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Teacher",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/teachers/550e8400-e29b-41d4-a716-446655440000",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"teachers",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Teacher",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\",\n  \"age\": 30,\n  \"gender\": \"male\",\n  \"addressLine1\": \"123 Main St\",\n  \"addressCity\": \"Anytown\",\n  \"addressState\": \"Anystate\",\n  \"pinCode\": 123456,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"1234567890\",\n  \"upiId\": \"john@upi\",\n  \"accountNumber\": \"1234567890\",\n  \"accountName\": \"John Doe\",\n  \"ifscCode\": \"IFSC0001234\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/teachers",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"teachers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Teacher",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\",\n  \"age\": 30,\n  \"gender\": \"male\",\n  \"addressLine1\": \"123 Main St\",\n  \"addressCity\": \"Anytown\",\n  \"addressState\": \"Anystate\",\n  \"pinCode\": 123456,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"email\": \"john.doe@example.com\",\n  \"phoneNumber\": \"1234567890\",\n  \"upiId\": \"john@upi\",\n  \"accountNumber\": \"1234567890\",\n  \"accountName\": \"John Doe\",\n  \"ifscCode\": \"IFSC0001234\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/teachers/550e8400-e29b-41d4-a716-446655440000",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"teachers",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Teacher",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/teachers/550e8400-e29b-41d4-a716-446655440000",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"teachers",
+						"550e8400-e29b-41d4-a716-446655440000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Batch by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/batches/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batches",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "123e4567-e89b-12d3-a456-426614174000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Batches by Teacher ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/batches/teacher/:teacherId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batches",
+						"teacher",
+						":teacherId"
+					],
+					"variable": [
+						{
+							"key": "teacherId",
+							"value": "12345"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Batch",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Math 101\",\n  \"course\": \"Mathematics\",\n  \"subject\": \"Algebra\",\n  \"description\": \"An introductory course to Algebra covering basic concepts and problem-solving techniques.\",\n  \"paymentFrequency\": \"Monthly\",\n  \"paymentAmount\": 150.00,\n  \"paymentDayOfMonth\": 15\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/batches",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batches"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Batch",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Math 101\",\n  \"course\": \"Mathematics\",\n  \"subject\": \"Algebra\",\n  \"description\": \"An introductory course to Algebra covering basic concepts and problem-solving techniques.\",\n  \"paymentFrequency\": \"Monthly\",\n  \"paymentAmount\": 150.00,\n  \"paymentDayOfMonth\": 15\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/batches/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batches",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "123e4567-e89b-12d3-a456-426614174000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Student to Batch",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/batches/:batchId/student/:studentId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batches",
+						":batchId",
+						"student",
+						":studentId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": "693c651c-206f-450b-aaa2-a36b5004f7dd"
+						},
+						{
+							"key": "studentId",
+							"value": "ea894b5e-8c13-48c4-902b-8294b88b69f8"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Batch",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/batches/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batches",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "123e4567-e89b-12d3-a456-426614174000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Students",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/students",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"students"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Student by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/students/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"students",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Students by batch ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/students/batch/:batchId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"students",
+						"batch",
+						":batchId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Student",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"age\": 16,\n  \"addressLine1\": \"456 Elm St\",\n  \"addressCity\": \"Othertown\",\n  \"addressState\": \"Otherstate\",\n  \"pinCode\": 654321,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"gender\": \"female\",\n  \"parent1Name\": \"John Doe\",\n  \"parent1Phone\": \"9876543210\",\n  \"parent1Email\": \"john.doe@example.com\",\n  \"parent2Name\": \"Mary Doe\",\n  \"parent2Phone\": \"0123456789\",\n  \"parent2Email\": \"mary.doe@example.com\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/students",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"students"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Student",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"age\": 16,\n  \"addressLine1\": \"456 Elm St\",\n  \"addressCity\": \"Othertown\",\n  \"addressState\": \"Otherstate\",\n  \"pinCode\": 654321,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"gender\": \"female\",\n  \"parent1Name\": \"John Doe\",\n  \"parent1Phone\": \"9876543210\",\n  \"parent1Email\": \"john.doe@example.com\",\n  \"parent2Name\": \"Mary Doe\",\n  \"parent2Phone\": \"0123456789\",\n  \"parent2Email\": \"mary.doe@example.com\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/students/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"students",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Student",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/students/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"students",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Messages for Batch",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}messages/batch/:batchId",
+					"host": [
+						"{{base_url}}messages"
+					],
+					"path": [
+						"batch",
+						":batchId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Messages for Student in Batch",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/messages/batch/:batchId/student/:studentId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"messages",
+						"batch",
+						":batchId",
+						"student",
+						":studentId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": "1"
+						},
+						{
+							"key": "studentId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Message by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/messages/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"messages",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Message",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"subject\": \"Follow Up\",\n  \"content\": \"Just checking in to see how you are doing.\",\n  \"sender\": \"admin@example.com\",\n  \"receiver\": \"user@example.com\",\n  \"timestamp\": \"2024-12-24T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/messages",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"messages"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Reply to Message",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"content\": \"I am doing well, thank you!\",\n  \"sender\": \"user@example.com\",\n  \"timestamp\": \"2024-12-25T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/messages/:id/reply",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"messages",
+						":id",
+						"reply"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Message",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/messages/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"messages",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get FeeRecords by Batch and Student",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/fee-records/batch/550e8400-e29b-41d4-a716-446655440000/student/550e8400-e29b-41d4-a716-446655440001",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"fee-records",
+						"batch",
+						"550e8400-e29b-41d4-a716-446655440000",
+						"student",
+						"550e8400-e29b-41d4-a716-446655440001"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get FeeRecord by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"fee-records",
+						"d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create FeeRecord",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"batchId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"studentId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"dueDate\": \"2024-12-31T23:59:59.999Z\",\n  \"paymentDate\": \"2024-12-25T12:34:56.789Z\",\n  \"amount\": 1500.00,\n  \"status\": \"paid\",\n  \"notes\": \"Payment received in full.\",\n  \"attachmentUrl\": \"http://example.com/receipt.pdf\",\n  \"teacherAcknowledgement\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/fee-records",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"fee-records"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update FeeRecord",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"dueDate\": \"2024-12-31T23:59:59.999Z\",\n  \"paymentDate\": \"2024-12-25T12:34:56.789Z\",\n  \"status\": \"paid\",\n  \"notes\": \"Payment received in full.\",\n  \"attachmentUrl\": \"http://example.com/receipt.pdf\",\n  \"teacherAcknowledgement\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"fee-records",
+						"d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete FeeRecord",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"fee-records",
+						"d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assignment by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/assignments/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assignments by Batch ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/assignments/batch/:batchId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						"batch",
+						":batchId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Assignments by Batch ID and Student ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/assignments/batch/:batchId/student/:studentId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						"batch",
+						":batchId",
+						"student",
+						":studentId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": ""
+						},
+						{
+							"key": "studentId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Assignment",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"publishDate\": \"2024-01-01T00:00:00.000Z\",\n  \"submissionDate\": \"2024-01-15T23:59:59.999Z\",\n  \"batchId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"studentId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"title\": \"Math Assignment 1\",\n  \"details\": \"Solve the algebra problems in the attached document.\",\n  \"attachmentUrls\": [\n    \"http://example.com/assignment1.pdf\",\n    \"http://example.com/assignment2.pdf\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/assignments",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Assignment",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"publishDate\": \"2024-01-01T00:00:00.000Z\",\n  \"submissionDate\": \"2024-01-15T23:59:59.999Z\",\n  \"batchId\": \"550e8400-e29b-41d4-a716-446655440000\",\n  \"studentId\": \"550e8400-e29b-41d4-a716-446655440001\",\n  \"title\": \"Math Assignment 1\",\n  \"details\": \"Solve the algebra problems in the attached document.\",\n  \"attachmentUrls\": [\n    \"http://example.com/assignment1.pdf\",\n    \"http://example.com/assignment2.pdf\"\n  ]\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/assignments/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Assignment",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/assignments/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"assignments",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Teacher",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/login/teacher",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"login",
+						"teacher"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Student",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userName\": \"johndoe\",\n  \"password\": \"password123\"\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/login/student",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"login",
+						"student"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload File",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": [
+								"",
+								"/Users/sk/Documents/Screenshot 2024-12-24 at 10.26.08 AM.png"
+							]
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}/uploads",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"uploads"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Teacher Notifications",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/notifications/teachers/:teacherId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"notifications",
+						"teachers",
+						":teacherId"
+					],
+					"variable": [
+						{
+							"key": "teacherId",
+							"value": "sample-teacher-id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark Teacher Notification as Seen",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/notifications/teachers/:notificationId/seen",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"notifications",
+						"teachers",
+						":notificationId",
+						"seen"
+					],
+					"variable": [
+						{
+							"key": "notificationId",
+							"value": "sample-notification-id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Student Notifications",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/notifications/students/:studentId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"notifications",
+						"students",
+						":studentId"
+					],
+					"variable": [
+						{
+							"key": "studentId",
+							"value": "sample-student-id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mark Student Notification as Seen",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/notifications/students/:notificationId/seen",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"notifications",
+						"students",
+						":notificationId",
+						"seen"
+					],
+					"variable": [
+						{
+							"key": "notificationId",
+							"value": "sample-notification-id"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notes batch",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/notes/batch/:batchId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notes",
+						"batch",
+						":batchId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notes student",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/notes/student/:batchId",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notes",
+						"student",
+						":batchId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notes",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"publishDate\": \"2024-12-31\",\r\n  \"description\": \"This is a valid description.\",\r\n  \"listUrls\": [\r\n    \"http://example.com/resource1.pdf\",\r\n    \"http://example.com/resource2.pdf\"\r\n  ]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_ur}l}/notes",
+					"host": [
+						"{{base_ur}l}"
+					],
+					"path": [
+						"notes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notes id",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/notes/:id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notes",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "notes id1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/notes/:id",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"notes",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "",
+			"type": "default"
+		}
+	]
 }
