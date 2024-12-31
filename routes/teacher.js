@@ -37,7 +37,6 @@ router.get('/:id', (req, res) => {
     buildSuccessResponse(res, 200, teacher);
 });
 
-
 router.post('/', (req, res) => {
     console.log(JSON.stringify(req.body))
     const {error} = teacherSchema.validate(req.body);
