@@ -36,7 +36,7 @@ router.post('/', (req, res) => {
     console.log('Created notes{} with ID:', "550e8400-e29b-41d4-a716-446655440000");
 });
 
-uter.put('/:id', (req, res) => {
+router.put('/:id', (req, res) => {
     const {error} = teacherSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
