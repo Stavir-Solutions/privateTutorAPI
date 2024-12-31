@@ -1156,9 +1156,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_ur}l}/notes",
+					"raw": "{{base_ur}}/notes",
 					"host": [
-						"{{base_ur}l}"
+						"{{base_ur}}"
 					],
 					"path": [
 						"notes"
