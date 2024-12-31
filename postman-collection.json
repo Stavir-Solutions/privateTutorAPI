@@ -1084,11 +1084,10 @@
 				},
 				"url": {
 					"raw": "{{base_url}}/notes/batch/:batchId",
-					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
+
 					"path": [
 						"notes",
 						"batch",
@@ -1123,11 +1122,10 @@
 				},
 				"url": {
 					"raw": "{{base_url}}/notes/student/:batchId",
-					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
+				
 					"path": [
 						"notes",
 						"student",
@@ -1185,11 +1183,9 @@
 				},
 				"url": {
 					"raw": "{{base_url}}/notes/:id",
-					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						":id"
@@ -1220,11 +1216,9 @@
 				},
 				"url": {
 					"raw": "{{base_url}}/notes/:id",
-					"protocol": "http",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						":id"
