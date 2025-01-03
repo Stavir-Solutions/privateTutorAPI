@@ -1,4 +1,5 @@
 const express = require('express');
+require('dotenv').config();
 const serverless = require('serverless-http');
 const teacherRoutes = require('./routes/teacher');
 const batchRoutes = require('./routes/batch');
