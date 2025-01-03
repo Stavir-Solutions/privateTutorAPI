@@ -16,6 +16,37 @@ async function create(teacher) {
     return teacherEntity.Item.id;
 }
 
+async function update(teacherId, teacherFields) {
+    const updateExpression = [];
+    const expressionAttributeNames = {};
+    const expressionAttributeValues = {};
+
+    console.log("Updating teacher fields", teacherFields);
+    for (const [key, value] of Object.entries(teacherFields)) {
+        updateExpression.push(`#${key} = :${key}`);
+        expressionAttributeNames[`#${key}`] = key;
+        expressionAttributeValues[`:${key}`] = value;
+    }
+
+    const params = {
+        TableName: tableName,
+        Key: {id: teacherId},
+        UpdateExpression: `SET ${updateExpression.join(', ')}`,
+        ExpressionAttributeNames: expressionAttributeNames,
+        ExpressionAttributeValues: expressionAttributeValues,
+        ReturnValues: 'UPDATED_NEW'
+    };
+
+    try {
+        const data = await db.update(params).promise();
+        console.log('Update succeeded:', JSON.stringify(data, null, 2));
+        return data.Attributes;
+    } catch (err) {
+        console.error('Unable to update teacher. Error JSON:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
+
 async function getById(teacherId) {
     const params = {
         TableName: tableName, Key: {
@@ -65,5 +96,5 @@ async function deleteById(teacherId) {
 }
 
 
-module.exports = {create, getById, getAll, deleteById}
+module.exports = {create, getById, getAll, deleteById, update}
 
