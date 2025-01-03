@@ -1,5 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
+const {createTeacher} = require('../services/teacherService');
 
 const router = express.Router();
 const Joi = require('joi');
@@ -46,8 +47,9 @@ router.post('/', (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('creating teacher {}', req.body);
-    buildSuccessResponse(res, 200, '{"id":"550e8400-e29b-41d4-a716-446655440000"}')
-    console.log('created teacher {}', "550e8400-e29b-41d4-a716-446655440000");
+    let teacherId = createTeacher(req.body)
+    buildSuccessResponse(res, 200, '{"id":"' + teacherId + '"}')
+    console.log('created teacher {}', teacherId);
 });
 
 
