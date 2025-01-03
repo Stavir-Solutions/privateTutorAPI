@@ -3,7 +3,7 @@ const db = require('../db/dynamodb');
 
 const tableName = "Teachers";
 
-async function createTeacher(teacher) {
+async function create(teacher) {
     let teacherEntity = toTeacherEntity(teacher);
     console.log('converted to entity ', teacherEntity);
     await db.put(teacherEntity, function (err, data) {
@@ -16,7 +16,7 @@ async function createTeacher(teacher) {
     return teacherEntity.Item.id;
 }
 
-async function getTeacherById(teacherId) {
+async function getById(teacherId) {
     const params = {
         TableName: tableName, Key: {
             id: teacherId,
@@ -32,7 +32,7 @@ async function getTeacherById(teacherId) {
     }
 }
 
-async function getAllTeachers() {
+async function getAll() {
     const params = {
         TableName: tableName,
     };
@@ -47,5 +47,23 @@ async function getAllTeachers() {
     }
 }
 
-module.exports = {createTeacher, getTeacherById, getAllTeachers}
+async function deleteById(teacherId) {
+    const params = {
+        TableName: tableName, Key: {
+            id: teacherId,
+        },
+    };
+
+    try {
+        const data = await db.delete(params).promise();
+        console.log('delete result', data);
+        return {};
+    } catch (err) {
+        console.error('Unable to delete teacher. Error JSON:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
+
+
+module.exports = {create, getById, getAll, deleteById}
 

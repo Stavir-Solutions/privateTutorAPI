@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {createTeacher, getTeacherById, getAllTeachers} = require('../services/teacherService');
+const {create, getById, getAll, deleteById} = require('../services/teacherService');
 
 const router = express.Router();
 const Joi = require('joi');
@@ -31,13 +31,13 @@ var teacher = '{' + '  "id": "550e8400-e29b-41d4-a716-446655440000",\n' + '  "fi
 
 
 router.get('/', async (req, res) => {
-    teachers = await getAllTeachers(req.params.id);
+    teachers = await getAll(req.params.id);
     console.log('teachers ', teachers);
     buildSuccessResponse(res, 200, teachers);
 });
 
 router.get('/:id', async (req, res) => {
-    teacher = await getTeacherById(req.params.id);
+    teacher = await getById(req.params.id);
     console.log('teacher by id ', teacher);
     buildSuccessResponse(res, 200, teacher);
 });
@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('creating teacher {}', req.body);
-    let teacherId = await createTeacher(req.body)
+    let teacherId = await create(req.body)
     buildSuccessResponse(res, 200, '{"id":"' + teacherId + '"}')
     console.log('created teacher {}', teacherId);
 });
@@ -71,8 +71,9 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
     console.log('Deleting teacher with id {}', req.params.id);
-    buildSuccessResponse(res, 200, '{}')
-    console.log('deleted teacher {}', "550e8400-e29b-41d4-a716-446655440000");
+    let response = deleteById(req.params.id);
+    buildSuccessResponse(res, 200, response)
+    console.log('deleted teacher {}', req.params.id);
 });
 
 
