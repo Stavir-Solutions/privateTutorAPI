@@ -16,7 +16,14 @@ To test your APIs locally with serverless, you can use the serverless-offline pl
    npm install serverless-offline --save-dev
    ```
 
-2. Start your server locally using the serverless-offline command:  
+2. create .env file and configure the folling AWS credentials
+```
+accessKeyId=KEY
+secretAccessKey=KEY
+region=us-east-1
+endpoint=https://587611035364.ddb.us-east-1.amazonaws.com
+```
+3. Start your server locally using the serverless-offline command:  
    ```bash
    npx serverless offline --noPrependStageInUrl
    ```
