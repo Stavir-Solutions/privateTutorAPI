@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {createTeacher} = require('../services/teacherService');
+const {createTeacher, getTeacherById, getAllTeachers} = require('../services/teacherService');
 
 const router = express.Router();
 const Joi = require('joi');
@@ -30,16 +30,20 @@ const teacherSchema = Joi.object({
 var teacher = '{' + '  "id": "550e8400-e29b-41d4-a716-446655440000",\n' + '  "firstName": "John",\n' + '  "lastName": "Doe",\n' + '  "userName": "johndoe",\n' + '  "password": "password123",\n' + '  "age": 30,\n' + '  "gender": "male",\n' + '  "addressLine1": "123 Main St",\n' + '  "addressCity": "Anytown",\n' + '  "addressState": "Anystate",\n' + '  "pinCode": 123456,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "email": "john.doe@example.com",\n' + '  "phoneNumber": "1234567890",\n' + '  "upiId": "john@upi",\n' + '  "accountNumber": "1234567890",\n' + '  "accountName": "John Doe",\n' + '  "ifscCode": "IFSC0001234"\n' + '}';
 
 
-router.get('/', (req, res) => {
-    buildSuccessResponse(res, 200, '[' + teacher + ']');
+router.get('/', async (req, res) => {
+    teachers = await getAllTeachers(req.params.id);
+    console.log('teachers ', teachers);
+    buildSuccessResponse(res, 200, teachers);
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
+    teacher = await getTeacherById(req.params.id);
+    console.log('teacher by id ', teacher);
     buildSuccessResponse(res, 200, teacher);
 });
 
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     console.log(JSON.stringify(req.body))
     const {error} = teacherSchema.validate(req.body);
     if (error) {
@@ -47,7 +51,7 @@ router.post('/', (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('creating teacher {}', req.body);
-    let teacherId = createTeacher(req.body)
+    let teacherId = await createTeacher(req.body)
     buildSuccessResponse(res, 200, '{"id":"' + teacherId + '"}')
     console.log('created teacher {}', teacherId);
 });
