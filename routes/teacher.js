@@ -25,7 +25,7 @@ const teacherSchema = Joi.object({
     accountName: Joi.string().required(),
     ifscCode: Joi.string().required()
 
-});
+}).unknown(false);
 
 const teacherUpdateSchema = Joi.object({
     firstName: Joi.string().optional(),
@@ -50,7 +50,7 @@ const teacherUpdateSchema = Joi.object({
     'firstName', 'lastName', 'userName', 'password', 'age', 'gender', 'addressLine1',
     'addressCity', 'addressState', 'pinCode', 'profilePicUrl', 'phoneNumber',
     'upiId', 'accountNumber', 'accountName', 'ifscCode'
-);
+).unknown(false);
 
 
 var teacher = '{' + '  "id": "550e8400-e29b-41d4-a716-446655440000",\n' + '  "firstName": "John",\n' + '  "lastName": "Doe",\n' + '  "userName": "johndoe",\n' + '  "password": "password123",\n' + '  "age": 30,\n' + '  "gender": "male",\n' + '  "addressLine1": "123 Main St",\n' + '  "addressCity": "Anytown",\n' + '  "addressState": "Anystate",\n' + '  "pinCode": 123456,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "email": "john.doe@example.com",\n' + '  "phoneNumber": "1234567890",\n' + '  "upiId": "john@upi",\n' + '  "accountNumber": "1234567890",\n' + '  "accountName": "John Doe",\n' + '  "ifscCode": "IFSC0001234"\n' + '}';

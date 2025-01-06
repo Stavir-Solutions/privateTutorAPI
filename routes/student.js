@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getById, getAll, deleteById, update, getByBatchId} = require('../services/studentService');
+const {create, getStudentById, getAll, deleteById, updateStudent, getByBatchId} = require('../services/studentService');
 
 const router = express.Router();
 const Joi = require('joi');
@@ -23,7 +23,7 @@ const studentSchema = Joi.object({
     parent2Phone: Joi.string().pattern(/^[0-9]{10}$/).required(),
     parent2Email: Joi.string().email().optional(),
     batches: Joi.array().items(Joi.string()).optional()
-});
+}).unknown(false);
 
 const studentUpdateSchema = Joi.object({
     firstName: Joi.string().max(50).optional(),
@@ -46,7 +46,7 @@ const studentUpdateSchema = Joi.object({
     'firstName', 'lastName', 'age', 'addressLine1', 'addressCity', 'addressState', 'pinCode',
     'profilePicUrl', 'gender', 'parent1Name', 'parent1Phone', 'parent1Email', 'parent2Name',
     'parent2Phone', 'parent2Email', 'batches'
-);
+).unknown(false);
 
 var student = '{' + '  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '  "firstName": "Jane",\n' + '  "lastName": "Doe",\n' + '  "age": 16,\n' + '  "addressLine1": "456 Elm St",\n' + '  "addressCity": "Othertown",\n' + '  "addressState": "Otherstate",\n' + '  "pinCode": 654321,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "gender": "female",\n' + '  "parent1Name": "John Doe",\n' + '  "parent1Phone": "9876543210",\n' + '  "parent1Email": "john.doe@example.com",\n' + '  "parent2Name": "Mary Doe",\n' + '  "parent2Phone": "0123456789",\n' + '  "parent2Email": "mary.doe@example.com"' + '}';
 
@@ -57,7 +57,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-    student = await getById(req.params.id);
+    student = await getStudentById(req.params.id);
     console.log('student by id ', student);
     buildSuccessResponse(res, 200, student);
 });
@@ -89,7 +89,7 @@ router.put('/:id', async (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('updating student {}', req.body);
-    let updateResult = update(req.params.id, req.body);
+    let updateResult = updateStudent(req.params.id, req.body);
     buildSuccessResponse(res, 200, updateResult)
     console.log('updated student {}', req.params.id);
 });
