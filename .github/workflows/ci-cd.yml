@@ -1,9 +1,9 @@
-name: Deploy to dev
+name: Deploy to mvp environment
 
 on:
   push:
     branches:
-      - dev
+      - mvp  
 
 jobs:
   deploy:
@@ -25,7 +25,7 @@ jobs:
 
      
       - name: Create Lambda deployment package
-        run: zip -r DEVArchive.zip . 
+        run: zip -r MVPArchive.zip . 
 
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v3
@@ -37,11 +37,11 @@ jobs:
      
       - name: Upload package to S3
         run: |
-          aws s3 cp DEVArchive.zip s3://private-teacher-api-release/DEVArchive.zip 
+          aws s3 cp Archive.zip s3://private-teacher-api-release/MVPArchive.zip 
      
       - name: Deploy to Lambda using S3
         run: |
           aws lambda update-function-code \
-            --function-name privateTutorAPIDevLambda  \
+            --function-name privateTutorAPIs \
             --s3-bucket private-teacher-api-release \
             --s3-key MVPArchive.zip 
