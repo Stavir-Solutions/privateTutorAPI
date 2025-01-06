@@ -1083,12 +1083,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/notes/batch/:batchId",
-					"protocol": "http",
+					"raw": "{{base_url}}/notes/batch/:batchId",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						"batch",
@@ -1122,12 +1120,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/notes/student/:batchId",
-					"protocol": "http",
+					"raw": "{{base_url}}/notes/student/:batchId",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						"student",
@@ -1150,7 +1146,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"publishDate\": \"2024-12-31\",\r\n  \"description\": \"This is a valid description.\",\r\n  \"listUrls\": [\r\n    \"http://example.com/resource1.pdf\",\r\n    \"http://example.com/resource2.pdf\"\r\n  ]\r\n}\r\n",
+					"raw": "{\r\n    \"publishDate\": \"2024-01-01T00:00:00.000Z\",\r\n    \"Title\": \"This is a new note .\",\r\n    \"listUrls\": [\r\n        \"http://example.com/resource1.pdf\",\r\n        \"http://example.com/resource2.pdf\"\r\n    ],\r\n    \"content\": \"This is the content of the new note, providing detailed information.\",\r\n    \"studentId\": \"1e4567-e89b-12d3-a456-42661417\",  \r\n    \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"     \r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1158,9 +1154,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_ur}l}/notes",
+					"raw": "{{base_ur}}/notes",
 					"host": [
-						"{{base_ur}l}"
+						"{{base_ur}}"
 					],
 					"path": [
 						"notes"
@@ -1176,7 +1172,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\r\n    \"publishDate\": \"2024-01-01T00:00:00.000Z\",\r\n    \"Title\": \"This is a new note .\",\r\n    \"listUrls\": [\r\n        \"http://example.com/resource1.pdf\",\r\n        \"http://example.com/resource2.pdf\"\r\n    ],\r\n    \"content\": \"This is the content of the new note, providing detailed information.\",\r\n    \"studentId\": \"1e4567-e89b-12d3-a456-42661417\",  \r\n    \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"     \r\n}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1184,12 +1180,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/notes/:id",
-					"protocol": "http",
+					"raw": "{{base_url}}/notes/:id",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						":id"
@@ -1219,12 +1213,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/notes/:id",
-					"protocol": "http",
+					"raw": "{{base_url}}/notes/:id",
 					"host": [
-						"localhost"
+						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						":id"
