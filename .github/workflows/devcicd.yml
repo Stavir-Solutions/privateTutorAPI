@@ -20,16 +20,16 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "API_KEY=${{ secrets.API_KEY }}" >> config/index.env
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> config/index.env
-          echo "DB_USER=${{ secrets.DB_USER }}" >> config/index.env
-          echo "DB_PASS=${{ secrets.DB_PASS }}" >> config/index.env
+          echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> .env
+          echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
+          echo "REGION=us-east-1" >> .env
+          echo "ENDPOINT=https://587611035364.ddb.us-east-1.amazonaws.com" >> .env
 
       - name: Install dependencies
         run: npm install
 
       - name: Create Lambda deployment package
-        run: zip -r DEVArchive.zip . 
+        run: zip -r DEVArchive.zip . -x ".git/*" -x "node_modules/*" -x ".env"
 
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v3
@@ -37,7 +37,7 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
+          
       - name: Upload package to S3 and deploy to Lambda
         run: |
           aws s3 cp DEVArchive.zip s3://private-teacher-api-release/DEVArchive.zip
