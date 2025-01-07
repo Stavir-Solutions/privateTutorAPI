@@ -1,11 +1,7 @@
 const {toTeacherEntity} = require('../db/mappers/teacherMapper');
 const db = require('../db/dynamodb');
 const {
-    PutItemCommand,
-    UpdateItemCommand,
-    GetItemCommand,
-    ScanCommand,
-    DeleteItemCommand
+    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
