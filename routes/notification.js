@@ -66,6 +66,7 @@ router.get('/students/:studentId', (req, res) => {
 });
 
 router.patch('/students/:notificationId/seen', (req, res) => {
+
     buildSuccessResponse(res, 200, studentNotifications);
     console.log('student notification {} is marked as seen', req.params.notificationId);
 });

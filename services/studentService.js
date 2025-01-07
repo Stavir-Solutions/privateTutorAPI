@@ -1,20 +1,31 @@
 const {toStudentEntity} = require('../db/mappers/studentMapper');
 const db = require('../db/dynamodb');
+const {
+    PutItemCommand,
+    UpdateItemCommand,
+    GetItemCommand,
+    ScanCommand,
+    DeleteItemCommand
+} = require('@aws-sdk/client-dynamodb');
+const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
+
 
 const tableName = "Students";
 
 async function create(student) {
     let studentEntity = toStudentEntity(student);
     console.log('converted to entity ', studentEntity);
-    await db.put(studentEntity, function (err, data) {
+
+    await db.send(new PutItemCommand(studentEntity, function (err, data) {
         if (err) {
             console.error('Unable to add teacher. Error JSON:', JSON.stringify(err, null, 2));
         } else {
             console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
         }
-    });
-    return studentEntity.Item.id;
+    }));
+    return unmarshall(studentEntity.Item).id;
 }
+
 
 async function updateStudent(studentId, studentFields) {
     const updateExpression = [];
@@ -25,22 +36,27 @@ async function updateStudent(studentId, studentFields) {
     for (const [key, value] of Object.entries(studentFields)) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
-        expressionAttributeValues[`:${key}`] = value;
+        if (Array.isArray(value)) {
+            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
+        } else {
+            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
+        }
     }
 
     const params = {
         TableName: tableName,
-        Key: {id: studentId},
+        Key: marshall({ id: studentId }),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
-        ReturnValues: 'UPDATED_NEW'
+        ReturnValues: 'UPDATED_NEW',
     };
 
+    console.log('update params ', params);
     try {
-        const data = await db.update(params).promise();
+        const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return data.Attributes;
+        return unmarshall(data.Attributes);
     } catch (err) {
         console.error('Unable to update student. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
@@ -49,32 +65,28 @@ async function updateStudent(studentId, studentFields) {
 
 async function getStudentById(studentId) {
     const params = {
-        TableName: tableName, Key: {
-            id: studentId,
-        },
+        TableName: tableName, Key: marshall({id: studentId}),
     };
 
     try {
-        const data = await db.get(params).promise();
-        return data.Item;
+        const data = await db.send(new GetItemCommand(params));
+        return data.Item ? unmarshall(data.Item) : {};
     } catch (err) {
-        console.error('Unable to get teacher. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to get student. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
 
 async function getByBatchId(batchId) {
-    var params = {
-        TableName : tableName,
-        FilterExpression: "contains (batches, :batchId)",
-        ExpressionAttributeValues : {
-            ':batchId' : batchId
-        }
+    const params = {
+        TableName: tableName, FilterExpression: "contains (batches, :batchId)", ExpressionAttributeValues: {
+            ':batchId': marshall(batchId),
+        },
     };
 
     try {
-        const data = await db.scan(params).promise();
-        return data.Items;
+        const data = await db.send(new ScanCommand(params));
+        return data.Items.map(item => unmarshall(item));
     } catch (err) {
         console.error('Unable to get student by batch. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
@@ -87,24 +99,22 @@ async function getAll() {
     };
 
     try {
-        const data = await db.scan(params).promise();
+        const data = await db.send(new ScanCommand(params));
         console.log('scan result', data);
-        return data.Items;
+        return data.Items.map(item => unmarshall(item));
     } catch (err) {
-        console.error('Unable to get student. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to get students. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
 
 async function deleteById(studentId) {
     const params = {
-        TableName: tableName, Key: {
-            id: studentId,
-        },
+        TableName: tableName, Key: marshall({id: studentId}),
     };
 
     try {
-        const data = await db.delete(params).promise();
+        const data = await db.send(new DeleteItemCommand(params));
         console.log('delete result', data);
         return {};
     } catch (err) {
