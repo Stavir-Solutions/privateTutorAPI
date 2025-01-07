@@ -10,6 +10,7 @@ plugins:
 functions:
   app:
     handler: index.handler
+    timeout: 120  # Timeout in seconds
     events:
       - http:
           path: /

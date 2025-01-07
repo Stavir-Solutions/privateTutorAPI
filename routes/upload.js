@@ -1,47 +1,42 @@
 const express = require('express');
 const multer = require('multer');
-const multerS3 = require('multer-s3');
-const AWS = require('aws-sdk');
+const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
+const {NodeHttpHandler} = require('@aws-sdk/node-http-handler');
 const router = express.Router();
 router.use(express.json());
 
-// Configure AWS SDK
-// AWS.config.update({
-//     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//     region: process.env.AWS_REGION
-// });
+const s3Config = {
+    region: process.env.region, credentials: {
+        accessKeyId: process.env.accessKeyId, secretAccessKey: process.env.secretAccessKey,
+    }, requestHandler: new NodeHttpHandler({
+        connectionTimeout: 60000, // 5 minutes
+        socketTimeout: 60000, // 5 minutes
+    }),
+};
 
-// const s3 = new AWS.S3();
+const s3Client = new S3Client(s3Config);
 
-// Configure multer storage to use S3
-// const upload = multer({
-//     storage: multerS3({
-//         s3: s3,
-//         bucket: process.env.S3_BUCKET_NAME,
-//         acl: 'public-read',
-//         metadata: function (req, file, cb) {
-//             cb(null, { fieldName: file.fieldname });
-//         },
-//         key: function (req, file, cb) {
-//             cb(null, Date.now().toString() + path.extname(file.originalname));
-//         }
-//     })
-// });
+const upload = multer({
+    storage: multer.memoryStorage(), limits: {
+        fileSize: 10 * 1024 * 1024, // limit file size to 10MB
+    },
+});
 
-// Upload route actual
-// router.post('/upload', upload.single('file'), (req, res) => {
-//     if (!req.file) {
-//         return res.status(400).send('No file uploaded.');
-//     }
-//     const fileUri = req.file.location;
-//     res.json({ uri: fileUri });
-// });
+router.post('/', upload.single('file'), async (req, res) => {
+    const params = {
+        Bucket: process.env.s3BucketName, Key: req.file.originalname, Body: req.file.buffer,
+    };
 
-// Upload route dummy
-router.post('/', (req, res) => {
-    console.log('file uploaded');
-    res.json({ uri: 'https://example-bucket.s3.us-west-2.amazonaws.com/sample-file.png' });
+    try {
+        console.log('upload ', params)
+        let response = await s3Client.send(new PutObjectCommand(params));
+        console.log('File uploaded ', response);
+        const fileUrl = `https://${params.Bucket}.s3.${process.env.region}.amazonaws.com/${encodeURIComponent(params.Key)}`;
+        res.send({'url': fileUrl});
+    } catch (err) {
+        console.error('Error:', err);
+        res.status(500).send('Error uploading file or creating DynamoDB record');
+    }
 });
 
 module.exports = router;

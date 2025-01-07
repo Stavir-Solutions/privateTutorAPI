@@ -1,8 +1,10 @@
 const {generateUUID} = require('../UUIDGenerator');
+const {marshall} = require('@aws-sdk/util-dynamodb');
+
 
 function toBatchEntity(batch) {
     return {
-        TableName: 'Batches', Item: {
+        TableName: 'Batches', Item: marshall({
             id: generateUUID(),
             teacherId: batch.teacherId,
             name: batch.name,
@@ -12,9 +14,9 @@ function toBatchEntity(batch) {
             paymentFrequency: batch.paymentFrequency,
             paymentAmount: batch.paymentAmount,
             paymentDayOfMonth: batch.paymentDayOfMonth
-        }
+        })
     };
 }
 
-module.exports = { toBatchEntity }
+module.exports = {toBatchEntity}
 

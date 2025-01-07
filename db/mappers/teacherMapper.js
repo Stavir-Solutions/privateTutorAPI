@@ -1,8 +1,9 @@
 const {generateUUID} = require('../UUIDGenerator');
+const { marshall } = require('@aws-sdk/util-dynamodb');
 
 function toTeacherEntity(teacher) {
     return {
-        TableName: 'Teachers', Item: {
+        TableName: 'Teachers', Item: marshall({
             id: generateUUID(), // Generate a unique ID for the teacher
             firstName: teacher.firstName,
             lastName: teacher.lastName,
@@ -21,7 +22,7 @@ function toTeacherEntity(teacher) {
             accountNumber: teacher.accountNumber,
             accountName: teacher.accountName,
             ifscCode: teacher.ifscCode
-        }
+        })
     };
 }
 

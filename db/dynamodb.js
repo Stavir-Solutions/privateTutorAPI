@@ -1,12 +1,11 @@
-var AWS = require('aws-sdk');
+const {DynamoDBClient} = require('@aws-sdk/client-dynamodb');
 
-AWS.config.update({
-    accessKeyId: process.env.accessKeyId,
-    secretAccessKey: process.env.secretAccessKey,
-    region: process.env.region,
-    endpoint: process.env.endpoint,
-});
+const dynamoConfig = {
+    region: process.env.region, credentials: {
+        accessKeyId: process.env.accessKeyId, secretAccessKey: process.env.secretAccessKey,
+    }, endpoint: process.env.dbendpoint
+};
 
-const db = new AWS.DynamoDB.DocumentClient({convertEmptyValues: true});
+const db = new DynamoDBClient(dynamoConfig);
 
 module.exports = db;
