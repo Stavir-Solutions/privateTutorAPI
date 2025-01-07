@@ -23,8 +23,7 @@ jobs:
           echo "ACCESS_KEY=${{ secrets.ACCESS_KEY }}" >> .env
           echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
           echo "REGION=us-east-1" >> .env
-          echo "ENDPOINT=https://587611035364.ddb.us-east-1.amazonaws.com" >> .env
-
+          echo "endpoint=${{ secrets.AWS_ENDPOINT }}" >> .env
       - name: Install dependencies
         run: npm install
 
