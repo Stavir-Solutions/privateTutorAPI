@@ -25,7 +25,7 @@ jobs:
           echo "REGION=us-east-1" >> .env
           echo "endpoint=${{ secrets.AWS_ENDPOINT }}" >> .env
         shell: bash
-        env: # Use env block to handle secrets securely in shell commands
+        env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
           SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
           AWS_ENDPOINT: ${{ secrets.AWS_ENDPOINT }}
