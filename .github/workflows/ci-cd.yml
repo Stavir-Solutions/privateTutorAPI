@@ -1,10 +1,10 @@
 
-name: Deploy to main
+name: Deploy to stage
 
 on:
   push:
     branches:
-      - main
+      - stage
 
 jobs:
   deploy:
