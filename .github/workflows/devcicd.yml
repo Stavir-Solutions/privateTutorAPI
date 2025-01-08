@@ -32,7 +32,7 @@ jobs:
         run: npm install
 
       - name: Create Lambda deployment package
-        run: zip -r DEVArchive.zip . -x ".git/*" -x "node_modules/*" -x ".env"
+        run: zip -r DEVArchive.zip . 
 
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v3
