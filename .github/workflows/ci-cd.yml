@@ -21,8 +21,8 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "ACCESS_KEY_ID=${{ secrets.accessKeyId }}" >> .env
-          echo "SECRET_ACCESS_KEY=${{ secrets.secretAccessKey }}" >> .env
+          echo "accessKeyId=${{ secrets.ACCESS_KEY_ID }}" >> .env
+          echo "secretAccessKey=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
           echo "region=us-east-1" >> .env
           echo "dbendpoint=${{ secrets.ENDPOINT }}" >> .env
           echo "s3BucketName=private-teacher-data" >> .env
