@@ -21,10 +21,11 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "ACCESS_KEY_ID=${{ secrets.ACCESS_KEY_ID }}" >> .env
-          echo "SECRET_ACCESS_KEY=${{ secrets.SECRET_ACCESS_KEY }}" >> .env
-          echo "REGION=us-east-1" >> .env
-          echo "ENDPOINT=${{ secrets.ENDPOINT }}" >> .env
+          echo "ACCESS_KEY_ID=${{ secrets.accessKeyId }}" >> .env
+          echo "SECRET_ACCESS_KEY=${{ secrets.secretAccessKey }}" >> .env
+          echo "region=us-east-1" >> .env
+          echo "dbendpoint=${{ secrets.ENDPOINT }}" >> .env
+          echo "s3BucketName=private-teacher-data" >> .env
         shell: bash
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
