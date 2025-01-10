@@ -6,7 +6,7 @@ const batchRoutes = require('./routes/batch');
 const studentRoutes = require('./routes/student');
 const messageRoutes = require('./routes/message');
 const feeRecords = require('./routes/feeRecord');
-const assignments = require('./routes/assignment');
+const assignmentsRoutes = require('./routes/assignment');
 const login = require('./routes/login');
 const uploads = require('./routes/upload');
 const notes = require('./routes/notes');
@@ -32,7 +32,7 @@ index.use('/batches', batchRoutes);
 index.use('/students', studentRoutes);
 index.use('/messages', messageRoutes);
 index.use('/fee-records', feeRecords);
-index.use('/assignments', assignments);
+index.use('/assignments', assignmentsRoutes);
 index.use('/login', login)
 index.use('/uploads', uploads)
 index.use('/notes',notes)

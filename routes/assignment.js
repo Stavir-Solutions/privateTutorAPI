@@ -1,5 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
+const {create, getByBatchIdAndStudentId , getById, deleteById, updateAssignment, getByBatchId} = require('../services/assignmentService');
 
 const router = express.Router();
 const Joi = require('joi');
@@ -18,28 +19,34 @@ const assignmentSchema = Joi.object({
 var assigment = '{\n' + '  "id": "e7b8a9c2-4b1e-4d3a-8a1e-2b3b4c5d6e7f",\n' + '  "publishDate": "2024-01-01T00:00:00.000Z",\n' + '  "submissionDate": "2024-01-15T23:59:59.999Z",\n' + '  "batchId": "550e8400-e29b-41d4-a716-446655440000",\n' + '  "studentId": "550e8400-e29b-41d4-a716-446655440001",\n' + '  "title": "Math Assignment 1",\n' + '  "details": "Solve the algebra problems in the attached document.",\n' + '  "attachmentUrls": [\n' + '    "http://example.com/assignment1.pdf",\n' + '    "http://example.com/assignment2.pdf"\n' + '  ]\n' + '}';
 
 
-router.get('/batch/:batchId', (req, res) => {
-    buildSuccessResponse(res, 200, '[' + assigment + ']');
+router.get('/batch/:batchId', async (req, res) => {
+    assigment = await getByBatchId(req.params.batchId);
+    console.log('get assignments by batch ', req.params.batchId)
+    buildSuccessResponse(res, 200, assignment);
 });
 
-router.get('/batch/:batchId/student/:studentId', (req, res) => {
-    buildSuccessResponse(res, 200, '[' + assigment + ']');
+router.get('/batch/:batchId/student/:studentId', async (req, res) => {
+    assigment = await getByBatchIdAndStudentId(req.params.batchId,studentId);
+    console.log('get assignments by batch ', req.params.batchId,studentId)
+    buildSuccessResponse(res, 200, students);
 });
 
-router.get('/:id', (req, res) => {
-    buildSuccessResponse(res, 200, assigment);
+router.get('/:id', async (req, res) => {
+    assigment = await getById(req.params.id);
+    console.log('assignment by id ', assignment);
+    buildSuccessResponse(res, 200, assignment);
 });
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     console.log(JSON.stringify(req.body))
-    const {error} = assignmentSchema.validate(req.body);
+    const {error} = studentSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
     }
-    console.log('creating assigment {}', req.body);
-    buildSuccessResponse(res, 200, '{"id":"e7b8a9c2-4b1e-4d3a-8a1e-2b3b4c5d6e7f"}')
-    console.log('created assigment {}', "e7b8a9c2-4b1e-4d3a-8a1e-2b3b4c5d6e7f");
+    let assignmentId = await create(req.body)
+    buildSuccessResponse(res, 200, '{"id":"' + assignmentId + '"}')
+    console.log('created assignment {}', assignmentId);
 });
 
 
@@ -51,15 +58,20 @@ router.put('/:id', (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('updating assigment {}', req.body);
-    buildSuccessResponse(res, 200, '{}')
-    console.log('updated assigment {}', "e7b8a9c2-4b1e-4d3a-8a1e-2b3b4c5d6e7f");
+    let updateResult = updateAssignment(req.params.id, req.body);
+    buildSuccessResponse(res, 200, updateResult)
+    console.log('updated assigment {}', req.params.id);
 });
+
+   
 
 router.delete('/:id', (req, res) => {
     console.log('Deleting assigment with id {}', req.params.id);
-    buildSuccessResponse(res, 200, '{}')
-    console.log('deleted assigment {}', "e7b8a9c2-4b1e-4d3a-8a1e-2b3b4c5d6e7f");
+    let response = deleteById(req.params.id);
+    buildSuccessResponse(res, 200, this.response)
+    console.log('deleted assigment {}', req.params.id );
 });
 
+   
 
 module.exports = router;
