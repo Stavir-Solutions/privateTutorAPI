@@ -28,7 +28,7 @@ router.get('/batch/:batchId', async (req, res) => {
 router.get('/batch/:batchId/student/:studentId', async (req, res) => {
     assigment = await getByBatchIdAndStudentId(req.params.batchId,studentId);
     console.log('get assignments by batch ', req.params.batchId,studentId)
-    buildSuccessResponse(res, 200, students);
+    buildSuccessResponse(res, 200, assignment);
 });
 
 router.get('/:id', async (req, res) => {
@@ -51,7 +51,7 @@ router.post('/', async (req, res) => {
 
 
 /* API to update the assigment */
-router.put('/:id', (req, res) => {
+router.put('/:id',(req, res) => {
     const {error} = assignmentSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
