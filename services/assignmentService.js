@@ -81,26 +81,6 @@ async function getByBatchIdAndStudentId(batchId, studentId) {
         throw err;
     }
 }
-async function getByBatchIdAndStudentId(batchId, studentId) {
-    const params = {
-        TableName: tableName,
-        KeyConditionExpression: "batchId = :batchId and studentId = :studentId",
-        ExpressionAttributeValues: {
-            ':batchId': { S: batchId }, // Assuming batchId is a string
-            ':studentId': { S: studentId }, // Assuming studentId is a string
-        },
-    };
-
-    try {
-        const data = await db.send(new QueryCommand(params));
-        return data.Items ? data.Items.map(item => unmarshall(item)) : [];
-    } catch (err) {
-        console.error('Unable to get assignments by batch ID and student ID. Error JSON:', JSON.stringify(err, null, 2));
-        throw err;
-    }
-}
-
-    
 
 async function getByBatchId(batchId) {
     const params = {
