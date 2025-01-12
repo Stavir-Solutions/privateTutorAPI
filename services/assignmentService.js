@@ -32,7 +32,7 @@ async function updateAssignment(assignmentId, assignmentFields) {
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
 
-    console.log("Updating assignment fields", assignmentFields);
+    console.log("Updating assignment fields:", assignmentFields);
     for (const [key, value] of Object.entries(assignmentFields)) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
@@ -45,7 +45,7 @@ async function updateAssignment(assignmentId, assignmentFields) {
 
     const params = {
         TableName: tableName,
-        Key: marshall({ id: assignmentId }),
+        Key: {id: {S: assignmentId}},
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -67,7 +67,7 @@ async function updateAssignment(assignmentId, assignmentFields) {
 async function getByBatchIdAndStudentId(batchId, studentId) {
     const params = {
         TableName: tableName,
-        FilterExpression: "contains (batches, :batchId AND studentId = :studentId)", ExpressionAttributeValues: {
+        FilterExpression: "contains (batches, :batchId) AND studentId = :studentId", ExpressionAttributeValues: {
             ':batchId': marshall(batchId),
             ':studentId': marshall(studentId),
         },
@@ -81,6 +81,25 @@ async function getByBatchIdAndStudentId(batchId, studentId) {
         throw err;
     }
 }
+async function getByBatchIdAndStudentId(batchId, studentId) {
+    const params = {
+        TableName: tableName,
+        KeyConditionExpression: "batchId = :batchId and studentId = :studentId",
+        ExpressionAttributeValues: {
+            ':batchId': { S: batchId }, // Assuming batchId is a string
+            ':studentId': { S: studentId }, // Assuming studentId is a string
+        },
+    };
+
+    try {
+        const data = await db.send(new QueryCommand(params));
+        return data.Items ? data.Items.map(item => unmarshall(item)) : [];
+    } catch (err) {
+        console.error('Unable to get assignments by batch ID and student ID. Error JSON:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
+
     
 
 async function getByBatchId(batchId) {
