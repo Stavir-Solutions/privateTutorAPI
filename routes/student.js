@@ -2,6 +2,7 @@ const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
 const {create, getStudentById, getAll, deleteById, updateStudent, getByBatchId} = require('../services/studentService');
 
+
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
@@ -63,7 +64,7 @@ router.get('/:id', async (req, res) => {
 });
 
 router.get('/batch/:batchId', async (req, res) => {
-    students = await getByBatchId(req.params.batchId);
+   const students = await getByBatchId(req.params.batchId);
     console.log('get students by batch ', req.params.batchId)
     buildSuccessResponse(res, 200, students);
 });
@@ -89,7 +90,7 @@ router.put('/:id', async (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('updating student {}', req.body);
-    let updateResult = updateStudent(req.params.id, req.body);
+    let updateResult = await updateStudent(req.params.id, req.body);
     buildSuccessResponse(res, 200, updateResult)
     console.log('updated student {}', req.params.id);
 });

@@ -84,14 +84,14 @@ router.post('/', async (req, res) => {
 
 
 /* API to update the teacher */
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     const {error} = teacherUpdateSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('updating teacher {}', req.body);
-    let updateResult = update(req.params.id, req.body);
+    let updateResult = await update(req.params.id, req.body);
     buildSuccessResponse(res, 200, updateResult)
     console.log('updated teacher {}', req.params.id);
 });
