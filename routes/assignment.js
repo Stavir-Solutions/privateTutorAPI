@@ -40,9 +40,8 @@ router.get('/batch/:batchId', async (req, res) => {
 
 router.get('/batch/:batchId/student/:studentId', async (req, res) => {
     const { batchId, studentId } = req.params;
-    const assignment = await getByBatchIdAndStudentId(req.params.batchId, studentId);
     console.log('get assignments by batch and student', batchId, studentId);
-
+    const assignment = await getByBatchIdAndStudentId(batchId, studentId);
     buildSuccessResponse(res, 200, assignment);
 });
 
