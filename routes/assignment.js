@@ -2,6 +2,8 @@ const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
 const {create, getByBatchIdAndStudentId , getById, deleteById, updateAssignment, getByBatchId} = require('../services/assignmentService');
 
+
+
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
@@ -65,22 +67,22 @@ router.post('/', async (req, res) => {
 
 
 /* API to update the assigment */
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
     const {error} = assignmentUpdateSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('updating assigment {}', req.body);
-    let updateResult = updateAssignment(req.params.id, req.body);
+    let updateResult = await updateAssignment(req.params.id, req.body);
     buildSuccessResponse(res, 200, updateResult)
     console.log('updated assigment {}', req.params.id);
 });
    
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     console.log('Deleting assigment with id {}', req.params.id);
-    let response = deleteById(req.params.id);
+    let response = await deleteById(req.params.id);
     buildSuccessResponse(res, 200, response)
     console.log('deleted assigment {}', req.params.id );
 });

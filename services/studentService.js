@@ -45,7 +45,7 @@ async function updateStudent(studentId, studentFields) {
 
     const params = {
         TableName: tableName,
-        Key: marshall({ id: studentId }),
+        Key: marshall({id: studentId}),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -79,8 +79,8 @@ async function getStudentById(studentId) {
 
 async function getByBatchId(batchId) {
     const params = {
-        TableName: tableName, FilterExpression: "contains (batches, :batchId)", ExpressionAttributeValues: {
-            ':batchId': marshall(batchId),
+        TableName: tableName, FilterExpression: "batchId = :batchId", ExpressionAttributeValues: {
+            ':batchId': {S: batchId},
         },
     };
 

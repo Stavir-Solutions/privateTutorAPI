@@ -30,12 +30,13 @@ async function update(teacherId, teacherFields) {
     for (const [key, value] of Object.entries(teacherFields)) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
-        expressionAttributeValues[`:${key}`] = marshall(value);
+        expressionAttributeValues[`:${key}`] = marshall(value, {convertEmptyValues: true});
+
     }
 
     const params = {
         TableName: tableName,
-        Key: {id: {S: teacherId}},
+        Key: marshall({id: teacherId}),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
