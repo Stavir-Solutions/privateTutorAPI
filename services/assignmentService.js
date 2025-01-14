@@ -52,7 +52,6 @@ async function updateAssignment(assignmentId, assignmentFields) {
         ReturnValues: 'UPDATED_NEW',
     };
 
-    console.log('update params ', params);
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
@@ -68,8 +67,8 @@ async function getByBatchIdAndStudentId(batchId, studentId) {
     const params = {
         TableName: tableName,
         FilterExpression: "contains (batches, :batchId) AND studentId = :studentId", ExpressionAttributeValues: {
-            ':batchId': marshall(batchId),
-            ':studentId': marshall(studentId),
+            ':batchId': {S: batchId},
+            ':studentId':{S: studentId},
         },
     };
 
@@ -84,8 +83,9 @@ async function getByBatchIdAndStudentId(batchId, studentId) {
 
 async function getByBatchId(batchId) {
     const params = {
-        TableName: tableName, FilterExpression: "contains (batches, :batchId)", ExpressionAttributeValues: {
+        TableName: tableName, FilterExpression: "batchId = :batchId", ExpressionAttributeValues: {
             ':batchId': marshall(batchId),
+
         },
     };
 
