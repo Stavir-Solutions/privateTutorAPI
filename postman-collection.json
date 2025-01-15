@@ -728,7 +728,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": ""
+							"value": "88ff66fa-0c2c-4ad7-af04-514fb2000359"
 						}
 					]
 				}
@@ -753,7 +753,7 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": ""
+							"value": "550e8400-e29b-41d4-a716-446655440000"
 						}
 					]
 				}
@@ -780,11 +780,11 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": ""
+							"value": "550e8400-e29b-41d4-a716-446655440000"
 						},
 						{
 							"key": "studentId",
-							"value": ""
+							"value": "550e8400-e29b-41d4-a716-446655440001"
 						}
 					]
 				}
@@ -843,7 +843,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": ""
+							"value": "88ff66fa-0c2c-4ad7-af04-514fb2000359"
 						}
 					]
 				}
@@ -867,7 +867,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": ""
+							"value": "88ff66fa-0c2c-4ad7-af04-514fb2000359"
 						}
 					]
 				}
@@ -1066,7 +1066,7 @@
 			"response": []
 		},
 		{
-			"name": "notes batch",
+			"name": "Get Notes By Batch Id",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -1095,7 +1095,7 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": ""
+							"value": "123e4567-e89b-12d3-a456-426614174000"
 						}
 					]
 				}
@@ -1103,7 +1103,7 @@
 			"response": []
 		},
 		{
-			"name": "notes student",
+			"name": "Get Notes By Student Id",
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -1120,19 +1120,19 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/notes/student/:batchId",
+					"raw": "{{base_url}}/notes/student/:studentId",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"notes",
 						"student",
-						":batchId"
+						":studentId"
 					],
 					"variable": [
 						{
-							"key": "batchId",
-							"value": ""
+							"key": "studentId",
+							"value": "1e4567-e89b-12d3-a456-42661417"
 						}
 					]
 				}
@@ -1140,13 +1140,14 @@
 			"response": []
 		},
 		{
-			"name": "notes",
+			"name": "Create notes",
 			"request": {
 				"method": "POST",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"publishDate\": \"2024-12-31\",\r\n  \"description\": \"This is a valid description.\",\r\n  \"listUrls\": [\r\n    \"http://example.com/resource1.pdf\",\r\n    \"http://example.com/resource2.pdf\"\r\n  ]\r\n}\r\n",
+						"raw": "{\r\n    \"publishDate\": \"2024-01-01T00:00:00.000Z\",\r\n    \"Title\": \"This is a new note.\",\r\n    \"listUrls\": [\r\n        \"http://example.com/resource1.pdf\",\r\n        \"http://example.com/resource2.pdf\"\r\n    ],\r\n    \"content\": \"This is the content of the new note, providing detailed information.\",\r\n    \"studentId\": \"1e4567-e89b-12d3-a456-42661417\",\r\n    \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"\r\n}\r\n",					
+					
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1166,13 +1167,14 @@
 			"response": []
 		},
 		{
-			"name": "notes id",
+			"name": "Update notes",
 			"request": {
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "",
+					"raw": "{\r\n    \"publishDate\": \"2024-01-01T00:00:00.000Z\",\r\n    \"Title\": \"This is a new note.\",\r\n    \"listUrls\": [\r\n        \"http://example.com/resource1.pdf\",\r\n        \"http://example.com/resource2.pdf\"\r\n    ],\r\n    \"content\": \"This is the content of the new note, providing detailed information.\",\r\n    \"studentId\": \"1e4567-e89b-12d3-a456-42661417\",\r\n    \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"\r\n}\r\n",					
+
 					"options": {
 						"raw": {
 							"language": "json"
@@ -1180,12 +1182,10 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}:3000/notes/:id",
-					"protocol": "http",
+					"raw": "{{base_url}}/:id",
 					"host": [
 						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						":id"
@@ -1193,7 +1193,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "123"
+							"value": "5bacffc3-2d5d-48cf-8cfe-4b6b4a986e11"
 						}
 					]
 				}
@@ -1201,7 +1201,7 @@
 			"response": []
 		},
 		{
-			"name": "notes id1",
+			"name": "Delete notes",
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -1215,12 +1215,10 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}:3000/notes/:id",
-					"protocol": "http",
+					"raw": "{{base_url}}/:id",
 					"host": [
 						"{{base_url}}"
 					],
-					"port": "3000",
 					"path": [
 						"notes",
 						":id"
@@ -1228,7 +1226,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "123"
+							"value": "5bacffc3-2d5d-48cf-8cfe-4b6b4a986e11"
 						}
 					]
 				}
