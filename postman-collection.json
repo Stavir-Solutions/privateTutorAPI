@@ -444,7 +444,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}messages/batch/:batchId",
+					"raw": "{{base_url}}/messages/batch/:batchId",
 					"host": [
 						"{{base_url}}messages"
 					],
@@ -455,7 +455,7 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": ""
+							"value": "a8f0c784-687f-4fa3-bd72-2fbdbe89c7d0"
 						}
 					]
 				}
@@ -482,11 +482,11 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": "1"
+							"value": "a8f0c784-687f-4fa3-bd72-2fbdbe89c7d0"
 						},
 						{
 							"key": "studentId",
-							"value": "1"
+							"value": "a423e456-7e89-12d3-a456-42661417434f"
 						}
 					]
 				}
@@ -510,7 +510,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+							"value": "b2430757-2f9f-4aaa-9d2c-32707949219d"
 						}
 					]
 				}
@@ -529,7 +529,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"subject\": \"Follow Up\",\n  \"content\": \"Just checking in to see how you are doing.\",\n  \"sender\": \"admin@example.com\",\n  \"receiver\": \"user@example.com\",\n  \"timestamp\": \"2024-12-24T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
+					"raw": "{\n  \"subject\": \"Follow Up\",\n  \"content\": \"Just checking in to see how you are doing.\",\n  \"sender\": \"admin@example.com\",\n  \"receiver\": \"user@example.com\",\n  \"batchId\": \"a8f0c784-687f-4fa3-bd72-2fbdbe89c7d0 \",\n  \"studentId\": \"a423e456-7e89-12d3-a456-42661417434f\",\n \"timestamp\": \"2024-12-24T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/messages",
@@ -570,7 +570,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+							"value": ""
 						}
 					]
 				}
@@ -594,7 +594,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+							"value": "b2430757-2f9f-4aaa-9d2c-32707949219d"
 						}
 					]
 				}
