@@ -21,9 +21,10 @@ const notesUpdateSchema = Joi.object({
     Title: Joi.string().max(500).optional(),
     listUrls: Joi.array().items(Joi.string().uri()).optional(),
     studentId: Joi.string().optional(),
+    batchId: Joi.string().optional(),
     content: Joi.string().optional()
 }).or(
-    'publishDate', 'Title', 'listUrls', 'studentId', 'content'
+    'publishDate', 'Title', 'listUrls', 'studentId', 'batchId', 'content'
 ).unknown(false);
 
 var notes = '{' +  ' "id": "550e8400-e29b-41d4-a716-446655440000", \n' +  ' "publishDate": "2024-01-01T00:00:00.000Z",\n ' +   ' "Title": "This is a sample note description.",\n' +   ' "listUrls": [\n' +  ' "http://example.com/resource1.pdf",\n' +     ' "http://example.com/resource2.pdf"\n' +     ' ],\n' + 
