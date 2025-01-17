@@ -73,7 +73,7 @@ functions:
           path: /messages/batch/{batchId}
           method: get
       - http:
-          path: /messages/batch/{batchId}/student/{studentId}
+          path: /messages/student/{studentId}
           method: get
       - http:
           path: /messages/{id}

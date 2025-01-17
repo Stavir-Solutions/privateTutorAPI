@@ -444,7 +444,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}messages/batch/:batchId",
+					"raw": "{{base_url}}/messages/batch/:batchId",
 					"host": [
 						"{{base_url}}messages"
 					],
@@ -455,7 +455,7 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": ""
+							"value": "a8f0c784-687f-4fa3-bd72-2fbdbe89c7d0"
 						}
 					]
 				}
@@ -463,30 +463,25 @@
 			"response": []
 		},
 		{
-			"name": "Get Messages for Student in Batch",
+			"name": "Get Messages for Student",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/messages/batch/:batchId/student/:studentId",
+					"raw": "{{base_url}}/messages/student/:studentId",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"messages",
-						"batch",
-						":batchId",
 						"student",
 						":studentId"
 					],
 					"variable": [
-						{
-							"key": "batchId",
-							"value": "1"
-						},
+						
 						{
 							"key": "studentId",
-							"value": "1"
+							"value": "a423e456-7e89-12d3-a456-42661417434f"
 						}
 					]
 				}
@@ -510,7 +505,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+							"value": "b2430757-2f9f-4aaa-9d2c-32707949219d"
 						}
 					]
 				}
@@ -529,7 +524,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"subject\": \"Follow Up\",\n  \"content\": \"Just checking in to see how you are doing.\",\n  \"sender\": \"admin@example.com\",\n  \"receiver\": \"user@example.com\",\n  \"timestamp\": \"2024-12-24T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
+					"raw": "{\n  \"subject\": \"Follow Up\",\n  \"content\": \"Just checking in to see how you are doing.\",\n  \"sender\": \"admin@example.com\",\n  \"receiver\": \"user@example.com\",\n  \"batchId\": \"a8f0c784-687f-4fa3-bd72-2fbdbe89c7d0 \",\n  \"studentId\": \"a423e456-7e89-12d3-a456-42661417434f\",\n \"timestamp\": \"2024-12-24T12:34:56.789Z\",\n  \"attachmentUrls\": [\n    \"http://example.com/attachment1.pdf\",\n    \"http://example.com/attachment2.pdf\"\n  ]\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/messages",
@@ -570,7 +565,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+							"value": ""
 						}
 					]
 				}
@@ -594,7 +589,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b"
+							"value": "b2430757-2f9f-4aaa-9d2c-32707949219d"
 						}
 					]
 				}
@@ -607,17 +602,31 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/fee-records/batch/550e8400-e29b-41d4-a716-446655440000/student/550e8400-e29b-41d4-a716-446655440001",
+					"raw": "{{base_url}}/fee-records/batch/:batchId/student/studentId",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"fee-records",
 						"batch",
-						"550e8400-e29b-41d4-a716-446655440000",
+						":batchId",
 						"student",
-						"550e8400-e29b-41d4-a716-446655440001"
+						":studentId"
+					],
+
+					"variable": [
+						{
+							"key": "batchId",
+							"value": "550e8400-e29b-41d4-a716-446655440000"
+						},
+						{
+							"key": "studentId",
+							"value": "550e8400-e29b-41d4-a716-446655440001"
+						}
+					
 					]
+
+
 				}
 			},
 			"response": []
@@ -628,13 +637,20 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
+					"raw": "{{base_url}}/fee-records/:id",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"fee-records",
-						"d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": " 4bb3f327-4f82-4c70-acca-0d12d507cd59"
+						}
+				
 					]
 				}
 			},
@@ -681,13 +697,20 @@
 					"raw": "{\n  \"dueDate\": \"2024-12-31T23:59:59.999Z\",\n  \"paymentDate\": \"2024-12-25T12:34:56.789Z\",\n  \"status\": \"paid\",\n  \"notes\": \"Payment received in full.\",\n  \"attachmentUrl\": \"http://example.com/receipt.pdf\",\n  \"teacherAcknowledgement\": true\n}"
 				},
 				"url": {
-					"raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
+					"raw": "{{base_url}}/fee-records/:id",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"fee-records",
-						"d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": " 4bb3f327-4f82-4c70-acca-0d12d507cd59"
+						}
+				
 					]
 				}
 			},
@@ -699,15 +722,23 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/fee-records/d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",
+					"raw": "{{base_url}}/fee-records/:id",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"fee-records",
-						"d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d"
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": " 4bb3f327-4f82-4c70-acca-0d12d507cd59"
+						}
+				
 					]
-				}
+	            }
+
 			},
 			"response": []
 		},
