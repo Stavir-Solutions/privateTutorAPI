@@ -78,7 +78,6 @@ router.put('/:id', async (req, res) => {
     buildSuccessResponse(res, 200, updateResult)
     console.log('updated assigment {}', req.params.id);
 });
-   
 
 router.delete('/:id', async (req, res) => {
     console.log('Deleting assigment with id {}', req.params.id);
@@ -86,7 +85,6 @@ router.delete('/:id', async (req, res) => {
     buildSuccessResponse(res, 200, response)
     console.log('deleted assigment {}', req.params.id );
 });
-
    
 
 module.exports = router;

@@ -1,4 +1,4 @@
-const {toMessageEntity} = require('../db/mappers/messageMapper');
+const {toFeeRecordEntity} = require('../db/mappers/feeRecordMapper');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand,
@@ -10,31 +10,30 @@ const {
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
 
-const tableName = "Messages";
+const tableName = "FeeRecords";
 
-async function create(message) {
-    let messageEntity = toMessageEntity(message);
-    console.log('converted to entity ', messageEntity);
+async function create(feeRecord) {
+    let FeeRecordEntity = toFeeRecordEntity(feeRecord);
+    console.log('converted to entity ',FeeRecordEntity);
 
-    await db.send(new PutItemCommand(messageEntity, function (err, data) {
+    await db.send(new PutItemCommand(FeeRecordEntity, function (err, data) {
         if (err) {
-            console.error('Unable to add messages. Error JSON:', JSON.stringify(err, null, 2));
+            console.error('Unable to add feeRecord. Error JSON:', JSON.stringify(err, null, 2));
         } else {
             console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
         }
     }));
-    return unmarshall(messageEntity.Item).id;
+    return unmarshall(FeeRecordEntity.Item).id;
 }
 
 
-async function updateMessage(messageId, messageFields) {
+async function updateFeeRecord(feeRecordId, feeRecordFields) {
     const updateExpression = [];
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
-    
 
-    console.log("Updating messages fields:", messageFields);
-    for (const [key, value] of Object.entries(messageFields)) {
+    console.log("Updating feeRecord fields:", feeRecordFields);
+    for (const [key, value] of Object.entries(feeRecordFields)) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
         if (Array.isArray(value)) {
@@ -46,7 +45,7 @@ async function updateMessage(messageId, messageFields) {
 
     const params = {
         TableName: tableName,
-        Key: {id: {S: messageId}},
+        Key: {id: {S: feeRecordId}},
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -58,50 +57,35 @@ async function updateMessage(messageId, messageFields) {
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
         return unmarshall(data.Attributes);
     } catch (err) {
-        console.error('Unable to update message. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to update feeRecord. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
-async function getByStudentId(studentId) {
+
+
+async function getByBatchIdAndStudentId(batchId, studentId) {
     const params = {
         TableName: tableName,
-        FilterExpression: "studentId = :studentId",
+        FilterExpression: "batchId = :batchId AND studentId = :studentId",
         ExpressionAttributeValues: {
-            ':studentId': marshall(studentId), 
-        },
-    };
-
-    try {
-        const data = await db.send(new ScanCommand(params));
-        return data.Items.map(item => unmarshall(item));
-    } catch (err) {
-        console.error('Unable to get by student. Error JSON:', JSON.stringify(err, null, 2));
-        throw err;
-    }
-}
-
-async function getByBatchId(batchId) {
-
-    const params = {
-        TableName: tableName, FilterExpression: "batchId = :batchId", ExpressionAttributeValues: {
             ':batchId': marshall(batchId),
-
+            ':studentId': marshall(studentId),
         },
     };
 
     try {
         const data = await db.send(new ScanCommand(params));
-        return data.Items.map(item => unmarshall(item));
+        return data.Items ? data.Items.map(item => unmarshall(item)) : [];
     } catch (err) {
-        console.error('Unable to get  by batch. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to get feeRecords by batch ID and student ID. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
 
-async function getById(messageId) {
+async function getById(feeRecordId) {
     const params = {
         TableName: tableName,
-        Key: marshall({ id: messageId })
+        Key: marshall({ id: feeRecordId })
     };
 
    
@@ -109,15 +93,15 @@ async function getById(messageId) {
         const data = await db.send(new GetItemCommand(params));
         return data.Item ? unmarshall(data.Item) : {};
     } catch (err) {
-        console.error('Unable to get messages. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to get feeRecord. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
 
 
-async function deleteById(messageId) {
+async function deleteById(feeRecordId) {
     const params = {
-        TableName: tableName, Key: marshall({id: messageId}),
+        TableName: tableName, Key: marshall({id: feeRecordId}),
     };
 
     try {
@@ -125,11 +109,11 @@ async function deleteById(messageId) {
         console.log('delete result', data);
         return {};
     } catch (err) {
-        console.error('Unable to delete messages. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to delete feeRecord. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
 
 
-module.exports = {create, getByStudentId , getById, deleteById, updateMessage, getByBatchId}
+module.exports = {create, getByBatchIdAndStudentId , getById, deleteById, updateFeeRecord}
 

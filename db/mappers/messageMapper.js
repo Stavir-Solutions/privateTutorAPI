@@ -1,14 +1,15 @@
 const {generateUUID} = require('../UUIDGenerator');
 const {marshall} = require('@aws-sdk/util-dynamodb');
 
-function RepliesEntity(reply) {
+
+function toReplyEntity(reply) {
     return {
         id: generateUUID(),
         content: reply.content,
         sender: reply.sender,
         timestamp: reply.timestamp ,
         attachmentUrls: reply.attachmentUrls,
-        replies: reply.replies ? reply.replies.map(RepliesEntity) :[], 
+        replies: reply.replies ? reply.replies.map(toReplyEntity) :[], 
     };
 }
 function toMessageEntity(message) {
@@ -24,8 +25,10 @@ function toMessageEntity(message) {
             receiver: message.receiver,
             timestamp: message.timestamp ,
             attachmentUrls: message.attachmentUrls,
-            replies: message.replies ? message.replies.map(RepliesEntity) : [],
-        }),
+            replies: message.replies ? message.replies.map(toReplyEntity) : [],
+        },
+    
+    ),
     };
 }
 

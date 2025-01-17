@@ -1,7 +1,7 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
 const Joi = require('joi');
-const {create, getByBatchIdAndStudentId , getById, deleteById, updateMessage, getByBatchId} = require('../services/messageService');
+const {create, getByStudentId, getById, deleteById, updateMessage, getByBatchId} = require('../services/messageService');
 
 const router = express.Router();
 router.use(express.json());
@@ -32,13 +32,7 @@ const replySchema = Joi.object({
 }).unknown(false);
 
 const messageUpdateSchema = Joi.object({
-    subject: Joi.string().max(100).optional(),
     content: Joi.string().optional(),
-    studentId: Joi.string().required(),  
-    batchId: Joi.string().required(),    
-    sender: Joi.string().email().optional(),
-    receiver: Joi.string().email().optional(),
-    timestamp: Joi.date().optional(),
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional(),
     replies: Joi.array().items(Joi.object({
         content: Joi.string().optional(),
@@ -47,7 +41,7 @@ const messageUpdateSchema = Joi.object({
         attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
     })).optional()
 }).or(
-    'subject', 'content','batchId','studentId', 'sender', 'receiver', 'timestamp', 'attachmentUrls', 'replies'
+     'content', 'attachmentUrls', 'replies'
 ).unknown(false);
 
 
@@ -67,12 +61,13 @@ router.get('/batch/:batchId', async (req, res) => {
     buildSuccessResponse(res, 200, message);
 });
 
-router.get('/batch/:batchId/student/:studentId', async (req, res) => {
-    const { batchId, studentId } = req.params;
-    console.log('getting messages for student {} in a batch {}', req.params.studentId, req.params.batchId);
-    const message = await getByBatchIdAndStudentId(batchId, studentId);
+
+router.get('/student/:studentId', async (req, res) => {
+    const message = await getByStudentId(req.params.studentId);
+    console.log('get message by student', req.params.studentId)
     buildSuccessResponse(res, 200, message);
 });
+
 
 router.get('/:id', async (req, res) => {
     const message = await getById(req.params.id);
