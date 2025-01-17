@@ -35,9 +35,11 @@ router.get('/batch/:batchId', (req, res) => {
     buildSuccessResponse(res, 200, '[' + message + ']');
 });
 
-router.get('/batch/:batchId/student/:studentId', (req, res) => {
-    console.log('getting messages for student {} in a batch {}', req.params.studentId, req.params.batchId);
-    buildSuccessResponse(res, 200, '[' + message + ']');
+
+router.get('/student/:studentId', async (req, res) => {
+    const message = await getByStudentId(req.params.studentId);
+    console.log('get message by student', req.params.studentId)
+    buildSuccessResponse(res, 200, message);
 });
 
 router.get('/:id', (req, res) => {
