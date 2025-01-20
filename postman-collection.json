@@ -1012,7 +1012,7 @@
 					"variable": [
 						{
 							"key": "teacherId",
-							"value": "sample-teacher-id"
+							"value": "123e4567-e89b-12d3-a456-426614174000"
 						}
 					]
 				}
@@ -1038,7 +1038,7 @@
 					"variable": [
 						{
 							"key": "notificationId",
-							"value": "sample-notification-id"
+							"value": "ae77d382-0712-41d9-80ef-e849d8660d9a"
 						}
 					]
 				}
@@ -1063,7 +1063,7 @@
 					"variable": [
 						{
 							"key": "studentId",
-							"value": "sample-student-id"
+							"value": "8a1b2c3d-4e5f-6789-0abc-def123456749"
 						}
 					]
 				}
@@ -1089,7 +1089,7 @@
 					"variable": [
 						{
 							"key": "notificationId",
-							"value": "sample-notification-id"
+							"value": "9dd34058-4a77-435b-888d-b0dbb487d475"
 						}
 					]
 				}
