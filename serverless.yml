@@ -133,32 +133,23 @@ functions:
           path: /notifications/teachers/{teacherId}
           method: get
       - http:
-          path: /notifications/teachers/{notificationId}/seen
+          path: /notifications/{notificationId}/seen
           method: patch
       - http:
           path: /notifications/students/{studentId}
           method: get
       - http:
-          path: /notifications/students/{notificationId}/seen
-          method: patch
-
-      - http:
            path: /notes
            method: post
-
       -  http:
            path: /notes/batch/{batchId}
            method: get
-
       - http:
            path: /notes/student/{id}
            method: get
-
       - http:
            path: /notes/{id}
-           method: put
-
-           
+           method: put 
       - http:
            path: /notes/{id}
            method: delete

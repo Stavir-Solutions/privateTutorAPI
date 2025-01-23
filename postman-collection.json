@@ -1012,7 +1012,7 @@
 					"variable": [
 						{
 							"key": "teacherId",
-							"value": "sample-teacher-id"
+							"value": "123e4567-e89b-12d3-a456-426614174003"
 						}
 					]
 				}
@@ -1020,12 +1020,12 @@
 			"response": []
 		},
 		{
-			"name": "Mark Teacher Notification as Seen",
+			"name": "Mark  Notification as Seen",
 			"request": {
 				"method": "PATCH",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/notifications/teachers/:notificationId/seen",
+					"raw": "{{base_url}}/notifications/:notificationId/seen",
 					"host": [
 						"{{base_url}}"
 					],
@@ -1038,7 +1038,7 @@
 					"variable": [
 						{
 							"key": "notificationId",
-							"value": "sample-notification-id"
+							"value": "c3277bf1-7e6f-4a56-87f2-647f6656c6fd"
 						}
 					]
 				}
@@ -1063,39 +1063,15 @@
 					"variable": [
 						{
 							"key": "studentId",
-							"value": "sample-student-id"
+							"value": "8a1b2c3d-4e5f-6789-0abc-def198456789"
 						}
 					]
 				}
 			},
 			"response": []
 		},
-		{
-			"name": "Mark Student Notification as Seen",
-			"request": {
-				"method": "PATCH",
-				"header": [],
-				"url": {
-					"raw": "{{base_url}}/notifications/students/:notificationId/seen",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"notifications",
-						"students",
-						":notificationId",
-						"seen"
-					],
-					"variable": [
-						{
-							"key": "notificationId",
-							"value": "sample-notification-id"
-						}
-					]
-				}
-			},
-			"response": []
-		},
+		
+			
 		{
 			"name": "Get Notes By Batch Id",
 			"protocolProfileBehavior": {
