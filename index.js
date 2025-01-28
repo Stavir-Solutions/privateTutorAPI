@@ -10,9 +10,12 @@ const assignments = require('./routes/assignment');
 const login = require('./routes/login');
 const uploads = require('./routes/upload');
 const notes = require('./routes/notes');
+const test = require('./routes/test');
+const testResult =require('./routes/testResult');
 const notifications = require('./routes/notification');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const { required } = require('joi');
 
 const index = express();
 
@@ -36,6 +39,8 @@ index.use('/assignments', assignments);
 index.use('/login', login)
 index.use('/uploads', uploads)
 index.use('/notes',notes)
+index.use('/tests',test)
+index.use('/test-results',testResult)
 index.use('/notifications', notifications)
 index.get('/', (req, res) => {
     res.send('{"name":"Private tutor apis"}');

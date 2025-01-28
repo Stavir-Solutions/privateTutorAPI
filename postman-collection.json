@@ -1239,6 +1239,373 @@
 				}
 			},
 			"response": []
+		},{
+			"name": "Create Test",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Midterm Exam\",\r\n  \"subject\": \"Mathematics\",\r\n  \"testDate\": \"2025-02-15T10:00:00.000Z\",\r\n  \"resultPublishDate\": \"2025-02-20T10:00:00.000Z\",\r\n  \"totalMarks\": 100,\r\n  \"minimumPassMark\": 40,\r\n  \"numberOfQuestions\": 20,\r\n  \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/tests",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tests"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Tests by Batch",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}//tests/batches/:batchId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"",
+						"tests",
+						"batches",
+						":batchId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Test by ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/tests/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tests",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "483fc7dd-9817-4e56-945f-c7496c3844a4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Test by ID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/tests/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tests",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Test",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Midterm Exam\",\r\n  \"subject\": \"Mathematics\",\r\n  \"testDate\": \"2025-02-15T10:00:00.000Z\",\r\n  \"resultPublishDate\": \"2025-02-20T10:00:00.000Z\",\r\n  \"totalMarks\": 100,\r\n  \"minimumPassMark\": 50,\r\n  \"numberOfQuestions\": 20\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/tests/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"tests",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "6d2fda27-022e-43f5-8968-e2165eab4a0f"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Test Result",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"testId\": \"123e48867-e89b-12d3-a456-426614174000\",\r\n    \"studentId\": \"123e4567-e89b-12d3-a456-4266141stu567\",\r\n    \"marks\": 85,\r\n    \"attestedByParent\": true\r\n}\r\n\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/test-results",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"test-results"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Test Result",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"studentId\": \"123e4567-e89b-12673-a456-4266141stu567\",\r\n    \"marks\": 985,\r\n    \"attestedByParent\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/test-results/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"test-results",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "25858eb6-8200-4ee2-b91b-0cceac839106"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Test Results by Test ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/test-results/tests/:testId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"test-results",
+						"tests",
+						":testId"
+					],
+					"variable": [
+						{
+							"key": "testId",
+							"value": "123e48867-e89b-12d3-a456-426614174000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Test Results by Student ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/test-results/students/:studentId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"test-results",
+						"students",
+						":studentId"
+					],
+					"variable": [
+						{
+							"key": "studentId",
+							"value": "123e4567-e89b-12673-a456-4266141stu567"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Test Result by ID",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/test-results/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"test-results",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "25858eb6-8200-4ee2-b91b-0cceac839106"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Test Result by ID",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/test-results/:id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"test-results",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "25858eb6-8200-4ee2-b91b-0cceac8391089"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
@@ -1249,3 +1616,4 @@
 		}
 	]
 }
+	

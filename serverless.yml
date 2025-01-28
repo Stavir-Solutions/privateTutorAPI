@@ -152,4 +152,37 @@ functions:
            method: put 
       - http:
            path: /notes/{id}
+           method: delete          
+      - http:
+           path: /tests
+           method: post
+      - http:
+           path: /tests/batches/{batchId}
+           method: get
+      - http:        
+           path: /tests/{id}
+           method: get
+      - http:    
+           path: /tests/{id}
+           method: put
+      - http:           
+           path: /tests/{id}
            method: delete
+      - http:
+          path: /test-results
+          method: post
+      - http:
+          path: /test-results/{id}
+          method: put
+      - http:
+          path: /test-results/{id}
+          method: get
+      - http:
+          path: /test-results/tests/{testId}
+          method: get
+      - http:
+          path: /test-results/students/{studentId}
+          method: get
+      - http:
+          path: /test-results/{id}
+          method: delete
