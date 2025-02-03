@@ -30,3 +30,12 @@ endpoint=https://587611035364.ddb.us-east-1.amazonaws.com
 3. Test your endpoints using Postman or cURL as previously described, but use the URL http://localhost:3000 (or the port specified in your serverless.yml file).  
    
 This will allow you to run and test your serverless application locally.
+
+
+## to test the code
+```
+   npm install --save-dev mocha
+   npm install --save-dev chai
+   npm install --save-dev sinon
+   npm test
+```
