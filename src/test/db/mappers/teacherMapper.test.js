@@ -3,9 +3,12 @@ const { toTeacherEntity } = require('../../../main/db/mappers/teacherMapper');
 const { marshall } = require('@aws-sdk/util-dynamodb');
 const { generateUUID } = require('../../../main/db/UUIDGenerator');
 
+
+//TODO Modify this testcase of use sinon and mock and id
 describe('toTeacherEntity', () => {
     it('should map teacher object to DynamoDB entity', () => {
-        const teacher = {
+        //given
+        const teacherData = {
             firstName: 'John',
             lastName: 'Doe',
             userName: 'johndoe',
@@ -25,20 +28,24 @@ describe('toTeacherEntity', () => {
             ifscCode: 'IFSC0001234'
         };
 
-        const result = toTeacherEntity(teacher);
+        //when
+        const result = toTeacherEntity(teacherData);
+
+        //then
         const expected = {
             TableName: 'Teachers',
             Item: marshall({
                 id: generateUUID(),
-                ...teacher
+                ...teacherData
             })
         };
 
         expect(result.TableName).to.equal(expected.TableName);
-        expect(result.Item).to.deep.include(marshall(teacher));
+        expect(result.Item).to.deep.include(marshall(teacherData));
     });
 
     it('should generate a unique ID for the teacher', () => {
+        //given
         const teacher = {
             firstName: 'Jane',
             lastName: 'Doe',
@@ -59,7 +66,10 @@ describe('toTeacherEntity', () => {
             ifscCode: 'IFSC0004321'
         };
 
+        //when
         const result = toTeacherEntity(teacher);
+
+        //then
         expect(result.Item).to.have.property('id');
     });
 });

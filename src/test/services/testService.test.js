@@ -16,14 +16,19 @@ describe('getById', () => {
         dbStub.restore();
     });
 
-    it('should return the test item when found', async () => {
+    it('should return the test when found', async () => {
+        //given
         const testId = 'test-id';
         const testItem = { id: testId, name: 'Test Name' };
         const marshalledItem = marshall(testItem);
 
         dbStub.resolves({ Item: marshalledItem });
 
+        //when
         const result = await getById(testId);
+
+
+        //then
         expect(result).to.deep.equal(testItem);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(GetItemCommand))).to.be.true;
