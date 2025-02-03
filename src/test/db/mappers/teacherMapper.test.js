@@ -1,7 +1,7 @@
 const { expect } = require('chai');
-const { toTeacherEntity } = require('../../../src/main/db/mappers/teacherMapper');
+const { toTeacherEntity } = require('../../../main/db/mappers/teacherMapper');
 const { marshall } = require('@aws-sdk/util-dynamodb');
-const { generateUUID } = require('../../../src/main/db/UUIDGenerator');
+const { generateUUID } = require('../../../main/db/UUIDGenerator');
 
 describe('toTeacherEntity', () => {
     it('should map teacher object to DynamoDB entity', () => {

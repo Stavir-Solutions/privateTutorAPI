@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { getById } = require('../../src/main/services/testService');
-const db = require('../../src/main/db/dynamodb');
+const { getById } = require('../../main/services/testService');
+const db = require('../../main/db/dynamodb');
 const { GetItemCommand } = require('@aws-sdk/client-dynamodb');
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 

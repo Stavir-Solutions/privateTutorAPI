@@ -4,7 +4,7 @@
   "description": "Backend of the private tutor app",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive 'test/**/*test.js'",
+    "test": "mocha --recursive 'src/test/**/*test.js'",
     "server": "npx serverless offline --noPrependStageInUrl"
   },
   "repository": {
