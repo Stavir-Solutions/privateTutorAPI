@@ -1,7 +1,7 @@
 const express = require('express');
 const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
 const Joi = require('joi');
-const {create,updateNotes, getByStudentId, deleteById,getByBatchId} = require('../main/services/notesService');
+const {create,updateNotes, getByStudentId, deleteById,getByBatchId} = require('../services/notesService');
 
 
 const router = express.Router();

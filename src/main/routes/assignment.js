@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getByBatchIdAndStudentId , getById, deleteById, updateAssignment, getByBatchId} = require('../main/services/assignmentService');
+const {create, getByBatchIdAndStudentId , getById, deleteById, updateAssignment, getByBatchId} = require('../services/assignmentService');
 
 
 

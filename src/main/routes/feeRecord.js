@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getByBatchIdAndStudentId , getById, deleteById, updateFeeRecord} = require('../main/services/feeRecordService');
+const {create, getByBatchIdAndStudentId , getById, deleteById, updateFeeRecord} = require('../services/feeRecordService');
 
 
 const router = express.Router();
