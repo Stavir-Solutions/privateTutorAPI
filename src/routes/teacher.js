@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getById, getAll, deleteById, update} = require('../services/teacherService');
+const {create, getById, getAll, deleteById, update} = require('../main/services/teacherService');
 
 const router = express.Router();
 const Joi = require('joi');

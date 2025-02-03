@@ -1,10 +1,10 @@
-const { create } = require('../services/studentService');
-const db = require('../db/dynamodb');
+const { create } = require('../src/main/services/studentService');
+const db = require('../src/main/db/dynamodb');
 const { PutItemCommand } = require('@aws-sdk/client-dynamodb');
-jest.mock('../db/dynamodb', () => ({
+jest.mock('../src/main/db/dynamodb', () => ({
     send: jest.fn(),
 }));
-jest.mock('../db/mappers/studentMapper', () => ({
+jest.mock('../src/main/db/mappers/studentMapper', () => ({
     toStudentEntity: jest.fn((student) => ({
         TableName: "Students",
         Item: { id: { S: "test-id" }, ...student },

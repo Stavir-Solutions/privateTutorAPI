@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse} = require("./responseUtils");
-const {getByTeacherId ,markNotificationSeen,getByStudentId} = require('../services/notificationService');
+const {getByTeacherId ,markNotificationSeen,getByStudentId} = require('../main/services/notificationService');
 
 
 const router = express.Router();
