@@ -169,9 +169,27 @@ describe('create', () => {
 
     it('should return an empty object when the item is not found', async () => {
         const testId = 'test-id';
+        const test = {
+            firstName: 'John',
+            lastName: 'Doe',
+            userName: 'johndoe',
+            password: 'password123',
+            age: 30,
+            gender: 'Male',
+            addressLine1: '123 Main St',
+            addressCity: 'Anytown',
+            addressState: 'Anystate',
+            pinCode: '123456',
+            profilePicUrl: 'http://example.com/profile.jpg',
+            email: 'john.doe@example.com',
+            phoneNumber: '1234567890',
+            upiId: 'john@upi',
+            accountNumber: '123456789',
+            accountName: 'John Doe',
+            ifscCode: 'IFSC0001234'
+        };
 
-
-        const result = await create(testId);
+        const result = await create(test);
         expect(result).to.deep.equal({});
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
