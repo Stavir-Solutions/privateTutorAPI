@@ -16,14 +16,9 @@ async function create(test) {
     let testEntity = toTestEntity(test);
     console.log('converted to entity ', testEntity);
 
-    await db.send(new PutItemCommand(testEntity, function (err, data) {
-        if (err) {
-            console.error('Unable to add test. Error JSON:', JSON.stringify(err, null, 2));
-        } else {
-            console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
-        }
-    }));
-    return unmarshall(testEntity.Item).id;
+    let result = await db.send(new PutItemCommand(testEntity ));
+    console.log("Test created with id:", result);
+    return unmarshall(result.Item).id;
 }
 
 

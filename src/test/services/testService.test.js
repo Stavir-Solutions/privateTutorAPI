@@ -128,21 +128,41 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
+        uuidStub.restore();
     });
 
     it('should return the create test when found', async () => {
         // Given
+        const test = {
+            firstName: 'John',
+            lastName: 'Doe',
+            userName: 'johndoe',
+            password: 'password123',
+            age: 30,
+            gender: 'Male',
+            addressLine1: '123 Main St',
+            addressCity: 'Anytown',
+            addressState: 'Anystate',
+            pinCode: '123456',
+            profilePicUrl: 'http://example.com/profile.jpg',
+            email: 'john.doe@example.com',
+            phoneNumber: '1234567890',
+            upiId: 'john@upi',
+            accountNumber: '123456789',
+            accountName: 'John Doe',
+            ifscCode: 'IFSC0001234'
+        };
         const testId = 'test-id';
-        const testItem = { id: testId };
+        const testItem = { id: testId, ...test };
         const marshalledItem = marshall(testItem);
 
         dbStub.resolves({ Item: marshalledItem });
 
         // When
-        const result = await create(testId);
+        const result = await create(test);
 
         // Then
-        expect(result).to.deep.equal(testItem);
+        expect(result).to.equal(testId);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
