@@ -5,15 +5,17 @@ const { updateTest} = require('../../main/services/testService');
 const { create} = require('../../main/services/testService');
 const { deletetestById} = require('../../main/services/testService');
 const { getallByBatch} = require('../../main/services/testService');
-
+const { generateUUID } = require('../../main/db/UUIDGenerator');
 const db = require('../../main/db/dynamodb');
 const { GetItemCommand } = require('@aws-sdk/client-dynamodb');
 const {UpdateItemCommand} = require('@aws-sdk/client-dynamodb');
 const {PutItemCommand} = require('@aws-sdk/client-dynamodb');
 const {DeleteItemCommand} = require('@aws-sdk/client-dynamodb');
 const { ScanCommand } = require('@aws-sdk/client-dynamodb');
-
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
+exports.generateUUID = () => 'mocked-uuid';
+
+
 
 describe('getById', () => {
     let dbStub;
@@ -120,43 +122,68 @@ describe('updateTest', () => {
 });
 
 describe('create', () => {
-    let dbStub;
+    let dbStub; 
+    let generateUUIDStub;
+    const testId = 'test-id';
 
     beforeEach(() => {
         dbStub = sinon.stub(db, 'send');
+        
+        generateUUIDStub = sinon.stub( 'generateUUID').returns(testId);
     });
 
     afterEach(() => {
-        dbStub.restore();
-        uuidStub.restore();
+        // Restore the stubs
+        if (dbStub && dbStub.restore) dbStub.restore();
+        if (generateUUIDStub && generateUUIDStub.restore) generateUUIDStub.restore();
+        
+        sinon.restore();
     });
 
-    it('should return the create test when found', async () => {
+    it('should return the created test ID when successful', async () => {
         // Given
         const test = {
-            firstName: 'John',
-            lastName: 'Doe',
-            userName: 'johndoe',
-            password: 'password123',
-            age: 30,
-            gender: 'Male',
-            addressLine1: '123 Main St',
-            addressCity: 'Anytown',
-            addressState: 'Anystate',
-            pinCode: '123456',
-            profilePicUrl: 'http://example.com/profile.jpg',
-            email: 'john.doe@example.com',
-            phoneNumber: '1234567890',
-            upiId: 'john@upi',
-            accountNumber: '123456789',
-            accountName: 'John Doe',
-            ifscCode: 'IFSC0001234'
+            name: 'Test Name',
+            subject: 'Mathematics',
+            testDate: '2024-01-20',
+            resultPublishDate: '2024-01-25',
+            totalMarks: 100,
+            minimumPassMark: 35,
+            numberOfQuestions: 50,
+            batchId: 'batch-123'
         };
-        const testId = 'test-id';
-        const testItem = { id: testId, ...test };
-        const marshalledItem = marshall(testItem);
 
-        dbStub.resolves({ Item: marshalledItem });
+        dbStub.resolves({
+            $metadata: { httpStatusCode: 200 }
+        });
+
+        // When
+        const result = await create(test);
+
+        // Then
+        expect(result).to.equal(testId);
+        expect(dbStub.calledOnce).to.be.true;
+        const putItemCommand = dbStub.firstCall.args[0];
+        expect(putItemCommand).to.be.instanceOf(PutItemCommand);
+        expect(putItemCommand.input.TableName).to.equal('Tests');
+    });
+
+    it('should handle empty response from DynamoDB', async () => {
+        // Given
+        const test = {
+            name: 'Test Name',
+            subject: 'Mathematics',
+            testDate: '2024-01-20',
+            resultPublishDate: '2024-01-25',
+            totalMarks: 100,
+            minimumPassMark: 35,
+            numberOfQuestions: 50,
+            batchId: 'batch-123'
+        };
+
+        dbStub.resolves({
+            $metadata: { httpStatusCode: 200 }
+        });
 
         // When
         const result = await create(test);
@@ -167,51 +194,25 @@ describe('create', () => {
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
 
-    it('should return an empty object when the item is not found', async () => {
-        const testId = 'test-id';
-        const test = {
-            firstName: 'John',
-            lastName: 'Doe',
-            userName: 'johndoe',
-            password: 'password123',
-            age: 30,
-            gender: 'Male',
-            addressLine1: '123 Main St',
-            addressCity: 'Anytown',
-            addressState: 'Anystate',
-            pinCode: '123456',
-            profilePicUrl: 'http://example.com/profile.jpg',
-            email: 'john.doe@example.com',
-            phoneNumber: '1234567890',
-            upiId: 'john@upi',
-            accountNumber: '123456789',
-            accountName: 'John Doe',
-            ifscCode: 'IFSC0001234'
-        };
-
-        const result = await create(test);
-        expect(result).to.deep.equal({});
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
     it('should throw an error when the db call fails', async () => {
         // Given
-        const testId = 'test-id';
+        const test = {
+            name: 'Test Name',
+            subject: 'Mathematics'
+        };
         const errorMessage = 'DB error';
-
         dbStub.rejects(new Error(errorMessage));
 
-        // When
+        // When/Then
         try {
-            await create(testId);
+            await create(test);
+            expect.fail('Should have thrown an error');
         } catch (err) {
-            // Then
             expect(err.message).to.equal(errorMessage);
         }
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
-
 });
 describe('deletetestById', () => {
     let dbStub;

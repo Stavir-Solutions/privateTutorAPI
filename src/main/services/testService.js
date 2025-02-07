@@ -1,4 +1,6 @@
 const {toTestEntity} = require('../db/mappers/testMapper');
+const { v4: uuidv4 } = require('uuid');
+
 const db = require('../db/dynamodb');
 const {
     PutItemCommand,
@@ -8,20 +10,26 @@ const {
     GetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
-
-
 const tableName = "Tests";
-
 async function create(test) {
-    let testEntity = toTestEntity(test);
-    console.log('converted to entity ', testEntity);
+    try {
+        const testEntity = toTestEntity(test);
+        console.log('converted to entity ', testEntity);
 
-    let result = await db.send(new PutItemCommand(testEntity ));
-    console.log("Test created with id:", result);
-    return unmarshall(result.Item).id;
+        const response = await db.send(new PutItemCommand(testEntity));
+        
+        if (response.$metadata?.httpStatusCode === 200) {
+            console.log('PutItem succeeded:', JSON.stringify(response, null, 2));
+            // Return the ID that was generated in toTestEntity
+            return unmarshall(testEntity.Item).id;
+        } else {
+            throw new Error('Failed to create test');
+        }
+    } catch (err) {
+        console.error('Unable to add test. Error JSON:', JSON.stringify(err, null, 2));
+        throw err;
+    }
 }
-
-
 async function updateTest(testId, testFields) {
     const updateExpression = [];
     const expressionAttributeNames = {};
