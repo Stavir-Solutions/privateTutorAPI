@@ -1,10 +1,11 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getByBatchIdAndStudentId , getById, deleteById, updateFeeRecord} = require('../services/feeRecordService');
+const {create, getByBatchIdAndStudentId ,getyBatchId,getById, deleteById, updateFeeRecord} = require('../services/feeRecordService');
 
 
 const router = express.Router();
 const Joi = require('joi');
+const {getByBatchId} = require("../services/messageService");
 router.use(express.json());
 
 const FeeRecordStatus = Object.freeze({
@@ -35,6 +36,12 @@ const feeRecordUpdateSchema = Joi.object({
 
 var feeRecord = '{\n' + '  "id": "d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",\n' + '  "batchId": "550e8400-e29b-41d4-a716-446655440000",\n' + '  "studentId": "550e8400-e29b-41d4-a716-446655440001",\n' + '  "dueDate": "2024-12-31T23:59:59.999Z",\n' + '  "paymentDate": "2024-12-25T12:34:56.789Z",\n' + '  "amount": 1500.00,\n' + '  "status": "paid",\n' + '  "notes": "Payment received in full.",\n' + '  "attachmentUrl": "http://example.com/receipt.pdf",\n' + '  "teacherAcknowledgement": true\n' + '}';
 
+
+router.get('/batch/:batchId', async (req, res) => {
+    const message = await getbyBatchId(req.params.batchId);
+    console.log('get message by batch ', req.params.batchId)
+    buildSuccessResponse(res, 200, message);
+});
 
 router.get('/batch/:batchId/student/:studentId', async (req, res) => {
     const { batchId, studentId } = req.params;

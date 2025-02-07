@@ -91,6 +91,9 @@ functions:
           path: /fee-records/batch/{batchId}/student/{studentId}
           method: get
       - http:
+          path: /fee-records/batch/{batchId}
+          method: get
+      - http:
           path: /fee-records/{id}
           method: get
       - http:
