@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getByBatchIdAndStudentId ,getyBatchId,getById, deleteById, updateFeeRecord} = require('../services/feeRecordService');
+const {create, getByBatchIdAndStudentId ,getbyBatchId,getById, deleteById, updateFeeRecord} = require('../services/feeRecordService');
 
 
 const router = express.Router();
@@ -38,9 +38,9 @@ var feeRecord = '{\n' + '  "id": "d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",\n' + ' 
 
 
 router.get('/batch/:batchId', async (req, res) => {
-    const message = await getbyBatchId(req.params.batchId);
+    const feeRecord = await getbyBatchId(req.params.batchId);
     console.log('get message by batch ', req.params.batchId)
-    buildSuccessResponse(res, 200, message);
+    buildSuccessResponse(res, 200, feeRecord);
 });
 
 router.get('/batch/:batchId/student/:studentId', async (req, res) => {
