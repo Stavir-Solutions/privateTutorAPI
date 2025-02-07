@@ -38,9 +38,9 @@ var feeRecord = '{\n' + '  "id": "d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",\n' + ' 
 
 
 router.get('/batches/:batchId', async (req, res) => {
-    const feeRecord = await getbyBatchId(req.params.batchId);
-    console.log('get feerecord by batch ', req.params.batchId)
-    buildSuccessResponse(res, 200, feeRecord);
+    const feeRecords = await getbyBatchId(req.params.batchId);
+    console.log('get  by batch ', req.params.batchId)
+    buildSuccessResponse(res, 200, feeRecords);
 });
 
 router.get('/batch/:batchId/student/:studentId', async (req, res) => {
