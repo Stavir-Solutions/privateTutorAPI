@@ -80,6 +80,22 @@ async function getByBatchIdAndStudentId(batchId, studentId) {
         console.error('Unable to get feeRecords by batch ID and student ID. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
+}async function getbyBatchId(batchId) {
+
+    const params = {
+        TableName: tableName, FilterExpression: "batchId = :batchId", ExpressionAttributeValues: {
+            ':batchId': marshall(batchId),
+
+        },
+    };
+
+    try {
+        const data = await db.send(new ScanCommand(params));
+        return data.Items.map(item => unmarshall(item));
+    } catch (err) {
+        console.error('Unable to get  by batch. Error JSON:', JSON.stringify(err, null, 2));
+        throw err;
+    }
 }
 
 async function getById(feeRecordId) {
@@ -115,5 +131,5 @@ async function deleteById(feeRecordId) {
 }
 
 
-module.exports = {create, getByBatchIdAndStudentId , getById, deleteById, updateFeeRecord}
+module.exports = {create, getByBatchIdAndStudentId ,getbyBatchId, getById, deleteById, updateFeeRecord}
 

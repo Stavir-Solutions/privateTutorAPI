@@ -632,6 +632,31 @@
 			"response": []
 		},
 		{
+			"name": "Get FeeRecords by Batch",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/fee-records/batches/:batchId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"fee-records",
+						"batches",
+						":batchId"
+					],
+					"variable": [
+						{
+							"key": "batchId",
+							"value": "550e8400-e29b-41d4-a716-446655440000"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get FeeRecord by ID",
 			"request": {
 				"method": "GET",
