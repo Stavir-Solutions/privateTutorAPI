@@ -23,7 +23,6 @@ function toStudentEntity(student) {
             parent2Name: student.parent2Name,
             parent2Phone: student.parent2Phone,
             parent2Email: student.parent2Email,
-            batchId:student.batchId
         },
         { removeUndefinedValues: true }
     )
