@@ -8,22 +8,27 @@ const Joi = require('joi');
 router.use(express.json());
 
 const studentSchema = Joi.object({
-    firstName: Joi.string().max(50).required(),
+    firstName: Joi.string().max(50).optional(),
     lastName: Joi.string().max(50).optional(),
+    userName: Joi.string().alphanum().min(3).max(30).required(),
+    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9]{6,20}$')).required(),
+    email: Joi.string().email().required(),
     age: Joi.number().integer().optional(),
-    addressLine1: Joi.string().required(),
+    addressLine1: Joi.string().optional(),
     addressCity: Joi.string().optional(),
     addressState: Joi.string().optional(),
-    pinCode: Joi.number().required(),
+    pinCode: Joi.number().optional(),
     profilePicUrl: Joi.string().uri().optional(),
     gender: Joi.string().valid('male', 'female', 'do not disclose').required(),
-    parent1Name: Joi.string().required(),
-    parent1Phone: Joi.string().pattern(/^[0-9]{10}$/).required(),
+    parent1Name: Joi.string().optional(),
+    parent1Phone: Joi.string().pattern(/^[0-9]{10}$/).optional(),
     parent1Email: Joi.string().email().optional(),
     parent2Name: Joi.string().optional(),
-    parent2Phone: Joi.string().pattern(/^[0-9]{10}$/).required(),
+    parent2Phone: Joi.string().pattern(/^[0-9]{10}$/).optional(),
     parent2Email: Joi.string().email().optional(),
-    batches: Joi.array().items(Joi.string()).optional()
+    batches: Joi.array().items(Joi.string()).optional(),
+    batchId: Joi.string().optional()
+
 }).unknown(false);
 
 const studentUpdateSchema = Joi.object({
@@ -42,15 +47,15 @@ const studentUpdateSchema = Joi.object({
     parent2Name: Joi.string().optional(),
     parent2Phone: Joi.string().pattern(/^[0-9]{10}$/).optional(),
     parent2Email: Joi.string().email().optional(),
-    batches: Joi.array().items(Joi.string()).optional()
+    batches: Joi.array().items(Joi.string()).optional(),
+    batchId:Joi.string().optional()
 }).or(
     'firstName', 'lastName', 'age', 'addressLine1', 'addressCity', 'addressState', 'pinCode',
     'profilePicUrl', 'gender', 'parent1Name', 'parent1Phone', 'parent1Email', 'parent2Name',
-    'parent2Phone', 'parent2Email', 'batches'
+    'parent2Phone', 'parent2Email', 'batches','batchId'
 ).unknown(false);
 
-var student = '{' + '  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '  "firstName": "Jane",\n' + '  "lastName": "Doe",\n' + '  "age": 16,\n' + '  "addressLine1": "456 Elm St",\n' + '  "addressCity": "Othertown",\n' + '  "addressState": "Otherstate",\n' + '  "pinCode": 654321,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "gender": "female",\n' + '  "parent1Name": "John Doe",\n' + '  "parent1Phone": "9876543210",\n' + '  "parent1Email": "john.doe@example.com",\n' + '  "parent2Name": "Mary Doe",\n' + '  "parent2Phone": "0123456789",\n' + '  "parent2Email": "mary.doe@example.com"' + '}';
-
+var student = '{' + '  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '  "firstName": "Jane",\n' + ' "username": "JaneDoe",\n' + '  "password: "password123",\n' + '  "email": ""jane.doe@example.com"",\n' + '   "lastName": "Doe",\n' + '  "age": 16,\n' + '  "addressLine1": "456 Elm St",\n' + '  "addressCity": "Othertown",\n' + '  "addressState": "Otherstate",\n' + '  "pinCode": 654321,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "gender": "female",\n' + '  "parent1Name": "John Doe",\n' + '  "parent1Phone": "9876543210",\n' + '  "parent1Email": "john.doe@example.com",\n' + '  "parent2Name": "Mary Doe",\n' + '  "parent2Phone": "0123456789",\n' + '  "parent2Email": "mary.doe@example.com"'  + ' "batchId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '}';
 router.get('/', async (req, res) => {
     students = await getAll(req.params.id);
     console.log('students ', students);

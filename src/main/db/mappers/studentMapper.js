@@ -7,6 +7,9 @@ function toStudentEntity(student) {
             id: generateUUID(), // Generate a unique ID for the student
             firstName: student.firstName,
             lastName: student.lastName,
+            userName: student.userName,
+            password: student.password,
+            email: student.email,
             age: student.age,
             addressLine1: student.addressLine1,
             addressCity: student.addressCity,
@@ -19,8 +22,11 @@ function toStudentEntity(student) {
             parent1Email: student.parent1Email,
             parent2Name: student.parent2Name,
             parent2Phone: student.parent2Phone,
-            parent2Email: student.parent2Email
-        })
+            parent2Email: student.parent2Email,
+            batchId:student.batchId
+        },
+        { removeUndefinedValues: true }
+    )
     };
 }
 
