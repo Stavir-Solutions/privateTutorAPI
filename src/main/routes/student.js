@@ -27,7 +27,6 @@ const studentSchema = Joi.object({
     parent2Phone: Joi.string().pattern(/^[0-9]{10}$/).optional(),
     parent2Email: Joi.string().email().optional(),
     batches: Joi.array().items(Joi.string()).optional(),
-    batchId: Joi.string().optional()
 
 }).unknown(false);
 
@@ -48,14 +47,13 @@ const studentUpdateSchema = Joi.object({
     parent2Phone: Joi.string().pattern(/^[0-9]{10}$/).optional(),
     parent2Email: Joi.string().email().optional(),
     batches: Joi.array().items(Joi.string()).optional(),
-    batchId:Joi.string().optional()
 }).or(
     'firstName', 'lastName', 'age', 'addressLine1', 'addressCity', 'addressState', 'pinCode',
     'profilePicUrl', 'gender', 'parent1Name', 'parent1Phone', 'parent1Email', 'parent2Name',
-    'parent2Phone', 'parent2Email', 'batches','batchId'
+    'parent2Phone', 'parent2Email', 'batches'
 ).unknown(false);
 
-var student = '{' + '  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '  "firstName": "Jane",\n' + ' "username": "JaneDoe",\n' + '  "password: "password123",\n' + '  "email": ""jane.doe@example.com"",\n' + '   "lastName": "Doe",\n' + '  "age": 16,\n' + '  "addressLine1": "456 Elm St",\n' + '  "addressCity": "Othertown",\n' + '  "addressState": "Otherstate",\n' + '  "pinCode": 654321,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "gender": "female",\n' + '  "parent1Name": "John Doe",\n' + '  "parent1Phone": "9876543210",\n' + '  "parent1Email": "john.doe@example.com",\n' + '  "parent2Name": "Mary Doe",\n' + '  "parent2Phone": "0123456789",\n' + '  "parent2Email": "mary.doe@example.com"'  + ' "batchId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '}';
+var student = '{' + '  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '  "firstName": "Jane",\n' + ' "username": "JaneDoe",\n' + '  "password: "password123",\n' + '  "email": ""jane.doe@example.com"",\n' + '   "lastName": "Doe",\n' + '  "age": 16,\n' + '  "addressLine1": "456 Elm St",\n' + '  "addressCity": "Othertown",\n' + '  "addressState": "Otherstate",\n' + '  "pinCode": 654321,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "gender": "female",\n' + '  "parent1Name": "John Doe",\n' + '  "parent1Phone": "9876543210",\n' + '  "parent1Email": "john.doe@example.com",\n' + '  "parent2Name": "Mary Doe",\n' + '  "parent2Phone": "0123456789",\n' + '  "parent2Email": "mary.doe@example.com"'  +  '}';
 router.get('/', async (req, res) => {
     students = await getAll(req.params.id);
     console.log('students ', students);
