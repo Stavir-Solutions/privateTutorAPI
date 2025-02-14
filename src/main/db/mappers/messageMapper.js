@@ -27,7 +27,7 @@ function toMessageEntity(message) {
             attachmentUrls: message.attachmentUrls,
             replies: message.replies ? message.replies.map(toReplyEntity) : [],
         },
-    
+        { removeUndefinedValues: true }
     ),
     };
 }

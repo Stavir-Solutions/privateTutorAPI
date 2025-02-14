@@ -446,9 +446,10 @@
 				"url": {
 					"raw": "{{base_url}}/messages/batch/:batchId",
 					"host": [
-						"{{base_url}}messages"
+						"{{base_url}}"
 					],
 					"path": [
+						"messages",
 						"batch",
 						":batchId"
 					],
@@ -1056,7 +1057,6 @@
 					],
 					"path": [
 						"notifications",
-						"teachers",
 						":notificationId",
 						"seen"
 					],
@@ -1321,7 +1321,7 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": ""
+							"value": "123e4567-e89b-12d3-a456-426614174000"
 						}
 					]
 				}
@@ -1357,7 +1357,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "483fc7dd-9817-4e56-945f-c7496c3844a4"
+							"value": "b5723bab-6cde-44e8-94bf-15f776a82896"
 						}
 					]
 				}
@@ -1390,7 +1390,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": ""
+							"value": "d6bbb2a2-8928-469d-9698-0f743efc62c2"
 						}
 					]
 				}

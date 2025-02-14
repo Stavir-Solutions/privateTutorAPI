@@ -14,7 +14,9 @@ function toBatchEntity(batch) {
             paymentFrequency: batch.paymentFrequency,
             paymentAmount: batch.paymentAmount,
             paymentDayOfMonth: batch.paymentDayOfMonth
-        })
+        },
+        { removeUndefinedValues: true }
+    )
     };
 }
 
