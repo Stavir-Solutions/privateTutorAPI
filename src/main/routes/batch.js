@@ -77,9 +77,11 @@ router.patch('/:batchId/student/:studentId', async (req, res) => {
     let student = await getStudentById(req.params.studentId);
     console.log('student ', student);
     console.log('batches before ', student.batches);
-    batches = student.batches;
+    //TODO keerthi to verify that the student is not already in the batch.
+    // If the below code is not working then do an explicit check before pushing to the batches set
+    let batches;
     if (!student.batches) {
-        batches = []
+        batches = new Set(student.batches || []);
     }
     batches.push(req.params.batchId);
     console.log('batches after ', student.batches);

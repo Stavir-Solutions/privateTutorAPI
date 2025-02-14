@@ -26,7 +26,7 @@ router.get('/teachers/:teacherId', async(req, res) => {
 
 router.patch('/:notificationId/seen', async (req, res) => {
     const Notifications = await markNotificationSeen(req.params.notificationId);
-    buildSuccessResponse(res, 200, null);
+    buildSuccessResponse(res, 200, Notifications);
     console.log('notification {} is marked as seen', req.params.notificationId);
 
 });

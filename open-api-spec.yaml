@@ -1,0 +1,1297 @@
+openapi: 3.0.0
+info:
+  title: Teacher parent connect API Documentation
+  version: 1.0.0
+paths:
+  /notifications:
+    get:
+      summary: Get all notifications
+      responses:
+        '200':
+          description: A list of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+    post:
+      summary: Create a new notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+      responses:
+        '200':
+          description: The created notification ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /notifications/{id}:
+    get:
+      summary: Get a notification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A notification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+    put:
+      summary: Update a notification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationUpdate'
+      responses:
+        '200':
+          description: The updated notification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+    patch:
+      summary: Partially update a notification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationPatch'
+      responses:
+        '200':
+          description: The updated notification
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+    delete:
+      summary: Delete a notification by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /notes:
+    get:
+      summary: Get all notes
+      responses:
+        '200':
+          description: A list of notes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+    post:
+      summary: Create a new note
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+      responses:
+        '200':
+          description: The created note ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /notes/{id}:
+    get:
+      summary: Get a note by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+    put:
+      summary: Update a note by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteUpdate'
+      responses:
+        '200':
+          description: The updated note
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+    delete:
+      summary: Delete a note by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /assignments:
+    get:
+      summary: Get all assignments
+      responses:
+        '200':
+          description: A list of assignments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Assignment'
+    post:
+      summary: Create a new assignment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      responses:
+        '200':
+          description: The created assignment ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /assignments/{id}:
+    get:
+      summary: Get an assignment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An assignment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+    put:
+      summary: Update an assignment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignmentUpdate'
+      responses:
+        '200':
+          description: The updated assignment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Assignment'
+    delete:
+      summary: Delete an assignment by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /batches:
+    get:
+      summary: Get all batches
+      responses:
+        '200':
+          description: A list of batches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Batch'
+    post:
+      summary: Create a new batch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Batch'
+      responses:
+        '200':
+          description: The created batch ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /batches/{id}:
+    get:
+      summary: Get a batch by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A batch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+    put:
+      summary: Update a batch by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchUpdate'
+      responses:
+        '200':
+          description: The updated batch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+    delete:
+      summary: Delete a batch by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /feerecords:
+    get:
+      summary: Get all fee records
+      responses:
+        '200':
+          description: A list of fee records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FeeRecord'
+    post:
+      summary: Create a new fee record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeRecord'
+      responses:
+        '200':
+          description: The created fee record ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /feerecords/{id}:
+    get:
+      summary: Get a fee record by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A fee record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeRecord'
+    put:
+      summary: Update a fee record by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FeeRecordUpdate'
+      responses:
+        '200':
+          description: The updated fee record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FeeRecord'
+    delete:
+      summary: Delete a fee record by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+
+  /messages:
+    get:
+      summary: Get all messages
+      responses:
+        '200':
+          description: A list of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+    post:
+      summary: Create a new message
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '200':
+          description: The created message ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /messages/{id}:
+    get:
+      summary: Get a message by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    put:
+      summary: Update a message by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageUpdate'
+      responses:
+        '200':
+          description: The updated message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+    delete:
+      summary: Delete a message by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /students:
+    get:
+      summary: Get all students
+      responses:
+        '200':
+          description: A list of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+    post:
+      summary: Create a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Student'
+      responses:
+        '200':
+          description: The created student ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /students/{id}:
+    get:
+      summary: Get a student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A student
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+    put:
+      summary: Update a student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentUpdate'
+      responses:
+        '200':
+          description: The updated student
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+    delete:
+      summary: Delete a student by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /teachers:
+    get:
+      summary: Get all teachers
+      responses:
+        '200':
+          description: A list of teachers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Teacher'
+    post:
+      summary: Create a new teacher
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teacher'
+      responses:
+        '200':
+          description: The created teacher ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /teachers/{id}:
+    get:
+      summary: Get a teacher by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A teacher
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+    put:
+      summary: Update a teacher by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeacherUpdate'
+      responses:
+        '200':
+          description: The updated teacher
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teacher'
+    delete:
+      summary: Delete a teacher by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /tests/batches/{batchId}:
+    get:
+      summary: Get tests by batch ID
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of tests
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Test'
+  /tests/{id}:
+    get:
+      summary: Get a test by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A test
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+    put:
+      summary: Update a test by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestUpdate'
+      responses:
+        '200':
+          description: The updated test
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Test'
+    delete:
+      summary: Delete a test by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /tests:
+    post:
+      summary: Create a new test
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Test'
+      responses:
+        '200':
+          description: The created test ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /testResults/students/{studentId}:
+    get:
+      summary: Get test results by student ID
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of test results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestResult'
+  /testResults/tests/{testId}:
+    get:
+      summary: Get test results by test ID
+      parameters:
+        - name: testId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of test results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestResult'
+  /testResults/{id}:
+    get:
+      summary: Get a test result by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResult'
+    put:
+      summary: Update a test result by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestResultUpdate'
+      responses:
+        '200':
+          description: The updated test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestResult'
+    delete:
+      summary: Delete a test result by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The deletion result
+          content:
+            application/json:
+              schema:
+                type: object
+  /testResults:
+    post:
+      summary: Create a new test result
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestResult'
+      responses:
+        '200':
+          description: The created test result ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+  /upload:
+    post:
+      summary: Upload a file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: The file URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+components:
+  schemas:
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        date:
+          type: string
+          format: date-time
+    NotificationUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        date:
+          type: string
+          format: date-time
+    Note:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        date:
+          type: string
+          format: date-time
+    NoteUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        date:
+          type: string
+          format: date-time
+    Assignment:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+    AssignmentUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+    Batch:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        teacherId:
+          type: string
+        course:
+          type: string
+        subject:
+          type: string
+        description:
+          type: string
+        paymentFrequency:
+          type: string
+        paymentAmount:
+          type: number
+        paymentDayOfMonth:
+          type: integer
+    BatchUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        course:
+          type: string
+        subject:
+          type: string
+        description:
+          type: string
+        paymentFrequency:
+          type: string
+        paymentAmount:
+          type: number
+        paymentDayOfMonth:
+          type: integer
+    FeeRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        studentId:
+          type: string
+        amount:
+          type: number
+        date:
+          type: string
+          format: date-time
+    FeeRecordUpdate:
+      type: object
+      properties:
+        studentId:
+          type: string
+        amount:
+          type: number
+        date:
+          type: string
+          format: date-time
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        senderId:
+          type: string
+        receiverId:
+          type: string
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    MessageUpdate:
+      type: object
+      properties:
+        senderId:
+          type: string
+        receiverId:
+          type: string
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    Student:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        age:
+          type: integer
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        gender:
+          type: string
+        parent1Name:
+          type: string
+        parent1Phone:
+          type: string
+        parent1Email:
+          type: string
+        parent2Name:
+          type: string
+        parent2Phone:
+          type: string
+        parent2Email:
+          type: string
+        batches:
+          type: array
+          items:
+            type: string
+    StudentUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        age:
+          type: integer
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        gender:
+          type: string
+        parent1Name:
+          type: string
+        parent1Phone:
+          type: string
+        parent1Email:
+          type: string
+        parent2Name:
+          type: string
+        parent2Phone:
+          type: string
+        parent2Email:
+          type: string
+        batches:
+          type: array
+          items:
+            type: string
+    Teacher:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        password:
+          type: string
+        email:
+          type: string
+        age:
+          type: integer
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        gender:
+          type: string
+        subject:
+          type: string
+      required:
+        - userName
+        - email
+        - password
+    TeacherUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        age:
+          type: integer
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        gender:
+          type: string
+        subject:
+          type: string
+    Test:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        subject:
+          type: string
+        testDate:
+          type: string
+          format: date-time
+        resultPublishDate:
+          type: string
+          format: date-time
+        totalMarks:
+          type: number
+        minimumPassMark:
+          type: number
+        numberOfQuestions:
+          type: integer
+        batchId:
+          type: string
+    TestUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        subject:
+          type: string
+        testDate:
+          type: string
+          format: date-time
+        resultPublishDate:
+          type: string
+          format: date-time
+        totalMarks:
+          type: number
+        minimumPassMark:
+          type: number
+        numberOfQuestions:
+          type: integer
+    TestResult:
+      type: object
+      properties:
+        id:
+          type: string
+        testId:
+          type: string
+        marks:
+          type: number
+        studentId:
+          type: string
+        attestedByParent:
+          type: boolean
+    TestResultUpdate:
+      type: object
+      properties:
+        marks:
+          type: number
+        studentId:
+          type: string
+        attestedByParent:
+          type: boolean
+    NotificationPatch:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        date:
+          type: string
+          format: date-time
