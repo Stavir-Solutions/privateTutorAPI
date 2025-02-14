@@ -348,7 +348,7 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": "123"
+							"value": "212e46a9-9a1d-4906-a27e-5ef03e989955"
 						}
 					]
 				}
@@ -367,7 +367,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"age\": 16,\n  \"addressLine1\": \"456 Elm St\",\n  \"addressCity\": \"Othertown\",\n  \"addressState\": \"Otherstate\",\n  \"pinCode\": 654321,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"gender\": \"female\",\n  \"parent1Name\": \"John Doe\",\n  \"parent1Phone\": \"9876543210\",\n  \"parent1Email\": \"john.doe@example.com\",\n  \"parent2Name\": \"Mary Doe\",\n  \"parent2Phone\": \"0123456789\",\n  \"parent2Email\": \"mary.doe@example.com\"\n}"
+					"raw": "{\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Doe\",\n  \"age\": 16,\n  \"userName\":\"johndoe\",\n  \"password\":\"password123\",\n  \"email\":\"jane.doe@example.com\",\n  \"addressLine1\": \"456 Elm St\",\n  \"addressCity\": \"Othertown\",\n  \"addressState\": \"Otherstate\",\n  \"pinCode\": 654321,\n  \"profilePicUrl\": \"http://example.com/profile.jpg\",\n  \"gender\": \"female\",\n  \"parent1Name\": \"John Doe\",\n  \"parent1Phone\": \"9876543210\",\n  \"parent1Email\": \"john.doe@example.com\",\n  \"parent2Name\": \"Mary Doe\",\n  \"parent2Phone\": \"0123456789\",\n  \"parent2Email\": \"mary.doe@example.com\"\n}"
 				},
 				"url": {
 					"raw": "{{base_url}}/students",

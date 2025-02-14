@@ -79,17 +79,19 @@ async function getStudentById(studentId) {
 
 async function getByBatchId(batchId) {
     const params = {
-        TableName: tableName, FilterExpression: "batchId = :batchId", ExpressionAttributeValues: {
-            ':batchId': {S: batchId},
+        TableName: tableName,
+        FilterExpression: "contains(batches, :batchId)",
+        ExpressionAttributeValues: {
+            ':batchId': { S: batchId }, 
         },
     };
 
     try {
         const data = await db.send(new ScanCommand(params));
-        return data.Items.map(item => unmarshall(item));
+        return data.Items.map(item => unmarshall(item)); 
     } catch (err) {
-        console.error('Unable to get student by batch. Error JSON:', JSON.stringify(err, null, 2));
-        throw err;
+        console.error('Unable to get students by batch. Error JSON:', JSON.stringify(err, null, 2));
+        throw err; 
     }
 }
 
@@ -125,4 +127,3 @@ async function deleteById(studentId) {
 
 
 module.exports = {create, getStudentById, getAll, deleteById, updateStudent, getByBatchId}
-
