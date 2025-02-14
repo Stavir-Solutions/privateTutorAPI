@@ -22,7 +22,9 @@ function toTeacherEntity(teacher) {
             accountNumber: teacher.accountNumber,
             accountName: teacher.accountName,
             ifscCode: teacher.ifscCode
-        })
+        },
+        { removeUndefinedValues: true }
+    )
     };
 }
 

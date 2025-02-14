@@ -12,7 +12,9 @@ function toNotesEntity(notes) {
             batchId: notes.batchId,
             content: notes.content,
             
-        })
+        },
+        { removeUndefinedValues: true }
+    )
     };
 }
 

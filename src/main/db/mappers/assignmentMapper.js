@@ -13,7 +13,9 @@ function toAssignmentEntity(assignment) {
             title: assignment.title,
             details: assignment.details,
             attachmentUrls: assignment.attachmentUrls,
-        })
+        },
+        { removeUndefinedValues: true }
+    )
     };
 }
 
