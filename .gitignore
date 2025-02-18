@@ -132,3 +132,5 @@ dist
 .idea
 
 Archive.zip
+
+*.pem
