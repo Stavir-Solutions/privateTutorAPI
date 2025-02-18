@@ -2,6 +2,7 @@ const db = require('../db/dynamodb');
 const jwt = require('jsonwebtoken');
 const {ScanCommand} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
+const {buildSuccessResponse} = require("../routes/responseUtils");
 
 async function getTeacherIfPasswordMatches(userName, password) {
 
@@ -86,16 +87,33 @@ function buildStudentPayload(student) {
 
 async function generateToken(payload) {
 
-    let jwtsecretBase64 = process.env.JWT_SECRET;
-    const jwtsecret = Buffer.from(jwtsecretBase64, 'base64').toString('utf-8');
-    console.log('jwtsecret {}', jwtsecret);
+    const jwtPublicKey = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('utf-8');
+    console.log('jwtsecret {}', jwtPublicKey);
 
-    const token = jwt.sign(payload, jwtsecret, {algorithm: 'RS256'});
+    const token = jwt.sign(payload, jwtPublicKey, {algorithm: 'RS256'});
 
     console.log(token)
     return token;
 }
 
+
+async function validateToken(token, res) {
+    const jwtPublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY, 'base64').toString('utf-8');
+    try {
+        let decoded = await jwt.verify(token, jwtPublicKey);
+        console.log('decoded {}', decoded);
+        return true;
+    } catch (error) {
+        console.error('Token validation error:', error);
+        return false;
+    }
+}
+
 module.exports = {
-    getTeacherIfPasswordMatches, getStudentIfPasswordMatches, generateToken, buildTeacherPayload, buildStudentPayload
+    getTeacherIfPasswordMatches,
+    getStudentIfPasswordMatches,
+    generateToken,
+    buildTeacherPayload,
+    buildStudentPayload,
+    validateToken
 }

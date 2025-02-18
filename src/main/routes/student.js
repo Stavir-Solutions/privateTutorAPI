@@ -5,7 +5,9 @@ const {create, getStudentById, getAll, deleteById, updateStudent, getByBatchId} 
 
 const router = express.Router();
 const Joi = require('joi');
+const authMiddleware = require("../middleware/authMiddleware");
 router.use(express.json());
+router.use(authMiddleware);
 
 const studentSchema = Joi.object({
     firstName: Joi.string().max(50).optional(),
