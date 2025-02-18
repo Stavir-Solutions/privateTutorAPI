@@ -26,6 +26,8 @@ jobs:
           echo "region=us-east-1" >> .env
           echo "dbendpoint=${{ secrets.ENDPOINT }}" >> .env
           echo "s3BucketName=private-teacher-data" >> .env
+          echo "JWT_PRIVATE_KEY=${{ secrets.JWT_PRIVATE_KEY }}" >> .env
+          echo "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> .env
         shell: bash
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
