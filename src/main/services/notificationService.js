@@ -14,10 +14,10 @@ const tableName = "Notifications";
 async function getByTeacherId(teacherId) {
     const params = {
         TableName: tableName,
-        FilterExpression: "teacherId = :teacherId ",
+        FilterExpression: "teacherId = :teacherId AND seen = :seen",
         ExpressionAttributeValues: {
             ':teacherId': marshall(teacherId),
-            
+            ':seen': marshall(false)
         },
     };
 
@@ -56,10 +56,10 @@ async function markNotificationSeen(notificationId) {
 async function getByStudentId(studentId) {
     const params = {
         TableName: tableName,
-        FilterExpression: "studentId = :studentId ",
+        FilterExpression: "studentId = :studentId AND seen = :seen",
         ExpressionAttributeValues: {
             ':studentId': marshall(studentId),
-           
+            ':seen': marshall(false)
 
         },
     };
