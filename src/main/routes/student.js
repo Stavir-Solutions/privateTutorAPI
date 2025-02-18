@@ -33,6 +33,8 @@ const studentSchema = Joi.object({
 const studentUpdateSchema = Joi.object({
     firstName: Joi.string().max(50).optional(),
     lastName: Joi.string().max(50).optional(),
+    userName: Joi.string().alphanum().min(3).max(30).optional(),
+    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9]{6,20}$')).required(),
     age: Joi.number().integer().optional(),
     addressLine1: Joi.string().optional(),
     addressCity: Joi.string().optional(),
@@ -50,7 +52,7 @@ const studentUpdateSchema = Joi.object({
 }).or(
     'firstName', 'lastName', 'age', 'addressLine1', 'addressCity', 'addressState', 'pinCode',
     'profilePicUrl', 'gender', 'parent1Name', 'parent1Phone', 'parent1Email', 'parent2Name',
-    'parent2Phone', 'parent2Email', 'batches'
+    'parent2Phone', 'parent2Email', 'batches', 'userName', 'password'
 ).unknown(false);
 
 var student = '{' + '  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '  "firstName": "Jane",\n' + ' "username": "JaneDoe",\n' + '  "password: "password123",\n' + '  "email": ""jane.doe@example.com"",\n' + '   "lastName": "Doe",\n' + '  "age": 16,\n' + '  "addressLine1": "456 Elm St",\n' + '  "addressCity": "Othertown",\n' + '  "addressState": "Otherstate",\n' + '  "pinCode": 654321,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "gender": "female",\n' + '  "parent1Name": "John Doe",\n' + '  "parent1Phone": "9876543210",\n' + '  "parent1Email": "john.doe@example.com",\n' + '  "parent2Name": "Mary Doe",\n' + '  "parent2Phone": "0123456789",\n' + '  "parent2Email": "mary.doe@example.com"'  +  '}';
