@@ -2,8 +2,11 @@ const express = require('express');
 const multer = require('multer');
 const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
 const {NodeHttpHandler} = require('@aws-sdk/node-http-handler');
+const authMiddleware = require("../middleware/authMiddleware");
+
 const router = express.Router();
 router.use(express.json());
+router.use(authMiddleware);
 
 const s3Config = {
     region: process.env.region, credentials: {

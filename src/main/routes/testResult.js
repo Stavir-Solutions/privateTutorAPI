@@ -2,9 +2,11 @@ const express = require('express');
 const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
 const Joi = require('joi');
 const {create,updateTestResult, getById, deleteById,getAllByStudentId,getAllByTestId} = require('../services/testResultService');
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 router.use(express.json());
+router.use(authMiddleware);
 
 const testResultSchema = Joi.object({
     testId: Joi.string().required(),

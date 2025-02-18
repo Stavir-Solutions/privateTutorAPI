@@ -6,7 +6,9 @@ const {create, getByBatchIdAndStudentId , getById, deleteById, updateAssignment,
 
 const router = express.Router();
 const Joi = require('joi');
+const authMiddleware = require("../middleware/authMiddleware");
 router.use(express.json());
+router.use(authMiddleware);
 
 const assignmentSchema = Joi.object({
     publishDate: Joi.date().required(),

@@ -1,10 +1,12 @@
 const express = require('express');
 const {buildSuccessResponse} = require("./responseUtils");
 const {getByTeacherId ,markNotificationSeen,getByStudentId} = require('../services/notificationService');
+const authMiddleware = require("../middleware/authMiddleware");
 
 
 const router = express.Router();
 router.use(express.json());
+router.use(authMiddleware);
 
 const  NotificationType = {
         MESSAGE: 'MESSAGE',

@@ -6,7 +6,9 @@ const {create, getByBatchIdAndStudentId ,getbyBatchId,getById, deleteById, updat
 const router = express.Router();
 const Joi = require('joi');
 const {getByBatchId} = require("../services/messageService");
+const authMiddleware = require("../middleware/authMiddleware");
 router.use(express.json());
+router.use(authMiddleware);
 
 const FeeRecordStatus = Object.freeze({
     PAID: 'paid', PENDING: 'pending'

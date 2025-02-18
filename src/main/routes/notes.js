@@ -2,10 +2,12 @@ const express = require('express');
 const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
 const Joi = require('joi');
 const {create,updateNotes, getByStudentId, deleteById,getByBatchId} = require('../services/notesService');
+const authMiddleware = require("../middleware/authMiddleware");
 
 
 const router = express.Router();
 router.use(express.json());
+router.use(authMiddleware);
 
 const notesSchema = Joi.object({
     publishDate: Joi.date().required(),

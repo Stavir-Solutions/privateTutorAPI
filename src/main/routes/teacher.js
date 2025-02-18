@@ -1,10 +1,13 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
 const {create, getById, getAll, deleteById, update} = require('../services/teacherService');
+const {validateToken} = require('../services/loginService')
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
+router.use(authMiddleware);
 
 const teacherSchema = Joi.object({
     firstName: Joi.string().optional(),
@@ -46,17 +49,16 @@ const teacherUpdateSchema = Joi.object({
     accountName: Joi.string().optional(),
     ifscCode: Joi.string().optional()
 
-}).or(
-    'firstName', 'lastName', 'userName', 'password', 'age', 'gender', 'addressLine1',
-    'addressCity', 'addressState', 'pinCode', 'profilePicUrl', 'phoneNumber',
-    'upiId', 'accountNumber', 'accountName', 'ifscCode'
-).unknown(false);
-
-
-var teacher = '{' + '  "id": "550e8400-e29b-41d4-a716-446655440000",\n' + '  "firstName": "John",\n' + '  "lastName": "Doe",\n' + '  "userName": "johndoe",\n' + '  "password": "password123",\n' + '  "age": 30,\n' + '  "gender": "male",\n' + '  "addressLine1": "123 Main St",\n' + '  "addressCity": "Anytown",\n' + '  "addressState": "Anystate",\n' + '  "pinCode": 123456,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "email": "john.doe@example.com",\n' + '  "phoneNumber": "1234567890",\n' + '  "upiId": "john@upi",\n' + '  "accountNumber": "1234567890",\n' + '  "accountName": "John Doe",\n' + '  "ifscCode": "IFSC0001234"\n' + '}';
-
+}).or('firstName', 'lastName', 'userName', 'password', 'age', 'gender', 'addressLine1', 'addressCity', 'addressState', 'pinCode', 'profilePicUrl', 'phoneNumber', 'upiId', 'accountNumber', 'accountName', 'ifscCode').unknown(false);
 
 router.get('/', async (req, res) => {
+    const token = req.header('Authorization')?.split(' ')[1];
+    let isValid = await validateToken(token);
+    console.log('isValid ', isValid);
+    if (!isValid) {
+        buildErrorMessage(res, 401, 'invalid token send your login response token as bearer <token>');
+        return;
+    }
     teachers = await getAll(req.params.id);
     console.log('teachers ', teachers);
     buildSuccessResponse(res, 200, teachers);
