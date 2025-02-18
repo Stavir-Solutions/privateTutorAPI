@@ -70,40 +70,38 @@ router.put('/:id', async (req, res) => {
     buildSuccessResponse(res, 200, updateResult);
     console.log('updated batch ', req.params.id);
 });
-
-
 router.patch('/:batchId/student/:studentId', async (req, res) => {
-    console.log('Adding student', req.params.studentId, 'to batch', req.params.batchId);
-    
-    // Fetch the student by ID
-    let student = await getStudentById(req.params.studentId);
+
+    const { batchId, studentId } = req.params;
+
+    console.log('add student', studentId, 'to batch', batchId);
+
+    if (!batchId || batchId.trim() === '' || batchId === ':batchId') {
+        return res.status(400).json({ message: 'batchId is required' });
+    }
+
+    let student = await getStudentById(studentId);
     console.log('Student:', student);
-    
-    // Check if the student exists
+
     if (!student) {
-        return res.status(404).send('Student not found');
+        return res.status(404).json({ message: 'Student not found' });
     }
 
-    console.log('Batches before:', student.batches);
-    
-    // Initialize batches as a Set to avoid duplicates
+    console.log('batches before:', student.batches);
+
     let batches = new Set(student.batches || []);
-    
-    // Check if the student is already in the batch
-    if (batches.has(req.params.batchId)) {
-        return res.status(400).send('Student is already in this batch');
+
+    if (batches.has(batchId)) {
+        return res.status(400).json({ message: 'Student is already in this batch' });
     }
 
-    // Add the batch ID to the Set
-    batches.add(req.params.batchId);
-    console.log('Batches after:', Array.from(batches)); // Convert Set to Array for logging
+    batches.add(batchId);
+    console.log('Batches after:', Array.from(batches));
 
-    // Update the student with the new batches
-    let updateResult = await updateStudent(req.params.studentId, { "batches": Array.from(batches) });
-    
-    // Send a success response
+    let updateResult = await updateStudent(studentId, { batches: Array.from(batches) });
     buildSuccessResponse(res, 200, updateResult);
-    console.log("Added Student " + req.params.studentId + " to Batch " + req.params.batchId);
+    console.log(`Added Student ${studentId} to Batch ${batchId}`);
+
 });
 
 router.delete('/:id', async (req, res) => {
