@@ -2,122 +2,134 @@ openapi: 3.0.0
 info:
   title: Teacher parent connect API Documentation
   version: 1.0.0
+
 paths:
-  /notifications:
+  /notifications/teachers/{teacherId}:
     get:
-      summary: Get all notifications
+      summary: Get all notifications for a specific teacher
+      parameters:
+        - name: teacherId
+          in: path
+          required: true
+          description: The ID of the teacher
+          schema:
+            type: string
       responses:
         '200':
-          description: A list of notifications
+          description: A list of notifications for the teacher
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Notification'
-    post:
-      summary: Create a new notification
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Notification'
-      responses:
-        '200':
-          description: The created notification ID
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-  /notifications/{id}:
-    get:
-      summary: Get a notification by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A notification
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Notification'
-    put:
-      summary: Update a notification by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NotificationUpdate'
-      responses:
-        '200':
-          description: The updated notification
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Notification'
+
+  /notifications/{notificationId}/seen:
     patch:
-      summary: Partially update a notification by ID
+      summary: Mark a notification as seen
       parameters:
-        - name: id
+        - name: notificationId
           in: path
           required: true
+          description: The ID of the notification to mark as seen
           schema:
             type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NotificationPatch'
       responses:
         '200':
-          description: The updated notification
+          description: Notification marked as seen
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Notification'
-    delete:
-      summary: Delete a notification by ID
+
+  /notifications/students/{studentId}:
+    get:
+      summary: Get all notifications for a specific student
       parameters:
-        - name: id
+        - name: studentId
           in: path
           required: true
+          description: The ID of the student
           schema:
             type: string
       responses:
         '200':
-          description: The deletion result
+          description: A list of notifications for the student
           content:
             application/json:
               schema:
-                type: object
-  /notes:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+
+components:
+  schemas:
+    Notification:
+      type: object
+      properties:
+        notificationId:
+          type: string
+          format: uuid
+        deeplink:
+          type: string
+        objectId:
+          type: string
+          format: uuid
+        studentId:
+          type: string
+          format: uuid
+        teacherId:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum: [MESSAGE, FEE_PAID, NEW_STUDENT, FEE_INVOICE_RELEASED, FEE_PAYMENT_CONFIRMED, ASSIGNMENT]
+        title:
+          type: string
+        seen:
+          type: boolean
+
+  /notes/batch/{batchId}:
     get:
-      summary: Get all notes
+      summary: Get all notes for a specific batch
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          description: The ID of the batch
+          schema:
+            type: string
       responses:
         '200':
-          description: A list of notes
+          description: List of notes for the batch
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Note'
+
+  /notes/student/{studentId}:
+    get:
+      summary: Get all notes for a specific student
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          description: The ID of the student
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of notes for the student
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+
+  /notes/:
     post:
       summary: Create a new note
       requestBody:
@@ -128,7 +140,7 @@ paths:
               $ref: '#/components/schemas/Note'
       responses:
         '200':
-          description: The created note ID
+          description: Note created successfully
           content:
             application/json:
               schema:
@@ -136,28 +148,15 @@ paths:
                 properties:
                   id:
                     type: string
+
   /notes/{id}:
-    get:
-      summary: Get a note by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A note
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Note'
     put:
-      summary: Update a note by ID
+      summary: Update an existing note
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the note to update
           schema:
             type: string
       requestBody:
@@ -168,56 +167,124 @@ paths:
               $ref: '#/components/schemas/NoteUpdate'
       responses:
         '200':
-          description: The updated note
+          description: Note updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
+
+  /notes/{id}:
     delete:
       summary: Delete a note by ID
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the note to delete
           schema:
             type: string
       responses:
         '200':
-          description: The deletion result
+          description: Note deleted successfully
           content:
             application/json:
               schema:
                 type: object
-  /assignments:
+                properties:
+                  message:
+                    type: string
+components:
+  schemas:
+    Note:
+      type: object
+      required:
+        - publishDate
+        - Title
+        - studentId
+        - batchId
+        - content
+      properties:
+        id:
+          type: string
+        publishDate:
+          type: string
+        Title:
+          type: string
+        listUrls:
+          type: array
+          items:
+            type: string
+        studentId:
+          type: string
+        batchId:
+          type: string
+        content:
+          type: string
+
+    NoteUpdate:
+      type: object
+      properties:
+        publishDate:
+          type: string
+        Title:
+          type: string
+        listUrls:
+          type: array
+          items:
+            type: string
+        studentId:
+          type: string
+        batchId:
+          type: string
+        content:
+          type: string
+
+  /assignments/batch/{batchId}:
     get:
-      summary: Get all assignments
+      summary: Get all assignments for a batch
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          description: The ID of the batch
+          schema:
+            type: string
       responses:
         '200':
-          description: A list of assignments
+          description: List of assignments for the batch
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Assignment'
-    post:
-      summary: Create a new assignment
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Assignment'
+
+  /assignments/batch/{batchId}/student/{studentId}:
+    get:
+      summary: Get all assignments for a student in a batch
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          description: The ID of the batch
+          schema:
+            type: string
+        - name: studentId
+          in: path
+          required: true
+          description: The ID of the student
+          schema:
+            type: string
       responses:
         '200':
-          description: The created assignment ID
+          description: List of assignments for the student in the batch
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
+                type: array
+                items:
+                  $ref: '#/components/schemas/Assignment'
+
   /assignments/{id}:
     get:
       summary: Get an assignment by ID
@@ -225,21 +292,25 @@ paths:
         - name: id
           in: path
           required: true
+          description: The ID of the assignment
           schema:
             type: string
       responses:
         '200':
-          description: An assignment
+          description: Assignment details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Assignment'
+
+  /assignments/{id}:
     put:
-      summary: Update an assignment by ID
+      summary: Update an assignment
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the assignment to update
           schema:
             type: string
       requestBody:
@@ -250,49 +321,42 @@ paths:
               $ref: '#/components/schemas/AssignmentUpdate'
       responses:
         '200':
-          description: The updated assignment
+          description: Assignment updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Assignment'
+
+  /assignments/{id}:
     delete:
       summary: Delete an assignment by ID
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the assignment to delete
           schema:
             type: string
       responses:
         '200':
-          description: The deletion result
+          description: Assignment deleted successfully
           content:
             application/json:
               schema:
                 type: object
-  /batches:
-    get:
-      summary: Get all batches
-      responses:
-        '200':
-          description: A list of batches
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Batch'
+
+  /assignments/:
     post:
-      summary: Create a new batch
+      summary: Create a new assignment
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Batch'
+              $ref: '#/components/schemas/Assignment'
       responses:
         '200':
-          description: The created batch ID
+          description: Assignment created successfully
           content:
             application/json:
               schema:
@@ -300,28 +364,82 @@ paths:
                 properties:
                   id:
                     type: string
+
+components:
+  schemas:
+    Assignment:
+      type: object
+      required:
+        - publishDate
+        - submissionDate
+        - batchId
+        - title
+      properties:
+        id:
+          type: string
+        publishDate:
+          type: string
+        submissionDate:
+          type: string
+        batchId:
+          type: string
+        studentId:
+          type: string
+        title:
+          type: string
+        details:
+          type: string
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+
+    AssignmentUpdate:
+      type: object
+      properties:
+        publishDate:
+          type: string
+        submissionDate:
+          type: string
+        batchId:
+          type: string
+        studentId:
+          type: string
+        title:
+          type: string
+        details:
+          type: string
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+
   /batches/{id}:
     get:
-      summary: Get a batch by ID
+      summary: Get batch by ID
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the batch
           schema:
             type: string
       responses:
         '200':
-          description: A batch
+          description: Batch details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Batch'
+
+  /batches/{id}:
     put:
-      summary: Update a batch by ID
+      summary: Update a batch
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the batch to update
           schema:
             type: string
       requestBody:
@@ -332,49 +450,62 @@ paths:
               $ref: '#/components/schemas/BatchUpdate'
       responses:
         '200':
-          description: The updated batch
+          description: Batch updated successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Batch'
+
+  /batches/{id}:    
     delete:
       summary: Delete a batch by ID
       parameters:
         - name: id
           in: path
           required: true
+          description: The ID of the batch to delete
           schema:
             type: string
       responses:
         '200':
-          description: The deletion result
+          description: Batch deleted successfully
           content:
             application/json:
               schema:
                 type: object
-  /feerecords:
+
+  /batches/teacher/{teacherId}:
     get:
-      summary: Get all fee records
+      summary: Get all batches for a teacher
+      parameters:
+        - name: teacherId
+          in: path
+          required: true
+          description: The ID of the teacher
+          schema:
+            type: string
       responses:
         '200':
-          description: A list of fee records
+          description: List of batches for the teacher
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/FeeRecord'
+                  $ref: '#/components/schemas/Batch'
+
+  /batches:
     post:
-      summary: Create a new fee record
+      summary: Create a new batch
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FeeRecord'
+              $ref: '#/components/schemas/Batch'
       responses:
         '200':
-          description: The created fee record ID
+          description: Batch created successfully
           content:
             application/json:
               schema:
@@ -382,7 +513,121 @@ paths:
                 properties:
                   id:
                     type: string
-  /feerecords/{id}:
+
+  /batches/{batchId}/student/{studentId}:
+    patch:
+      summary: Add a student to a batch
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          description: The ID of the batch
+          schema:
+            type: string
+        - name: studentId
+          in: path
+          required: true
+          description: The ID of the student
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Student added to batch
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  schemas:
+    Batch:
+      type: object
+      required:
+        - name
+        - teacherId
+        - paymentFrequency
+        - paymentAmount
+        - paymentDayOfMonth
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        teacherId:
+          type: string
+        course:
+          type: string
+        subject:
+          type: string
+        description:
+          type: string
+        paymentFrequency:
+          type: string
+        paymentAmount:
+          type: number
+        paymentDayOfMonth:
+          type: integer
+
+    BatchUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        course:
+          type: string
+        subject:
+          type: string
+        description:
+          type: string
+        paymentFrequency:
+          type: string
+        paymentAmount:
+          type: number
+        paymentDayOfMonth:
+          type: integer
+
+  /fee-records/batches/{batchId}:
+    get:
+      summary: Get fee records by batch ID
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fee records retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FeeRecord"
+
+  /fee-records/batch/{batchId}/student/{studentId}:
+    get:
+      summary: Get fee records by batch ID and student ID
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fee record retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FeeRecord"
+
+  /fee-records/{id}:
     get:
       summary: Get a fee record by ID
       parameters:
@@ -392,14 +637,16 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: A fee record
+        "200":
+          description: Fee record retrieved successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FeeRecord'
-    put:
-      summary: Update a fee record by ID
+                $ref: "#/components/schemas/FeeRecord"
+
+  /fee-records/{id}:
+    patch:
+      summary: Update a fee record
       parameters:
         - name: id
           in: path
@@ -411,41 +658,125 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/FeeRecordUpdate'
+              $ref: "#/components/schemas/FeeRecordUpdate"
       responses:
-        '200':
-          description: The updated fee record
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FeeRecord'
-    delete:
-      summary: Delete a fee record by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The deletion result
+        "200":
+          description: Fee record updated successfully
           content:
             application/json:
               schema:
                 type: object
-  /login:
+
+  /fee-records/{id}:
+    delete:
+      summary: Delete a fee record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fee record deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /fee-records:
     post:
-      summary: User login
+      summary: Create a new fee record
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Login'
+              $ref: "#/components/schemas/FeeRecordCreate"
+      responses:
+        "200":
+          description: Fee record created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+
+components:
+  schemas:
+    FeeRecord:
+      type: object
+      required:
+        - batchId
+        - studentId
+        - dueDate
+        - paymentDate
+        - amount
+        - status
+      properties:
+        id:
+          type: string
+        batchId:
+          type: string
+        studentId:
+          type: string
+        dueDate:
+          type: string
+        paymentDate:
+          type: string
+        amount:
+          type: number
+        status:
+          type: string
+        notes:
+          type: string
+        attachmentUrl:
+          type: string
+        teacherAcknowledgement:
+          type: boolean
+
+    FeeRecordUpdate:
+      type: object
+      properties:
+        dueDate:
+          type: string
+        paymentDate:
+          type: string
+        status:
+          type: string
+        notes:
+          type: string
+        attachmentUrl:
+          type: string
+        teacherAcknowledgement:
+          type: boolean
+
+  /login/teacher:
+    post:
+      summary: Teacher login
+      description: Authenticate a teacher and return a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userName
+                - password
+              properties:
+                userName:
+                  type: string
+                  description: The teacher's username
+                password:
+                  type: string
+                  format: password
+                  description: The teacher's password
       responses:
         '200':
-          description: Login successful
+          description: Successful login
           content:
             application/json:
               schema:
@@ -454,18 +785,106 @@ paths:
                   token:
                     type: string
 
-  /messages:
-    get:
-      summary: Get all messages
+  /login/student:
+    post:
+      summary: Student login
+      description: Authenticate a student and return a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userName
+                - password
+              properties:
+                userName:
+                  type: string
+                  description: The student's username
+                password:
+                  type: string
+                  format: password
+                  description: The student's password
       responses:
         '200':
-          description: A list of messages
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    
+  /messages/batch/{batchId}:
+    get:
+      summary: Get messages by batch ID
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of messages
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Message'
+
+  /messages/student/{studentId}:
+    get:
+      summary: Get messages by student ID
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+
+  /messages/{id}:
+    get:
+      summary: Get message by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+  /messages/{id}:
+    delete:
+      summary: Delete message by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Message deleted
+
+  /messages:
     post:
       summary: Create a new message
       requestBody:
@@ -475,8 +894,8 @@ paths:
             schema:
               $ref: '#/components/schemas/Message'
       responses:
-        '200':
-          description: The created message ID
+        "200":
+          description: Message created
           content:
             application/json:
               schema:
@@ -484,24 +903,10 @@ paths:
                 properties:
                   id:
                     type: string
-  /messages/{id}:
-    get:
-      summary: Get a message by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A message
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-    put:
-      summary: Update a message by ID
+
+  /messages/{id}/reply:
+    patch:
+      summary: Reply to a message
       parameters:
         - name: id
           in: path
@@ -513,29 +918,107 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/MessageUpdate'
+              $ref: '#/components/schemas/Reply'
       responses:
-        '200':
-          description: The updated message
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Message'
-    delete:
-      summary: Delete a message by ID
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
+        "200":
+          description: Reply added successfully
+
+components:
+  schemas:
+    Message:
+      type: object
+      required:
+        - subject
+        - content
+        - sender
+        - receiver
+        - batchId
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        content:
+          type: string
+        sender:
+          type: string
+        receiver:
+          type: string
+        batchId:
+          type: string
+        studentId:
+          type: string
+        timestamp:
+          type: string
+        attachmentUrls:
+          type: array
+          items:
             type: string
-      responses:
-        '200':
-          description: The deletion result
-          content:
-            application/json:
-              schema:
-                type: object
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reply'
+
+    Reply:
+      type: object
+      required:
+        - content
+        - sender
+        - timestamp
+      properties:
+        content:
+          type: string
+        sender:
+          type: string
+        timestamp:
+          type: string
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+
+    MessageUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        content:
+          type: string
+        sender:
+          type: string
+        receiver:
+          type: string
+        batchId:
+          type: string
+        studentId:
+          type: string
+        timestamp:
+          type: string
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+        replies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reply'
+
+    ReplyUpdate:
+      type: object
+      properties:
+        content:
+          type: string
+        sender:
+          type: string
+        timestamp:
+          type: string
+        attachmentUrls:
+          type: array
+          items:
+            type: string
+
   /students:
     get:
       summary: Get all students
@@ -548,6 +1031,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Student'
+  /students:                
     post:
       summary: Create a new student
       requestBody:
@@ -555,10 +1039,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Student'
+              $ref: '#/components/schemas/StudentCreate'
       responses:
         '200':
-          description: The created student ID
+          description: Student created successfully
           content:
             application/json:
               schema:
@@ -568,7 +1052,7 @@ paths:
                     type: string
   /students/{id}:
     get:
-      summary: Get a student by ID
+      summary: Get student by ID
       parameters:
         - name: id
           in: path
@@ -577,13 +1061,14 @@ paths:
             type: string
       responses:
         '200':
-          description: A student
+          description: Student details
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Student'
+  /students/{id}:
     put:
-      summary: Update a student by ID
+      summary: Update a student
       parameters:
         - name: id
           in: path
@@ -598,13 +1083,11 @@ paths:
               $ref: '#/components/schemas/StudentUpdate'
       responses:
         '200':
-          description: The updated student
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Student'
+          description: Student updated successfully
+
+  /students/{id}:
     delete:
-      summary: Delete a student by ID
+      summary: Delete a student
       parameters:
         - name: id
           in: path
@@ -613,11 +1096,122 @@ paths:
             type: string
       responses:
         '200':
-          description: The deletion result
+          description: Student deleted successfully
+
+  /students/batch/{batchId}:
+    get:
+      summary: Get students by batch ID
+      parameters:
+        - name: batchId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of students in the batch
           content:
             application/json:
               schema:
-                type: object
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+components:
+  schemas:
+    Student:
+      type: object
+      required:
+        - userName
+        - password
+        - parent1Phone      
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        email:
+          type: string
+        age:
+          type: integer
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        gender:
+          type: string
+        parent1Name:
+          type: string
+        parent1Phone:
+          type: string
+        parent1Email:
+          type: string
+          format: email
+        parent2Name:
+          type: string
+        parent2Phone:
+          type: string
+        parent2Email:
+          type: string
+        batches:
+          type: array
+          items:
+            type: string
+
+    StudentUpdate:
+      type: object    
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        email:
+          type: string
+        age:
+          type: integer
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        gender:
+          type: string
+        parent1Name:
+          type: string
+        parent1Phone:
+          type: string
+        parent1Email:
+          type: string
+          format: email
+        parent2Name:
+          type: string
+        parent2Phone:
+          type: string
+        parent2Email:
+          type: string
+        batches:
+          type: array
+          items:
+            type: string
+
   /teachers:
     get:
       summary: Get all teachers
@@ -630,6 +1224,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Teacher'
+  /teachers:
     post:
       summary: Create a new teacher
       requestBody:
@@ -640,14 +1235,14 @@ paths:
               $ref: '#/components/schemas/Teacher'
       responses:
         '200':
-          description: The created teacher ID
+          description: Teacher created successfully
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   id:
-                    type: string
+                    type: string          
   /teachers/{id}:
     get:
       summary: Get a teacher by ID
@@ -659,11 +1254,9 @@ paths:
             type: string
       responses:
         '200':
-          description: A teacher
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Teacher'
+          description: Successful response
+
+  /teachers/{id}:
     put:
       summary: Update a teacher by ID
       parameters:
@@ -680,11 +1273,8 @@ paths:
               $ref: '#/components/schemas/TeacherUpdate'
       responses:
         '200':
-          description: The updated teacher
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Teacher'
+          description: Teacher updated successfully
+  /teachers/{id}:
     delete:
       summary: Delete a teacher by ID
       parameters:
@@ -695,54 +1285,139 @@ paths:
             type: string
       responses:
         '200':
-          description: The deletion result
-          content:
-            application/json:
-              schema:
-                type: object
+          description: Teacher deleted successfully
 
+components:
+  schemas:
+    Teacher:
+      type: object
+      required:
+        - userName
+        - password
+        - PhoneNumber            
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        password:
+          type: string
+        age:
+          type: integer
+        gender:
+          type: string
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        upiId:
+          type: string
+        accountNumber:
+          type: string
+        accountName:
+          type: string
+        ifscCode:
+          type: string
+    TeacherUpdate:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        userName:
+          type: string
+        password:
+          type: string
+        age:
+          type: integer
+        gender:
+          type: string
+        addressLine1:
+          type: string
+        addressCity:
+          type: string
+        addressState:
+          type: string
+        pinCode:
+          type: integer
+        profilePicUrl:
+          type: string
+        email:
+          type: string
+        phoneNumber:
+          type: string
+        upiId:
+          type: string
+        accountNumber:
+          type: string
+        accountName:
+          type: string
+        ifscCode:
+          type: string
   /tests/batches/{batchId}:
     get:
-      summary: Get tests by batch ID
+      summary: Get all tests by batch
+      description: Retrieve all tests associated with a specific batch.
       parameters:
         - name: batchId
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the batch
       responses:
-        '200':
-          description: A list of tests
+        200:
+          description: Successfully retrieved the list of tests
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/Test'
+
   /tests/{id}:
     get:
       summary: Get a test by ID
+      description: Retrieve the details of a specific test using its unique ID.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the test
       responses:
-        '200':
-          description: A test
+        200:
+          description: Test details retrieved successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Test'
+
+  /tests/{id}:
     put:
-      summary: Update a test by ID
+      summary: Update a test
+      description: Modify details of an existing test.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the test to be updated
       requestBody:
         required: true
         content:
@@ -750,30 +1425,28 @@ paths:
             schema:
               $ref: '#/components/schemas/TestUpdate'
       responses:
-        '200':
-          description: The updated test
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Test'
+        200:
+          description: Test updated successfully
+
+  /tests/{id}:
     delete:
-      summary: Delete a test by ID
+      summary: Delete a test
+      description: Remove a test from the system using its unique ID.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the test to be deleted
       responses:
-        '200':
-          description: The deletion result
-          content:
-            application/json:
-              schema:
-                type: object
+        200:
+          description: Test deleted successfully
+      
   /tests:
     post:
       summary: Create a new test
+      description: Add a new test with required details.
       requestBody:
         required: true
         content:
@@ -781,8 +1454,8 @@ paths:
             schema:
               $ref: '#/components/schemas/Test'
       responses:
-        '200':
-          description: The created test ID
+        200:
+          description: Test created successfully
           content:
             application/json:
               schema:
@@ -790,66 +1463,133 @@ paths:
                 properties:
                   id:
                     type: string
+                    description: The unique identifier of the created test
+
+components:
+  schemas:
+    Test:
+      type: object
+      required:
+        - name
+        - subject
+        - testDate
+        - resultPublishDate
+        - totalMarks
+        - minimumPassMark
+        - numberOfQuestions
+        - batchId
+      properties:
+        id:
+          type: string
+        name:
+          type: string      
+        subject:
+          type: string
+        testDate:
+          type: string
+        resultPublishDate:
+          type: string
+        totalMarks:
+          type: integer
+        minimumPassMark:
+          type: integer
+        numberOfQuestions:
+          type: integer
+        batchId:
+          type: string
+
+    TestUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        subject:
+          type: string
+        testDate:
+          type: string
+        resultPublishDate:
+          type: string
+        totalMarks:
+          type: integer
+        minimumPassMark:
+          type: integer
+        numberOfQuestions:
+          type: integer
+        batchId:
+          type: string
+
   /testResults/students/{studentId}:
     get:
-      summary: Get test results by student ID
+      summary: Get all test results by student ID
+      description: Retrieve all test results associated with a specific student.
       parameters:
         - name: studentId
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the student
       responses:
-        '200':
-          description: A list of test results
+        200:
+          description: Successfully retrieved test results
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/TestResult'
+
   /testResults/tests/{testId}:
     get:
-      summary: Get test results by test ID
+      summary: Get all test results by test ID
+      description: Retrieve all test results associated with a specific test.
       parameters:
         - name: testId
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the test
       responses:
-        '200':
-          description: A list of test results
+        200:
+          description: Successfully retrieved test results
           content:
             application/json:
               schema:
                 type: array
                 items:
                   $ref: '#/components/schemas/TestResult'
+
   /testResults/{id}:
     get:
       summary: Get a test result by ID
+      description: Retrieve the details of a specific test result using its unique ID.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the test result
       responses:
-        '200':
-          description: A test result
+        200:
+          description: Test result details retrieved successfully
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestResult'
+
+    /testResults/{id}:              
     put:
-      summary: Update a test result by ID
+      summary: Update a test result
+      description: Modify details of an existing test result.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the test result to be updated
       requestBody:
         required: true
         content:
@@ -857,30 +1597,29 @@ paths:
             schema:
               $ref: '#/components/schemas/TestResultUpdate'
       responses:
-        '200':
-          description: The updated test result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TestResult'
+        200:
+          description: Test result updated successfully
+
+  /testResults/{id}:
     delete:
-      summary: Delete a test result by ID
+      summary: Delete a test result
+      description: Remove a test result from the system using its unique ID.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+          description: The unique identifier of the test result to be deleted
       responses:
-        '200':
-          description: The deletion result
-          content:
-            application/json:
-              schema:
-                type: object
+        200:
+          description: Test result deleted successfully
+ 
+
   /testResults:
     post:
       summary: Create a new test result
+      description: Add a new test result with required details.
       requestBody:
         required: true
         content:
@@ -888,8 +1627,8 @@ paths:
             schema:
               $ref: '#/components/schemas/TestResult'
       responses:
-        '200':
-          description: The created test result ID
+        200:
+          description: Test result created successfully
           content:
             application/json:
               schema:
@@ -897,6 +1636,39 @@ paths:
                 properties:
                   id:
                     type: string
+
+
+components:
+  schemas:
+    TestResult:
+      type: object
+      required:
+        - testId
+        - marks
+        - studentId
+        - attestedByParent
+      properties:
+        id:
+          type: string
+        testId:
+          type: string
+        marks:
+          type: integer
+        studentId:
+          type: string
+        attestedByParent:
+          type: boolean
+
+    TestResultUpdate:
+      type: object
+      properties:
+        marks:
+          type: integer
+        studentId:
+          type: string
+        attestedByParent:
+          type: boolean
+
   /upload:
     post:
       summary: Upload a file
@@ -920,378 +1692,3 @@ paths:
                 properties:
                   url:
                     type: string
-components:
-  schemas:
-    Notification:
-      type: object
-      properties:
-        id:
-          type: string
-        title:
-          type: string
-        message:
-          type: string
-        date:
-          type: string
-          format: date-time
-    NotificationUpdate:
-      type: object
-      properties:
-        title:
-          type: string
-        message:
-          type: string
-        date:
-          type: string
-          format: date-time
-    Note:
-      type: object
-      properties:
-        id:
-          type: string
-        title:
-          type: string
-        content:
-          type: string
-        date:
-          type: string
-          format: date-time
-    NoteUpdate:
-      type: object
-      properties:
-        title:
-          type: string
-        content:
-          type: string
-        date:
-          type: string
-          format: date-time
-    Assignment:
-      type: object
-      properties:
-        id:
-          type: string
-        title:
-          type: string
-        description:
-          type: string
-        dueDate:
-          type: string
-          format: date-time
-    AssignmentUpdate:
-      type: object
-      properties:
-        title:
-          type: string
-        description:
-          type: string
-        dueDate:
-          type: string
-          format: date-time
-    Batch:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        teacherId:
-          type: string
-        course:
-          type: string
-        subject:
-          type: string
-        description:
-          type: string
-        paymentFrequency:
-          type: string
-        paymentAmount:
-          type: number
-        paymentDayOfMonth:
-          type: integer
-    BatchUpdate:
-      type: object
-      properties:
-        name:
-          type: string
-        course:
-          type: string
-        subject:
-          type: string
-        description:
-          type: string
-        paymentFrequency:
-          type: string
-        paymentAmount:
-          type: number
-        paymentDayOfMonth:
-          type: integer
-    FeeRecord:
-      type: object
-      properties:
-        id:
-          type: string
-        studentId:
-          type: string
-        amount:
-          type: number
-        date:
-          type: string
-          format: date-time
-    FeeRecordUpdate:
-      type: object
-      properties:
-        studentId:
-          type: string
-        amount:
-          type: number
-        date:
-          type: string
-          format: date-time
-    Login:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-    Message:
-      type: object
-      properties:
-        id:
-          type: string
-        senderId:
-          type: string
-        receiverId:
-          type: string
-        content:
-          type: string
-        timestamp:
-          type: string
-          format: date-time
-    MessageUpdate:
-      type: object
-      properties:
-        senderId:
-          type: string
-        receiverId:
-          type: string
-        content:
-          type: string
-        timestamp:
-          type: string
-          format: date-time
-    Student:
-      type: object
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        userName:
-          type: string
-        password:
-          type: string
-        email:
-          type: string
-        age:
-          type: integer
-        addressLine1:
-          type: string
-        addressCity:
-          type: string
-        addressState:
-          type: string
-        pinCode:
-          type: integer
-        profilePicUrl:
-          type: string
-        gender:
-          type: string
-        parent1Name:
-          type: string
-        parent1Phone:
-          type: string
-        parent1Email:
-          type: string
-        parent2Name:
-          type: string
-        parent2Phone:
-          type: string
-        parent2Email:
-          type: string
-        batches:
-          type: array
-          items:
-            type: string
-    StudentUpdate:
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-        age:
-          type: integer
-        addressLine1:
-          type: string
-        addressCity:
-          type: string
-        addressState:
-          type: string
-        pinCode:
-          type: integer
-        profilePicUrl:
-          type: string
-        gender:
-          type: string
-        parent1Name:
-          type: string
-        parent1Phone:
-          type: string
-        parent1Email:
-          type: string
-        parent2Name:
-          type: string
-        parent2Phone:
-          type: string
-        parent2Email:
-          type: string
-        batches:
-          type: array
-          items:
-            type: string
-    Teacher:
-      type: object
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        userName:
-          type: string
-        password:
-          type: string
-        email:
-          type: string
-        age:
-          type: integer
-        addressLine1:
-          type: string
-        addressCity:
-          type: string
-        addressState:
-          type: string
-        pinCode:
-          type: integer
-        profilePicUrl:
-          type: string
-        gender:
-          type: string
-        subject:
-          type: string
-      required:
-        - userName
-        - email
-        - password
-    TeacherUpdate:
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-        age:
-          type: integer
-        addressLine1:
-          type: string
-        addressCity:
-          type: string
-        addressState:
-          type: string
-        pinCode:
-          type: integer
-        profilePicUrl:
-          type: string
-        gender:
-          type: string
-        subject:
-          type: string
-    Test:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        subject:
-          type: string
-        testDate:
-          type: string
-          format: date-time
-        resultPublishDate:
-          type: string
-          format: date-time
-        totalMarks:
-          type: number
-        minimumPassMark:
-          type: number
-        numberOfQuestions:
-          type: integer
-        batchId:
-          type: string
-    TestUpdate:
-      type: object
-      properties:
-        name:
-          type: string
-        subject:
-          type: string
-        testDate:
-          type: string
-          format: date-time
-        resultPublishDate:
-          type: string
-          format: date-time
-        totalMarks:
-          type: number
-        minimumPassMark:
-          type: number
-        numberOfQuestions:
-          type: integer
-    TestResult:
-      type: object
-      properties:
-        id:
-          type: string
-        testId:
-          type: string
-        marks:
-          type: number
-        studentId:
-          type: string
-        attestedByParent:
-          type: boolean
-    TestResultUpdate:
-      type: object
-      properties:
-        marks:
-          type: number
-        studentId:
-          type: string
-        attestedByParent:
-          type: boolean
-    NotificationPatch:
-      type: object
-      properties:
-        title:
-          type: string
-        message:
-          type: string
-        date:
-          type: string
-          format: date-time
