@@ -31,7 +31,8 @@ router.post('/teacher', async (req, res) => {
         return buildErrorMessage(res, 401, 'Invalid username or password');
     }
 
-    buildSuccessResponse(res, 200, '{"token": ' + await generateToken(buildTeacherPayload(teacher)) + '}');
+    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(teacher))  });
+
     console.log('{} logged in', req.body.userName);
 });
 
@@ -49,7 +50,8 @@ router.post('/student', async (req, res) => {
         return buildErrorMessage(res, 401, 'Invalid username or password');
     }
 
-    buildSuccessResponse(res, 200, '{"token": ' + await generateToken(buildStudentPayload(student)) + '}');
+    buildSuccessResponse(res, 200, {token: await generateToken(buildStudentPayload(student)) });
+
     console.log('{} logged in', req.body.userName);
 });
 

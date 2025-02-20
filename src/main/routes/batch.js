@@ -5,9 +5,7 @@ const {updateStudent, getStudentById} = require('../services/studentService');
 
 const router = express.Router();
 const Joi = require('joi');
-const authMiddleware = require("../middleware/authMiddleware");
 router.use(express.json());
-router.use(authMiddleware);
 
 
 const batchSchema = Joi.object({
@@ -105,6 +103,38 @@ router.patch('/:batchId/student/:studentId', async (req, res) => {
     console.log(`Added Student ${studentId} to Batch ${batchId}`);
 
 });
+router.delete('/:batchId/student/:studentId', async (req, res) => {
+    const { batchId, studentId } = req.params;
+
+    console.log('Remove student', studentId, 'from batch', batchId);
+
+    if (!batchId || batchId.trim() === '' || batchId === ':batchId') {
+        return res.status(400).json({ message: 'batchId is required' });
+    }
+
+    let student = await getStudentById(studentId);
+    console.log('Student:', student);
+
+    if (!student) {
+        return res.status(404).json({ message: 'Student not found' });
+    }
+
+    console.log('Batches before:', student.batches);
+
+    let batches = new Set(student.batches || []);
+
+    if (!batches.has(batchId)) {
+        return res.status(400).json({ message: 'Student is not in this batch' });
+    }
+
+    batches.delete(batchId);
+    console.log('Batches after:', Array.from(batches));
+
+    let updateResult = await updateStudent(studentId, { batches: Array.from(batches) });
+    buildSuccessResponse(res, 200, updateResult);
+    console.log(`Removed Student ${studentId} from Batch ${batchId}`);
+});
+
 
 router.delete('/:id', async (req, res) => {
     let response = await deleteById(req.params.id);
