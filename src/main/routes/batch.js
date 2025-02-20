@@ -5,8 +5,9 @@ const {updateStudent, getStudentById} = require('../services/studentService');
 
 const router = express.Router();
 const Joi = require('joi');
+const authMiddleware = require("../middleware/authMiddleware");
 router.use(express.json());
-
+router.use(authMiddleware);
 
 const batchSchema = Joi.object({
     name: Joi.string().max(50).required(),
