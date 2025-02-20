@@ -11,7 +11,13 @@
 			"name": "Get Teachers",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/teachers",
 					"host": [
@@ -28,7 +34,13 @@
 			"name": "Get Teacher",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/teachers/660e8400-e29b-41d4-a716-446655440001",
 					"host": [
@@ -50,6 +62,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -81,6 +98,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -104,7 +126,13 @@
 			"name": "Delete Teacher",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/teachers/550e8400-e29b-41d4-a716-446655440000",
 					"host": [
@@ -122,7 +150,13 @@
 			"name": "Get Batch by ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/batches/:id",
 					"host": [
@@ -146,7 +180,13 @@
 			"name": "Get Batches by Teacher ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/batches/teacher/:teacherId",
 					"host": [
@@ -175,6 +215,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -201,6 +246,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -226,14 +276,20 @@
 			},
 			"response": []
 		},
+
 		{
-			"name": "Add Student to Batch",
+			"name": "Delete Student from Batch",
 			"request": {
-				"method": "PATCH",
+				"method": "DELETE",
 				"header": [
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -254,22 +310,29 @@
 					"variable": [
 						{
 							"key": "batchId",
-							"value": "212e46a9-9a1d-4906-a27e-5ef03e989955"
+							"value": "212e46a9-9a1d-4906-a27e-5ef03e9899098"
 						},
 						{
 							"key": "studentId",
-							"value": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+							"value": "da4842bf-066a-4da0-9567-35cfd0023776"
 						}
 					]
 				}
 			},
 			"response": []
-		},
+		},		
 		{
 			"name": "Delete Batch",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+
+			    ],
 				"url": {
 					"raw": "{{base_url}}/batches/:id",
 					"host": [
@@ -293,7 +356,13 @@
 			"name": "Get All Students",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/students",
 					"host": [
@@ -310,7 +379,13 @@
 			"name": "Get Student by ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/students/:id",
 					"host": [
@@ -334,7 +409,13 @@
 			"name": "Get Students by batch ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/students/batch/:batchId",
 					"host": [
@@ -363,6 +444,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -389,6 +475,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -418,7 +509,13 @@
 			"name": "Delete Student",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/students/:id",
 					"host": [
@@ -442,7 +539,13 @@
 			"name": "Get Messages for Batch",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/messages/batch/:batchId",
 					"host": [
@@ -467,7 +570,13 @@
 			"name": "Get Messages for Student",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/messages/student/:studentId",
 					"host": [
@@ -493,7 +602,13 @@
 			"name": "Get Message by ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/messages/:id",
 					"host": [
@@ -521,6 +636,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -547,6 +667,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -577,7 +702,13 @@
 			"name": "Delete Message",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/messages/:id",
 					"host": [
@@ -601,7 +732,13 @@
 			"name": "Get FeeRecords by Batch and Student",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/fee-records/batch/:batchId/student/studentId",
 					"host": [
@@ -636,7 +773,13 @@
 			"name": "Get FeeRecords by Batch",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/fee-records/batches/:batchId",
 					"host": [
@@ -661,7 +804,13 @@
 			"name": "Get FeeRecord by ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/fee-records/:id",
 					"host": [
@@ -690,6 +839,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -716,6 +870,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -746,7 +905,13 @@
 			"name": "Delete FeeRecord",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/fee-records/:id",
 					"host": [
@@ -772,7 +937,13 @@
 			"name": "Get Assignment by ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/assignments/:id",
 					"host": [
@@ -796,7 +967,13 @@
 			"name": "Get Assignments by Batch ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/assignments/batch/:batchId",
 					"host": [
@@ -821,7 +998,13 @@
 			"name": "Get Assignments by Batch ID and Student ID",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/assignments/batch/:batchId/student/:studentId",
 					"host": [
@@ -856,6 +1039,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -882,6 +1070,11 @@
 					{
 						"key": "Content-Type",
 						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -911,7 +1104,13 @@
 			"name": "Delete Assignment",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/assignments/:id",
 					"host": [
@@ -993,6 +1192,11 @@
 					{
 						"key": "Content-Type",
 						"value": "multipart/form-data"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
 					}
 				],
 				"body": {
@@ -1024,7 +1228,13 @@
 			"name": "Get Teacher Notifications",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/notifications/teachers/:teacherId",
 					"host": [
@@ -1049,7 +1259,13 @@
 			"name": "Mark  Notification as Seen",
 			"request": {
 				"method": "PATCH",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/notifications/:notificationId/seen",
 					"host": [
@@ -1074,7 +1290,13 @@
 			"name": "Get Student Notifications",
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"url": {
 					"raw": "{{base_url}}/notifications/students/:studentId",
 					"host": [
@@ -1104,7 +1326,13 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1141,7 +1369,13 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1175,7 +1409,13 @@
 			"name": "Create notes",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 						"raw": "{\r\n    \"publishDate\": \"2024-01-01T00:00:00.000Z\",\r\n    \"Title\": \"This is a new note.\",\r\n    \"listUrls\": [\r\n        \"http://example.com/resource1.pdf\",\r\n        \"http://example.com/resource2.pdf\"\r\n    ],\r\n    \"content\": \"This is the content of the new note, providing detailed information.\",\r\n    \"studentId\": \"1e4567-e89b-12d3-a456-42661417\",\r\n    \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"\r\n}\r\n",					
@@ -1202,7 +1442,13 @@
 			"name": "Update notes",
 			"request": {
 				"method": "PUT",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"publishDate\": \"2024-01-01T00:00:00.000Z\",\r\n    \"Title\": \"This is a new note.\",\r\n    \"listUrls\": [\r\n        \"http://example.com/resource1.pdf\",\r\n        \"http://example.com/resource2.pdf\"\r\n    ],\r\n    \"content\": \"This is the content of the new note, providing detailed information.\",\r\n    \"studentId\": \"1e4567-e89b-12d3-a456-42661417\",\r\n    \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"\r\n}\r\n",					
@@ -1236,7 +1482,13 @@
 			"name": "Delete notes",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1268,7 +1520,13 @@
 			"name": "Create Test",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n  \"name\": \"Midterm Exam\",\r\n  \"subject\": \"Mathematics\",\r\n  \"testDate\": \"2025-02-15T10:00:00.000Z\",\r\n  \"resultPublishDate\": \"2025-02-20T10:00:00.000Z\",\r\n  \"totalMarks\": 100,\r\n  \"minimumPassMark\": 40,\r\n  \"numberOfQuestions\": 20,\r\n  \"batchId\": \"123e4567-e89b-12d3-a456-426614174000\"\r\n}\r\n",
@@ -1297,7 +1555,13 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1335,7 +1599,13 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1368,7 +1638,13 @@
 			"name": "Delete Test by ID",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1401,7 +1677,11 @@
 			"name": "Update Test",
 			"request": {
 				"method": "PUT",
-				"header": [],
+				"header": [{
+					"key": "Authorization",
+					"value": "bearer {{auth_token}}",
+					"type": "text"
+				}],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n  \"name\": \"Midterm Exam\",\r\n  \"subject\": \"Mathematics\",\r\n  \"testDate\": \"2025-02-15T10:00:00.000Z\",\r\n  \"resultPublishDate\": \"2025-02-20T10:00:00.000Z\",\r\n  \"totalMarks\": 100,\r\n  \"minimumPassMark\": 50,\r\n  \"numberOfQuestions\": 20\r\n}\r\n",
@@ -1434,7 +1714,11 @@
 			"name": "Create Test Result",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [{
+					"key": "Authorization",
+					"value": "bearer {{auth_token}}",
+					"type": "text"
+				}],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"testId\": \"123e48867-e89b-12d3-a456-426614174000\",\r\n    \"studentId\": \"123e4567-e89b-12d3-a456-4266141stu567\",\r\n    \"marks\": 85,\r\n    \"attestedByParent\": true\r\n}\r\n\r\n",
@@ -1460,7 +1744,13 @@
 			"name": "Update Test Result",
 			"request": {
 				"method": "PUT",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"studentId\": \"123e4567-e89b-12673-a456-4266141stu567\",\r\n    \"marks\": 985,\r\n    \"attestedByParent\": false\r\n}",
@@ -1496,7 +1786,13 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1533,7 +1829,13 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1570,7 +1872,13 @@
 			},
 			"request": {
 				"method": "GET",
-				"header": [],
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "",
@@ -1603,7 +1911,11 @@
 			"name": "Delete Test Result by ID",
 			"request": {
 				"method": "DELETE",
-				"header": [],
+				"header": [{
+					"key": "Authorization",
+					"value": "bearer {{auth_token}}",
+					"type": "text"
+				}],
 				"body": {
 					"mode": "raw",
 					"raw": "",

@@ -49,6 +49,9 @@ functions:
           path: /batches/{batchId}/student/{studentId}
           method: patch
       - http:
+          path: /batches/{batchId}/student/{studentId}
+          method: delete           
+      - http:
           path: /batches/{id}
           method: delete
       - http:
