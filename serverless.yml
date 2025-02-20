@@ -50,7 +50,7 @@ functions:
           method: patch
       - http:
           path: /batches/{batchId}/student/{studentId}
-          method:           
+          method: delete           
       - http:
           path: /batches/{id}
           method: delete
