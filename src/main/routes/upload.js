@@ -27,7 +27,7 @@ const upload = multer({
 
 router.post('/', upload.single('file'), async (req, res) => {
     const params = {
-        Bucket: process.env.S3BucketName, Key: req.file.originalname, Body: req.file.buffer, ContentType: contentType, ACL: 'public-read',
+        Bucket: process.env.S3BucketName, Key: req.file.originalname, Body: req.file.buffer,
     };
 
     try {
