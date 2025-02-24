@@ -1,11 +1,7 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
 const db = require('../db/dynamodb');
 const {
-    PutItemCommand,
-    UpdateItemCommand,
-    GetItemCommand,
-    ScanCommand,
-    DeleteItemCommand
+    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
@@ -27,47 +23,61 @@ async function create(message) {
 }
 
 
-async function updateMessage(messageId, messageFields) {
-    const updateExpression = [];
-    const expressionAttributeNames = {};
-    const expressionAttributeValues = {};
-    
+async function addReplyToMessage(messageId, reply) {
+    console.log('add reply to message {}', messageId);
+    const message = await getById(messageId);
+    if (!message) {
+        console.log('Message with id {} not found', messageId);
+        throw new Error('Message not found');
+    }
+    console.log("message:", message);
 
-    console.log("Updating messages fields:", messageFields);
-    for (const [key, value] of Object.entries(messageFields)) {
-        updateExpression.push(`#${key} = :${key}`);
-        expressionAttributeNames[`#${key}`] = key;
-        if (Array.isArray(value)) {
-            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
-        } else {
-            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
-        }
+    if (!message.replies) {
+        message.replies = [];
+        console.log("no replies found, creating new array");
+    }
+    message.replies.push(reply);
+    message.replies.push(reply);
+
+    console.log("adding reply:", reply);
+    console.log("to replies:", message.replies);
+
+    console.log("each element in replies");
+
+    let marshalledReplies = [];
+    for (reply of message.replies) {
+        console.log("reply:", reply);
+        let marshalledReply = marshall(reply, {convertEmptyValues: true});
+        marshalledReplies.push(marshalledReply);
+        console.log("marshalledReply:", marshalledReply);
     }
 
     const params = {
-        TableName: tableName,
-        Key: {id: {S: messageId}},
-        UpdateExpression: `SET ${updateExpression.join(', ')}`,
-        ExpressionAttributeNames: expressionAttributeNames,
-        ExpressionAttributeValues: expressionAttributeValues,
-        ReturnValues: 'UPDATED_NEW',
-    };
+        TableName: tableName, Key: marshall({id: messageId}), UpdateExpression: 'SET #replies = :replies',
+        ExpressionAttributeNames: {
+            '#replies': 'replies',
+        }, ExpressionAttributeValues: {
+            ':replies': {L: marshalledReplies},
+        }, ReturnValues: 'ALL_NEW'
+    }
 
+    console.log('params:', params);
+
+    // send the update request to dynamodb
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return unmarshall(data.Attributes);
+        return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
         console.error('Unable to update message. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
+
 async function getByStudentId(studentId) {
     const params = {
-        TableName: tableName,
-        FilterExpression: "studentId = :studentId",
-        ExpressionAttributeValues: {
-            ':studentId': marshall(studentId), 
+        TableName: tableName, FilterExpression: "studentId = :studentId", ExpressionAttributeValues: {
+            ':studentId': marshall(studentId),
         },
     };
 
@@ -100,11 +110,10 @@ async function getByBatchId(batchId) {
 
 async function getById(messageId) {
     const params = {
-        TableName: tableName,
-        Key: marshall({ id: messageId })
+        TableName: tableName, Key: marshall({id: messageId})
     };
 
-   
+
     try {
         const data = await db.send(new GetItemCommand(params));
         return data.Item ? unmarshall(data.Item) : {};
@@ -131,5 +140,5 @@ async function deleteById(messageId) {
 }
 
 
-module.exports = {create, getByStudentId , getById, deleteById, updateMessage, getByBatchId}
+module.exports = {create, getByStudentId, getById, deleteById, addReplyToMessage, getByBatchId}
 
