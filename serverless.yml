@@ -192,3 +192,6 @@ functions:
       - http:
           path: /test-results/{id}
           method: delete
+      - http:
+          path: /signup/teachers
+          method: post
