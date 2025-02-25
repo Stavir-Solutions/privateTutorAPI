@@ -64,7 +64,7 @@ router.post('/teachers', async (req, res) => {
     }
     console.log('creating teacher {}', req.body);
     let teacherId = await create(req.body)
-    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(req.body))  });
+    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(req.body, teacherId)) });
     console.log('created teacher {}', teacherId);
 });
 
@@ -78,7 +78,7 @@ router.post('/students', async (req, res) => {
     }
     console.log('creating student {}', req.body);
     let studentId = await createStudent(req.body)
-    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(req.body))  });
+    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(req.body,studentId)) });
     console.log('created student {}', studentId);
 });
 
