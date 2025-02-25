@@ -31,6 +31,24 @@
 			"response": []
 		},
 		{
+			"name": "signup teachers",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{base_url}}/signup/teachers "
+			},
+			"response": []
+		},
+		{
+			"name": "signup students",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": "{{base_url}}/signup/students"
+			},
+			"response": []
+		},		
+		{
 			"name": "Get Teacher",
 			"request": {
 				"method": "GET",
