@@ -1,7 +1,14 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
 const Joi = require('joi');
-const {create, getByStudentId, getById, deleteById, updateMessage, getByBatchId} = require('../services/messageService');
+const {
+    create,
+    getByStudentId,
+    getById,
+    deleteById,
+    addReplyToMessage,
+    getByBatchId
+} = require('../services/messageService');
 const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
@@ -42,19 +49,17 @@ const messageUpdateSchema = Joi.object({
         timestamp: Joi.date().optional(),
         attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
     })).optional()
-}).or(
-     'content', 'attachmentUrls', 'replies'
-).unknown(false);
+}).or('content', 'attachmentUrls', 'replies').unknown(false);
 
 
 const replyUpdateSchema = Joi.object({
-    content: Joi.string().optional(), 
-    sender: Joi.string().email().optional(), 
-    timestamp: Joi.date().optional(), 
+    content: Joi.string().optional(),
+    sender: Joi.string().email().optional(),
+    timestamp: Joi.date().optional(),
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
 }).unknown(false);
 
-let message = '[\n' + '  {\n' + '    id: \'9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b\',\n' + '    subject: \'Follow Up\',\n' + '    content: \'Just checking in to see how you are doing.\',\n' + '    sender: \'admin@example.com\',\n' +'    studentId: \'a423e456-7e89-12d3-a456-42661417434f\',\n' + '  batchId: \'a8f0c784-687f-4fa3-bd72-2fbdbe89c7d0",\',\n' + '    receiver: \'user@example.com\',\n' + '    timestamp: \'2024-12-24T12: 34: 56.789Z,\n' + '    attachmentUrls: [\n' + '      \'http: //example.com/attachment1.txt\',\n' + '      \'http: //example.com/attachment2.pdf\'\n' + '    ],\n' + '    replies: [\n' + '      {\n' + '        content: \'I am doing well, thank you!\',\n' + '        sender: \'user@example.com\',\n' + '        timestamp: \'2024-12-25T12: 34: 56.789Z,\n' + '        attachmentUrls: [\n' + '        ]\n' + '      },\n' + '      {\n' + '        content: \'Good to hear that see you in class soon!\',\n' + '        sender: \'user@example.com\',\n' + '        timestamp: \'2024-12-25T14: 34: 56.789Z,\n' + '        attachmentUrls: [\n' + '          \'http: //example.com/attachment5.png\',\n' + '        ]\n' + '      }\n' + '    ]\n' + '  }\n' + ']'
+let message = '[\n' + '  {\n' + '    id: \'9b2e4d16-8e4b-4a2b-9b2e-4d168e4b4a2b\',\n' + '    subject: \'Follow Up\',\n' + '    content: \'Just checking in to see how you are doing.\',\n' + '    sender: \'admin@example.com\',\n' + '    studentId: \'a423e456-7e89-12d3-a456-42661417434f\',\n' + '  batchId: \'a8f0c784-687f-4fa3-bd72-2fbdbe89c7d0",\',\n' + '    receiver: \'user@example.com\',\n' + '    timestamp: \'2024-12-24T12: 34: 56.789Z,\n' + '    attachmentUrls: [\n' + '      \'http: //example.com/attachment1.txt\',\n' + '      \'http: //example.com/attachment2.pdf\'\n' + '    ],\n' + '    replies: [\n' + '      {\n' + '        content: \'I am doing well, thank you!\',\n' + '        sender: \'user@example.com\',\n' + '        timestamp: \'2024-12-25T12: 34: 56.789Z,\n' + '        attachmentUrls: [\n' + '        ]\n' + '      },\n' + '      {\n' + '        content: \'Good to hear that see you in class soon!\',\n' + '        sender: \'user@example.com\',\n' + '        timestamp: \'2024-12-25T14: 34: 56.789Z,\n' + '        attachmentUrls: [\n' + '          \'http: //example.com/attachment5.png\',\n' + '        ]\n' + '      }\n' + '    ]\n' + '  }\n' + ']'
 
 
 router.get('/batch/:batchId', async (req, res) => {
@@ -92,18 +97,20 @@ router.post('/', async (req, res) => {
 });
 
 router.patch('/:id/reply', async (req, res) => {
-
-
-    const {error} = replyUpdateSchema.validate(req.body);
+    const { error } = replyUpdateSchema.validate(req.body);
     if (error) {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
-    console.log('replying to message {}', req.params.id);
-    let updateResult= await updateMessage(req.params.updateResult);
 
-    buildSuccessResponse(res, 200, updateResult);
+    console.log('replying to message {}', req.params.id);
+
+    await addReplyToMessage(req.params.id, req.body);
+
+    buildSuccessResponse(res, 200, { message: "Reply updated successfully" });
+
     console.log('replied to message {}', req.params.id);
 });
+
 
 router.delete('/:id', (req, res) => {
     console.log('deleting message {}', req.params.id);

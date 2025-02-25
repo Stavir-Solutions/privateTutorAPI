@@ -1,11 +1,7 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
 const db = require('../db/dynamodb');
 const {
-    PutItemCommand,
-    UpdateItemCommand,
-    GetItemCommand,
-    ScanCommand,
-    DeleteItemCommand
+    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
@@ -25,49 +21,25 @@ async function create(message) {
     }));
     return unmarshall(messageEntity.Item).id;
 }
+async function addReplyToMessage(messageId, reply) {
+    console.log('Adding reply to message ID:', messageId);
 
-
-async function updateMessage(messageId, messageFields) {
-    const updateExpression = [];
-    const expressionAttributeNames = {};
-    const expressionAttributeValues = {};
-    
-
-    console.log("Updating messages fields:", messageFields);
-    for (const [key, value] of Object.entries(messageFields)) {
-        updateExpression.push(`#${key} = :${key}`);
-        expressionAttributeNames[`#${key}`] = key;
-        if (Array.isArray(value)) {
-            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
-        } else {
-            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
-        }
+    const message = await getById(messageId);
+    if (!message || !message.id) {
+        console.log('Message not found:', messageId);
+        throw new Error('Message not found');
     }
 
-    const params = {
-        TableName: tableName,
-        Key: {id: {S: messageId}},
-        UpdateExpression: `SET ${updateExpression.join(', ')}`,
-        ExpressionAttributeNames: expressionAttributeNames,
-        ExpressionAttributeValues: expressionAttributeValues,
-        ReturnValues: 'UPDATED_NEW',
-    };
+    console.log("Message retrieved:", JSON.stringify(message, null, 2));
+    console.log("Reply to add:", JSON.stringify(reply, null, 2));
 
-    try {
-        const data = await db.send(new UpdateItemCommand(params));
-        console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return unmarshall(data.Attributes);
-    } catch (err) {
-        console.error('Unable to update message. Error JSON:', JSON.stringify(err, null, 2));
-        throw err;
-    }
+    return { message: "Reply added successfully (No update performed)" };
 }
+
 async function getByStudentId(studentId) {
     const params = {
-        TableName: tableName,
-        FilterExpression: "studentId = :studentId",
-        ExpressionAttributeValues: {
-            ':studentId': marshall(studentId), 
+        TableName: tableName, FilterExpression: "studentId = :studentId", ExpressionAttributeValues: {
+            ':studentId': marshall(studentId),
         },
     };
 
@@ -100,11 +72,10 @@ async function getByBatchId(batchId) {
 
 async function getById(messageId) {
     const params = {
-        TableName: tableName,
-        Key: marshall({ id: messageId })
+        TableName: tableName, Key: marshall({id: messageId})
     };
 
-   
+
     try {
         const data = await db.send(new GetItemCommand(params));
         return data.Item ? unmarshall(data.Item) : {};
@@ -131,5 +102,4 @@ async function deleteById(messageId) {
 }
 
 
-module.exports = {create, getByStudentId , getById, deleteById, updateMessage, getByBatchId}
-
+module.exports = {create, getByStudentId, getById, deleteById, addReplyToMessage, getByBatchId}

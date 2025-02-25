@@ -195,3 +195,6 @@ functions:
       - http:
           path: /signup/teachers
           method: post
+      - http:
+          path: /signup/students
+          method: post          
