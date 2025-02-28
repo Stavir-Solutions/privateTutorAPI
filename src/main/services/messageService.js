@@ -21,6 +21,9 @@ async function create(message) {
     }));
     return unmarshall(messageEntity.Item).id;
 }
+async function addReplyToMessage(messageId, reply) {
+    console.log('Adding reply to message ID:', messageId);
+
 
 
 async function addReplyToMessage(messageId, reply) {
@@ -71,6 +74,7 @@ async function addReplyToMessage(messageId, reply) {
         console.error('Unable to update message. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
+
 }
 
 async function getByStudentId(studentId) {

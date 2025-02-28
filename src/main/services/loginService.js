@@ -51,9 +51,9 @@ async function getStudentIfPasswordMatches(userName, password) {
 }
 
 
-function buildTeacherPayload(teacher) {
+function buildTeacherPayload(teacher,id) {
     return {
-        id: teacher.id,
+        id : id,
         userName: teacher.userName,
         email: teacher.email,
         firstName: teacher.firstName,
@@ -61,13 +61,13 @@ function buildTeacherPayload(teacher) {
         phoneNumber: teacher.phoneNumber,
         profilePicUrl: teacher.profilePicUrl,
         gender: teacher.gender,
-        age: teacher.age
+        age: teacher.age,
     };
 }
 
-function buildStudentPayload(student) {
+function buildStudentPayload(student,id) {
     return {
-        id: student.id,
+        id: id,
         userName: student.userName,
         parent1Email: student.parent1Email,
         parent2Email: student.parent2Email,
@@ -88,8 +88,7 @@ function buildStudentPayload(student) {
 async function generateToken(payload) {
 
     const jwtPublicKey = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('utf-8');
-    console.log('jwtsecret {}', jwtPublicKey);
-
+    console.log('jwtPublicKey:', jwtPublicKey);
     const token = jwt.sign(payload, jwtPublicKey, {algorithm: 'RS256'});
 
     console.log(token)

@@ -97,18 +97,19 @@ router.post('/', async (req, res) => {
 });
 
 router.patch('/:id/reply', async (req, res) => {
-
-
-    const {error} = replyUpdateSchema.validate(req.body);
+    const { error } = replyUpdateSchema.validate(req.body);
     if (error) {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
+
     console.log('replying to message {}', req.params.id);
     let updateResult = await addReplyToMessage(req.params.id, req.body);
 
-    buildSuccessResponse(res, 200, updateResult);
+    buildSuccessResponse(res, 201, { message: "Reply updated successfully" });
+
     console.log('replied to message {}', req.params.id);
 });
+
 
 router.delete('/:id', (req, res) => {
     console.log('deleting message {}', req.params.id);

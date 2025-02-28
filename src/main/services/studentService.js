@@ -12,7 +12,7 @@ const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
 const tableName = "Students";
 
-async function create(student) {
+async function createStudent(student) {
     let studentEntity = toStudentEntity(student);
     console.log('converted to entity ', studentEntity);
 
@@ -126,4 +126,4 @@ async function deleteById(studentId) {
 }
 
 
-module.exports = {create, getStudentById, getAll, deleteById, updateStudent, getByBatchId}
+module.exports = {createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId}
