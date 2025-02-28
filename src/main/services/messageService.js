@@ -24,16 +24,57 @@ async function create(message) {
 async function addReplyToMessage(messageId, reply) {
     console.log('Adding reply to message ID:', messageId);
 
+
+
+async function addReplyToMessage(messageId, reply) {
+    console.log('add reply to message {}', messageId);
     const message = await getById(messageId);
-    if (!message || !message.id) {
-        console.log('Message not found:', messageId);
+    if (!message) {
+        console.log('Message with id {} not found', messageId);
         throw new Error('Message not found');
     }
+    console.log("message:", message);
 
-    console.log("Message retrieved:", JSON.stringify(message, null, 2));
-    console.log("Reply to add:", JSON.stringify(reply, null, 2));
+    if (!message.replies) {
+        message.replies = [];
+        console.log("no replies found, creating new array");
+    }
+    message.replies.push(reply);
 
-    return { message: "Reply added successfully (No update performed)" };
+    console.log("adding reply:", reply);
+    console.log("to replies:", message.replies);
+
+    console.log("each element in replies");
+
+    let marshalledReplies = [];
+    for (reply of message.replies) {
+        console.log("reply:", reply);
+        let marshalledReply = marshall(reply, {convertEmptyValues: true});
+        marshalledReplies.push(marshalledReply);
+        console.log("marshalledReply:", marshalledReply);
+    }
+
+    const params = {
+        TableName: tableName, Key: marshall({id: messageId}), UpdateExpression: 'SET #replies = :replies',
+        ExpressionAttributeNames: {
+            '#replies': 'replies',
+        }, ExpressionAttributeValues: {
+            ':replies': message.replies ? {"L":marshall(message.replies)} : {L: []}
+        }, ReturnValues: 'UPDATED_NEW'
+    }
+
+    console.log('params:', JSON.stringify(params, null, 2));
+
+    // send the update request to dynamodb
+    try {
+        const data = await db.send(new UpdateItemCommand(params));
+        console.log('Update succeeded:', JSON.stringify(data, null, 2));
+        return data.Attributes ? unmarshall(data.Attributes) : {};
+    } catch (err) {
+        console.error('Unable to update message. Error JSON:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+
 }
 
 async function getByStudentId(studentId) {
@@ -103,3 +144,4 @@ async function deleteById(messageId) {
 
 
 module.exports = {create, getByStudentId, getById, deleteById, addReplyToMessage, getByBatchId}
+

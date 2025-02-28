@@ -103,10 +103,9 @@ router.patch('/:id/reply', async (req, res) => {
     }
 
     console.log('replying to message {}', req.params.id);
+    let updateResult = await addReplyToMessage(req.params.id, req.body);
 
-    await addReplyToMessage(req.params.id, req.body);
-
-    buildSuccessResponse(res, 200, { message: "Reply updated successfully" });
+    buildSuccessResponse(res, 201, { message: "Reply updated successfully" });
 
     console.log('replied to message {}', req.params.id);
 });

@@ -52,7 +52,7 @@ async function updateStudent(studentId, studentFields) {
         ReturnValues: 'UPDATED_NEW',
     };
 
-    console.log('update params ', params);
+    console.log('update params ', JSON.stringify(params, null, 2));
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
