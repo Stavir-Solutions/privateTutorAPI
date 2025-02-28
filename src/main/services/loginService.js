@@ -2,58 +2,56 @@ const db = require('../db/dynamodb');
 const jwt = require('jsonwebtoken');
 const {ScanCommand} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
-const {buildSuccessResponse} = require("../routes/responseUtils");
+const UserType = require("../common/UserType");
+
+const TOKEN_VALIDITY_SECONDS = 3600;
 
 async function getTeacherIfPasswordMatches(userName, password) {
 
     let scanParams = {
-        TableName: "Teachers", FilterExpression: "userName = :userName", ExpressionAttributeValues: marshall({
-            ":userName": userName
+        TableName: "Teachers",
+        FilterExpression: "userName = :userName AND password = :passWord",
+        ExpressionAttributeValues: marshall({
+            ":userName": userName, ":passWord": password
         })
     };
     const result = await db.send(new ScanCommand(scanParams));
     const teacher = result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
 
     if (null == teacher) {
-        console.log("Teacher does not exist")
+        console.log("Incorrect username or password")
         return null;
+    } else {
+        return teacher;
     }
 
-    if (teacher.password === password) {
-        return teacher;
-    } else {
-        console.log("incorrect password")
-    }
-    return null;
 }
 
 async function getStudentIfPasswordMatches(userName, password) {
 
     let scanParams = {
-        TableName: "Students", FilterExpression: "userName = :userName", ExpressionAttributeValues: marshall({
-            ":userName": userName
+        TableName: "Students",
+        FilterExpression: "userName = :userName AND password = :passWord",
+        ExpressionAttributeValues: marshall({
+            ":userName": userName, ":passWord": password
         })
     };
     const result = await db.send(new ScanCommand(scanParams));
     const student = result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
 
     if (null == student) {
-        console.log("Student does not exist")
+        console.log("Incorrect username or password")
         return null;
+    } else {
+        return student;
     }
 
-    if (student.password === password) {
-        return student;
-    } else {
-        console.log("incorrect password")
-    }
-    return null;
 }
 
 
-function buildTeacherPayload(teacher,id) {
+function buildTeacherPayload(teacher, id) {
     return {
-        id : id,
+        id: id,
         userName: teacher.userName,
         email: teacher.email,
         firstName: teacher.firstName,
@@ -62,10 +60,11 @@ function buildTeacherPayload(teacher,id) {
         profilePicUrl: teacher.profilePicUrl,
         gender: teacher.gender,
         age: teacher.age,
+        userType: UserType.TEACHER
     };
 }
 
-function buildStudentPayload(student,id) {
+function buildStudentPayload(student, id) {
     return {
         id: id,
         userName: student.userName,
@@ -81,7 +80,8 @@ function buildStudentPayload(student,id) {
         profilePicUrl: student.profilePicUrl,
         gender: student.gender,
         batches: student.batches,
-        age: student.age
+        age: student.age,
+        userType: UserType.STUDENT
     };
 }
 
@@ -89,24 +89,29 @@ async function generateToken(payload) {
 
     const jwtPublicKey = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('utf-8');
     console.log('jwtPublicKey:', jwtPublicKey);
-    const token = jwt.sign(payload, jwtPublicKey, {algorithm: 'RS256'});
+    const token = jwt.sign(payload, jwtPublicKey, {algorithm: 'RS256', expiresIn: TOKEN_VALIDITY_SECONDS});
 
     console.log(token)
     return token;
 }
 
 
-async function validateToken(token, res) {
+async function decodeToken(token, jwtPublicKey) {
+    return jwt.verify(token, jwtPublicKey);
+}
+
+async function validateToken(token) {
     const jwtPublicKey = Buffer.from(process.env.JWT_PUBLIC_KEY, 'base64').toString('utf-8');
     try {
-        let decoded = await jwt.verify(token, jwtPublicKey);
+        let decoded = await decodeToken(token, jwtPublicKey);
         console.log('decoded {}', decoded);
-        return true;
+        return decoded;
     } catch (error) {
         console.error('Token validation error:', error);
-        return false;
+        return null;
     }
 }
+
 
 module.exports = {
     getTeacherIfPasswordMatches,
