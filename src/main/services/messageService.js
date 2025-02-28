@@ -37,7 +37,6 @@ async function addReplyToMessage(messageId, reply) {
         console.log("no replies found, creating new array");
     }
     message.replies.push(reply);
-    message.replies.push(reply);
 
     console.log("adding reply:", reply);
     console.log("to replies:", message.replies);
@@ -57,11 +56,11 @@ async function addReplyToMessage(messageId, reply) {
         ExpressionAttributeNames: {
             '#replies': 'replies',
         }, ExpressionAttributeValues: {
-            ':replies': {L: marshalledReplies},
-        }, ReturnValues: 'ALL_NEW'
+            ':replies': message.replies ? {"L":marshall(message.replies)} : {L: []}
+        }, ReturnValues: 'UPDATED_NEW'
     }
 
-    console.log('params:', params);
+    console.log('params:', JSON.stringify(params, null, 2));
 
     // send the update request to dynamodb
     try {
