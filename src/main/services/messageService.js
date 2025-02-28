@@ -21,10 +21,6 @@ async function create(message) {
     }));
     return unmarshall(messageEntity.Item).id;
 }
-async function addReplyToMessage(messageId, reply) {
-    console.log('Adding reply to message ID:', messageId);
-
-
 
 async function addReplyToMessage(messageId, reply) {
     console.log('add reply to message {}', messageId);
