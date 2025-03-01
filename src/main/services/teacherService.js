@@ -54,7 +54,7 @@ async function update(teacherId, teacherFields) {
     }
 }
 
-async function getById(teacherId) {
+async function getTeacherById(teacherId) {
     const params = {
         TableName: tableName, Key: {
             id: {S: teacherId}
@@ -104,5 +104,5 @@ async function deleteById(teacherId) {
 }
 
 
-module.exports = {create, getById, getAll, deleteById, update}
+module.exports = {create, getTeacherById, getAll, deleteById, update}
 

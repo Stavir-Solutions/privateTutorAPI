@@ -8,17 +8,19 @@ const {
     buildStudentRefreshTokenPayload,
     buildTeacherRefreshTokenPayload,
     buildTeacherPayload,
-    buildStudentPayload
+    buildStudentPayload,
+    validateToken,
+    generateNewTokenFromRefreshToken
 } = require('../services/loginService');
-
+const { REFRESH_TOKEN_HEADER } = require('../common/config');
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
 
+
 const loginSchema = Joi.object({
     userName: Joi.string().alphanum().required(), password: Joi.string().required()
 });
-
 
 router.post('/teacher', async (req, res) => {
     console.log(JSON.stringify(req.body))
@@ -58,10 +60,25 @@ router.post('/student', async (req, res) => {
 
     buildSuccessResponse(res, 200, {
         token: await generateAccessToken(buildStudentPayload(student, student.id)),
-        refreshToken: await generateRefreshToken(buildTeacherRefreshTokenPayload(student.id))
+        refreshToken: await generateRefreshToken(buildStudentRefreshTokenPayload(student.id))
     });
 
     console.log('{} logged in', req.body.userName);
+});
+
+
+router.get("/refresh", async (req, res) => {
+    const refreshToken = req.get(REFRESH_TOKEN_HEADER);
+
+    if (!refreshToken) {
+        return buildErrorMessage(res, 401, 'Invalid refreshToken');
+    }
+    const payload = await validateToken(refreshToken);
+    if (null == payload) {
+        return buildErrorMessage(res, 401, 'Refresh token expired or not valid, login again');
+    }
+
+    return await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 });
 
 module.exports = router;

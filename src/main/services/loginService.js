@@ -4,12 +4,13 @@ const {ScanCommand} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 const UserType = require("../common/UserType");
 const TokenType = require("../common/TokenType");
-
-const ACCESS_TOKEN_VALIDITY_SECONDS = 3600;
-const REFRESH_TOKEN_VALIDITY_SECONDS = 2592000;
+const {getTeacherById} = require("./teacherService");
+const {buildErrorMessage, buildSuccessResponse} = require("../routes/responseUtils");
+const {getStudentById} = require("./studentService");
+const { ACCESS_TOKEN_VALIDITY_SECONDS } = require('../common/config');
+const { REFRESH_TOKEN_VALIDITY_SECONDS } = require('../common/config');
 
 async function getTeacherIfPasswordMatches(userName, password) {
-
     let scanParams = {
         TableName: "Teachers",
         FilterExpression: "userName = :userName AND password = :passWord",
@@ -138,6 +139,36 @@ async function validateToken(token) {
     }
 }
 
+async function generateTokenForTeacherFromRefreshToken(payload, res, refreshToken) {
+    console.log("refresh refreshToken for teacher ", payload.id)
+    const teacher = await getTeacherById(payload.id);
+    if (null == teacher) {
+        return buildErrorMessage(res, 401, 'Invalid refreshToken, teach does not exist', payload.id);
+    }
+    buildSuccessResponse(res, 200, {
+        token: await generateAccessToken(buildTeacherPayload(teacher, teacher.id)), refreshToken: refreshToken
+    });
+}
+
+async function generateTokenForStudentFromRefreshToken(payload, res, refreshToken) {
+    const student = await getStudentById(payload.id);
+    if (null == student) {
+        return buildErrorMessage(res, 401, 'Invalid refreshToken, login again');
+    }
+    buildSuccessResponse(res, 200, {
+        token: await generateAccessToken(buildStudentPayload(student, student.id)), refreshToken: refreshToken
+    });
+}
+
+async function generateNewTokenFromRefreshToken(payload, res, refreshToken) {
+    if (payload.userType === UserType.TEACHER) {
+        return await generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
+    } else if (payload.role === UserType.STUDENT) {
+        return await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
+    } else {
+        return buildErrorMessage(res, 401, 'Invalid refreshToken, login again');
+    }
+}
 
 module.exports = {
     getTeacherIfPasswordMatches,
@@ -148,5 +179,6 @@ module.exports = {
     buildStudentRefreshTokenPayload,
     buildTeacherPayload,
     buildStudentPayload,
-    validateToken
+    validateToken,
+    generateNewTokenFromRefreshToken
 }

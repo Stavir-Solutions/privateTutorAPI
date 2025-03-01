@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getById, getAll, deleteById, update} = require('../services/teacherService');
+const {create, getTeacherById, getAll, deleteById, update} = require('../services/teacherService');
 const {validateToken} = require('../services/loginService')
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -65,7 +65,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-    teacher = await getById(req.params.id);
+    teacher = await getTeacherById(req.params.id);
     console.log('teacher by id ', teacher);
     buildSuccessResponse(res, 200, teacher);
 });

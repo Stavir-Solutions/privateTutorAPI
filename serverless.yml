@@ -197,4 +197,7 @@ functions:
           method: post
       - http:
           path: /signup/students
-          method: post          
+          method: post
+      - http:
+          path: /login/refresh
+          method: get
