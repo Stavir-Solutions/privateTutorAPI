@@ -3,7 +3,10 @@ const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
 const {
     getTeacherIfPasswordMatches,
     getStudentIfPasswordMatches,
-    generateToken,
+    generateAccessToken,
+    generateRefreshToken,
+    buildStudentRefreshTokenPayload,
+    buildTeacherRefreshTokenPayload,
     buildTeacherPayload,
     buildStudentPayload
 } = require('../services/loginService');
@@ -31,7 +34,10 @@ router.post('/teacher', async (req, res) => {
         return buildErrorMessage(res, 401, 'Invalid username or password');
     }
 
-    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(teacher))  });
+    buildSuccessResponse(res, 200, {
+        token: await generateAccessToken(buildTeacherPayload(teacher, teacher.id)),
+        refreshToken: await generateRefreshToken(buildTeacherRefreshTokenPayload(teacher.id))
+    });
 
     console.log('{} logged in', req.body.userName);
 });
@@ -50,7 +56,10 @@ router.post('/student', async (req, res) => {
         return buildErrorMessage(res, 401, 'Invalid username or password');
     }
 
-    buildSuccessResponse(res, 200, {token: await generateToken(buildStudentPayload(student)) });
+    buildSuccessResponse(res, 200, {
+        token: await generateAccessToken(buildStudentPayload(student, student.id)),
+        refreshToken: await generateRefreshToken(buildTeacherRefreshTokenPayload(student.id))
+    });
 
     console.log('{} logged in', req.body.userName);
 });
