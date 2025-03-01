@@ -3,8 +3,10 @@ const jwt = require('jsonwebtoken');
 const {ScanCommand} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 const UserType = require("../common/UserType");
+const TokenType = require("../common/TokenType");
 
-const TOKEN_VALIDITY_SECONDS = 3600;
+const ACCESS_TOKEN_VALIDITY_SECONDS = 3600;
+const REFRESH_TOKEN_VALIDITY_SECONDS = 2592000;
 
 async function getTeacherIfPasswordMatches(userName, password) {
 
@@ -60,7 +62,8 @@ function buildTeacherPayload(teacher, id) {
         profilePicUrl: teacher.profilePicUrl,
         gender: teacher.gender,
         age: teacher.age,
-        userType: UserType.TEACHER
+        userType: UserType.TEACHER,
+        tokenType: TokenType.ACCESS
     };
 }
 
@@ -81,15 +84,38 @@ function buildStudentPayload(student, id) {
         gender: student.gender,
         batches: student.batches,
         age: student.age,
-        userType: UserType.STUDENT
+        userType: UserType.STUDENT,
+        tokenType: TokenType.ACCESS
     };
 }
 
-async function generateToken(payload) {
+function buildTeacherRefreshTokenPayload(id) {
+    return {
+        id: id, userType: UserType.TEACHER
+    };
+}
+
+function buildStudentRefreshTokenPayload(id) {
+    return {
+        id: id, userType: UserType.STUDENT
+    };
+}
+
+async function generateAccessToken(payload) {
 
     const jwtPublicKey = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('utf-8');
     console.log('jwtPublicKey:', jwtPublicKey);
-    const token = jwt.sign(payload, jwtPublicKey, {algorithm: 'RS256', expiresIn: TOKEN_VALIDITY_SECONDS});
+    const token = jwt.sign(payload, jwtPublicKey, {algorithm: 'RS256', expiresIn: ACCESS_TOKEN_VALIDITY_SECONDS});
+
+    console.log(token)
+    return token;
+}
+
+async function generateRefreshToken(payload) {
+
+    const jwtPublicKey = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('utf-8');
+    console.log('jwtPublicKey:', jwtPublicKey);
+    const token = jwt.sign(payload, jwtPublicKey, {algorithm: 'RS256', expiresIn: REFRESH_TOKEN_VALIDITY_SECONDS});
 
     console.log(token)
     return token;
@@ -116,7 +142,10 @@ async function validateToken(token) {
 module.exports = {
     getTeacherIfPasswordMatches,
     getStudentIfPasswordMatches,
-    generateToken,
+    generateAccessToken,
+    generateRefreshToken,
+    buildTeacherRefreshTokenPayload,
+    buildStudentRefreshTokenPayload,
     buildTeacherPayload,
     buildStudentPayload,
     validateToken
