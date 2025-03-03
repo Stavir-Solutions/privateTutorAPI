@@ -4,7 +4,7 @@
   "description": "Backend of the private tutor app",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --recursive 'src/test/**/*test.js'",
+    "test": "mocha --recursive src/test/**/*test.js",
     "server": "npx serverless offline --noPrependStageInUrl"
   },
   "repository": {
@@ -36,8 +36,8 @@
     "uuid": "^11.0.3"
   },
   "devDependencies": {
-    "chai": "^5.1.2",
-    "mocha": "^11.1.0",
+    "chai": "4.5.0",
+    "mocha": "11.1.0",
     "serverless-offline": "^14.4.0",
     "sinon": "^19.0.2"
   }
