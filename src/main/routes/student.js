@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getStudentById, getAll, deleteById, updateStudent, getByBatchId} = require('../services/studentService');
+const {getStudentById, getAll, deleteById, updateStudent, getByBatchId, createStudent} = require('../services/studentService');
 
 
 const router = express.Router();
@@ -83,7 +83,7 @@ router.post('/', async (req, res) => {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
     }
-    let studentId = await create(req.body)
+    let studentId = await createStudent(req.body)
     buildSuccessResponse(res, 200, '{"id":"' + studentId + '"}')
     console.log('created student {}', studentId);
 });

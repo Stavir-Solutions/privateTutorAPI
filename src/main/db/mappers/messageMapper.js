@@ -32,4 +32,4 @@ function toMessageEntity(message) {
     };
 }
 
-module.exports = {toMessageEntity}
+module.exports = {toMessageEntity,toReplyEntity}

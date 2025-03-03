@@ -12,7 +12,7 @@ const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
 const tableName = "Students";
 
-async function create(student) {
+async function createStudent(student) {
     let studentEntity = toStudentEntity(student);
     console.log('converted to entity ', studentEntity);
 
@@ -52,7 +52,7 @@ async function updateStudent(studentId, studentFields) {
         ReturnValues: 'UPDATED_NEW',
     };
 
-    console.log('update params ', params);
+    console.log('update params ', JSON.stringify(params, null, 2));
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
@@ -126,4 +126,4 @@ async function deleteById(studentId) {
 }
 
 
-module.exports = {create, getStudentById, getAll, deleteById, updateStudent, getByBatchId}
+module.exports = {createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId}
