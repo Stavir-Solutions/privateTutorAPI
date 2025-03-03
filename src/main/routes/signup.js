@@ -6,7 +6,7 @@ const {createStudent} = require('../services/studentService');
 
 const router = express.Router();
 const Joi = require('joi');
-const {generateToken, buildTeacherPayload} = require("../services/loginService");
+const {generateAccessToken, buildTeacherPayload, buildStudentPayload} = require("../services/loginService");
 router.use(express.json());
 
 const teacherSchema = Joi.object({
@@ -64,7 +64,7 @@ router.post('/teachers', async (req, res) => {
     }
     console.log('creating teacher {}', req.body);
     let teacherId = await create(req.body)
-    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(req.body, teacherId)) });
+    buildSuccessResponse(res, 200, {token: await generateAccessToken(buildTeacherPayload(req.body, teacherId)) });
     console.log('created teacher {}', teacherId);
 });
 
@@ -78,7 +78,7 @@ router.post('/students', async (req, res) => {
     }
     console.log('creating student {}', req.body);
     let studentId = await createStudent(req.body)
-    buildSuccessResponse(res, 200, {token: await generateToken(buildTeacherPayload(req.body,studentId)) });
+    buildSuccessResponse(res, 200, {token: await generateAccessToken(buildStudentPayload(req.body,studentId)) });
     console.log('created student {}', studentId);
 });
 
