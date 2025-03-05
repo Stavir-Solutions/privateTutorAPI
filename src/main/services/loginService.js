@@ -102,7 +102,7 @@ function buildStudentRefreshTokenPayload(id) {
     };
 }
 
-async function generateAccessToken(payload) {
+    async function generateAccessToken(payload) {
 
     const jwtPublicKey = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('utf-8');
     console.log('jwtPublicKey:', jwtPublicKey);

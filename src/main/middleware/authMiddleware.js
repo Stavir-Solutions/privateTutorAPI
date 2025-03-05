@@ -35,17 +35,19 @@ async function authMiddleware(req, res, next) {
         return buildErrorMessage(res, 401, 'invalid token. send your login response token as bearer <token>');
     }
 
-    console.log('req.originalUrl', req.originalUrl);
 
-    if (isTeacherUrl(req) && decodedToken.userType !== UserType.TEACHER) {
-        return buildErrorMessage(res, 403, 'Forbidden. You are not authorized to access this teacher resource');
-        // TODO make sure that a teacher can access only his data
-    }
-
-    if (isStudentUrl(req) && decodedToken.userType !== UserType.STUDENT) {
-        return buildErrorMessage(res, 403, 'Forbidden. You are not authorized to access this teacher resource');
-        // TODO make sure that a student can access only his data
-    }
+    // THE following commented code will be revisisted later
+    // console.log('req.originalUrl', req.originalUrl);
+    //
+    // if (isTeacherUrl(req) && decodedToken.userType !== UserType.TEACHER) {
+    //     return buildErrorMessage(res, 403, 'Forbidden. You are not authorized to access this teacher resource');
+    //     // TODO make sure that a teacher can access only his data
+    // }
+    //
+    // if (isStudentUrl(req) && decodedToken.userType !== UserType.STUDENT) {
+    //     return buildErrorMessage(res, 403, 'Forbidden. You are not authorized to access this teacher resource');
+    //     // TODO make sure that a student can access only his data
+    // }
     next();
 
 }
