@@ -11,6 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/Stavir-Solutions/privateTutorAPI.git"
   },
+  "type": "commonjs",
   "keywords": [],
   "author": "",
   "license": "ISC",
