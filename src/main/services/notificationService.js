@@ -34,24 +34,23 @@ async function markNotificationSeen(notificationId) {
         TableName: tableName,
         Key: {
             notificationId: marshall(notificationId) 
-        },
-        UpdateExpression: "SET seen = :seen",
+         },
+        UpdateExpression: "SET seen = :seen, notificationSeenTime = :seenTime",
         ExpressionAttributeValues: {
-            ':seen': marshall(true) 
+            ':seen': marshall(true) ,
+            ':seenTime': marshall(new Date().toISOString() )
         },
-        ReturnValues: "UPDATED_NEW" 
+        ReturnValues: "UPDATED_NEW"
     };
 
     try {
         const data = await db.send(new UpdateItemCommand(params));
-        return data.Attributes ? unmarshall(data.Attributes) : null;
+        return data.Attributes ? unmarshall(data.Attributes) : {}; 
     } catch (err) {
-        console.error('Unable to mark teacher notification as seen. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to mark teacher notification as seen. Error:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
-
-
 
 async function getByStudentId(studentId) {
     const params = {

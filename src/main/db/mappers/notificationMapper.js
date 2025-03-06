@@ -12,7 +12,8 @@ function toNotificationEntity(notification) {
             title: notification.title,
             objectId: notification.objectId,
             deeplink: notification.deeplink ,
-            seen: notification.seen
+            seen: notification.seen,
+            notificationTime:notification.notificationTime
         },
         { removeUndefinedValues: true }
 
