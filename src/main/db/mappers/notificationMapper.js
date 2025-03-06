@@ -13,7 +13,6 @@ function toNotificationEntity(notification) {
             objectId: notification.objectId,
             deeplink: notification.deeplink ,
             seen: notification.seen,
-            notificationSeenTime: new Date().toISOString(),
             notificationTime:notification.notificationTime
         },
         { removeUndefinedValues: true }
