@@ -1,13 +1,11 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { getById } = require('../../main/services/testService');
-const { updateTest} = require('../../main/services/testService');
-const { create} = require('../../main/services/testService');
-const { deletetestById} = require('../../main/services/testService');
-const { getallByBatch} = require('../../main/services/testService');
-
+const { getByBatchId } = require('../../main/services/notesService');
+const { updateNotes} = require('../../main/services/notesService');
+const { create} = require('../../main/services/notesService');
+const { deleteById} = require('../../main/services/notesService');
+const { getByStudentId} = require('../../main/services/notesService');
 const db = require('../../main/db/dynamodb');
-const { GetItemCommand } = require('@aws-sdk/client-dynamodb');
 const {UpdateItemCommand} = require('@aws-sdk/client-dynamodb');
 const {PutItemCommand} = require('@aws-sdk/client-dynamodb');
 const {DeleteItemCommand} = require('@aws-sdk/client-dynamodb');
@@ -15,7 +13,7 @@ const { ScanCommand } = require('@aws-sdk/client-dynamodb');
 
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 
-describe('getById', () => {
+describe('getByBatchId', () => {
     let dbStub;
 
     beforeEach(() => {
@@ -26,51 +24,49 @@ describe('getById', () => {
         dbStub.restore();
     });
 
-    it('should return the test when found', async () => {
+    it('should return the notes when found', async () => {
+          
+        
         //given
-        const testId = 'test-id';
-        const testItem = { id: testId, name: 'Test Name' };
-        const marshalledItem = marshall(testItem);
-
-        dbStub.resolves({ Item: marshalledItem });
-
+        const batchId = 'batch-id';
+        const notesItems = [{ id: batchId, name: 'notes Name' }, { id: batchId, name: 'notes Name'}];
+        const marshalledItems = notesItems.map(item => marshall(item));
+        dbStub.resolves({ Items: marshalledItems });
         //when
-        const result = await getById(testId);
-
-
+        const result = await getByBatchId(batchId);
         //then
-        expect(result).to.deep.equal(testItem);
+        expect(result).to.deep.equal(notesItems);
         expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(GetItemCommand))).to.be.true;
+        expect(dbStub.calledWith(sinon.match.instanceOf(ScanCommand))).to.be.true;
     });
 
     it('should return an empty object when the item is not found', async () => {
-        const testId = 'test-id';
+        const batchId = 'batch-id';
 
-        dbStub.resolves({});
+        dbStub.resolves({ Items: [] });
 
-        const result = await getById(testId);
-        expect(result).to.deep.equal({});
+        const result = await getByBatchId(batchId);
+        expect(result).to.deep.equal([]);
         expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(GetItemCommand))).to.be.true;
+        expect(dbStub.calledWith(sinon.match.instanceOf(ScanCommand))).to.be.true;
     });
 
     it('should throw an error when the db call fails', async () => {
-        const testId = 'test-id';
+        const batchId = 'batch-id';
         const errorMessage = 'DB error';
 
         dbStub.rejects(new Error(errorMessage));
 
         try {
-            await getById(testId);
+            await getByBatchId(batchId);
         } catch (err) {
             expect(err.message).to.equal(errorMessage);
         }
         expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(GetItemCommand))).to.be.true;
+        expect(dbStub.calledWith(sinon.match.instanceOf(ScanCommand))).to.be.true;
     });
 });
-describe('updateTest', () => {
+describe('updateNotes', () => {
     let dbStub;
 
     beforeEach(() => {
@@ -81,49 +77,49 @@ describe('updateTest', () => {
         dbStub.restore();
     });
 
-    it('should return the updated test when found', async () => {
+    it('should return the updated notes when found', async () => {
         // given
-        const testId = 'test-id';
-        const testFields = { name: 'Updated Name' };
-        const testItem = { id: testId, name: 'Updated Name' };
-        const marshalledItem = marshall(testItem);
+        const notesId = 'notes-id';
+        const notesFields = { name: 'Updated notes Name' };
+        const notesItem = { id: notesId, name: 'Updated notes Name' };
+        const marshalledItem = marshall(notesItem);
 
         dbStub.resolves({ Attributes: marshalledItem }); 
         // when
-        const result = await updateTest(testId, testFields);
+        const result = await updateNotes(notesId, notesFields);
 
         // then
-        expect(result).to.deep.equal(testItem);
+        expect(result).to.deep.equal(notesItem);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(UpdateItemCommand))).to.be.true;
     });
     it('should return an empty object when the item is not found', async () => {
         // Given
-        const testId = 'test-id';
-        const testFields = { name: 'Updated Name' };
+        const notesId = 'notes-id';
+        const notesFields = { name: 'Updated notes Name' };
 
-        dbStub.resolves({});
+        dbStub.resolves({ Attributes: null });
 
         // When
-        const result = await updateTest(testId, testFields);
+        const result = await updateNotes(notesId, notesFields);
 
         // Then
-        expect(result).to.deep.equal({}); 
+        expect(result).to.deep.equal({});
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(UpdateItemCommand))).to.be.true;
     });
 
     it('should throw an error when the db call fails', async () => {
         // Given
-        const testId = 'test-id';
-        const testFields = { name: 'Updated Name' };    
+        const notesId = 'notes-id';
+        const notesFields = { name: 'Updatednotes Name' };
         const errorMessage = 'DB error';
 
         dbStub.rejects(new Error(errorMessage));
 
         // When
         try {
-            await updateTest(testId, testFields);
+            await updateNotes(notesId,notesFields);
         } catch (err) {
             // Then
             expect(err.message).to.equal(errorMessage);
@@ -146,79 +142,42 @@ describe('create', () => {
         uuidStub.restore();
     });
 
-    it('should return the create test when found', async () => {
+    it('should return the create notes when found', async () => {
         // Given
-        const test = {
-            firstName: 'John',
-            lastName: 'Doe',
-            userName: 'johndoe',
-            password: 'password123',
-            age: 30,
-            gender: 'Male',
-            addressLine1: '123 Main St',
-            addressCity: 'Anytown',
-            addressState: 'Anystate',
-            pinCode: '123456',
-            profilePicUrl: 'http://example.com/profile.jpg',
-            email: 'john.doe@example.com',
-            phoneNumber: '1234567890',
-            upiId: 'john@upi',
-            accountNumber: '123456789',
-            accountName: 'John Doe',
-            ifscCode: 'IFSC0001234'
-        };
-        const testId = 'test-id';
-        const testItem = { id: testId, ...test };
-        const marshalledItem = marshall(testItem);
+    
+        const notesId = 'notes-id';
+        const notesItem = { id: notesId, ...notes };
+        const marshalledItem = marshall(notesItem);
 
         dbStub.resolves({ Item: marshalledItem });
 
         // When
-        const result = await create(testId);
+        const result = await create(notesId);
 
         // Then
-        expect(result).to.equal(testId);
+        expect(result).to.equal(notesId);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
 
     it('should return an empty object when the item is not found', async () => {
-        const testId = 'test-id';
-        const test = {
-            firstName: 'John',
-            lastName: 'Doe',
-            userName: 'johndoe',
-            password: 'password123',
-            age: 30,
-            gender: 'Male',
-            addressLine1: '123 Main St',
-            addressCity: 'Anytown',
-            addressState: 'Anystate',
-            pinCode: '123456',
-            profilePicUrl: 'http://example.com/profile.jpg',
-            email: 'john.doe@example.com',
-            phoneNumber: '1234567890',
-            upiId: 'john@upi',
-            accountNumber: '123456789',
-            accountName: 'John Doe',
-            ifscCode: 'IFSC0001234'
-        };
+        const notesId = 'notes-id';
 
-        const result = await create(testId);
+        const result = await create(notesId);
         expect(result).to.deep.equal({});
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
     it('should throw an error when the db call fails', async () => {
         // Given
-        const testId = 'test-id';
+        const notesId = 'notes-id';
         const errorMessage = 'DB error';
 
         dbStub.rejects(new Error(errorMessage));
 
         // When
         try {
-            await create(testId);
+            await create(notesId);
         } catch (err) {
             // Then
             expect(err.message).to.equal(errorMessage);
@@ -228,7 +187,7 @@ describe('create', () => {
     });
 
 });
-describe('deletetestById', () => {
+describe('deleteById', () => {
     let dbStub;
 
     beforeEach(() => {
@@ -239,33 +198,43 @@ describe('deletetestById', () => {
         dbStub.restore();
     });
 
-    it('should return the deleted test when found', async () => {
+    it('should return the deleted notes when found', async () => {
         //given
-        const testId = 'test-id';
-        const deleteItem = {};
-        const marshalledItem = marshall(deleteItem);
+        const notesId = 'notes-id';
+        const deletenotesItem = {};
+        const marshalledItem = marshall(deletenotesItem);
 
         dbStub.resolves({ Item: marshalledItem });
 
         //when
-        const result = await deletetestById(testId);
+        const result = await deleteById(notesId);
 
 
         //then
-        expect(result).to.deep.equal(deleteItem);
+        expect(result).to.deep.equal(deletenotesItem);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(DeleteItemCommand))).to.be.true;
     });
 
+    it('should return an empty object when the item is not found', async () => {
+        const notesId = 'notes-id';
+
+        dbStub.resolves({});
+
+        const result = await deleteById(notesId);
+        expect(result).to.deep.equal({});
+        expect(dbStub.calledOnce).to.be.true;
+        expect(dbStub.calledWith(sinon.match.instanceOf(DeleteItemCommand))).to.be.true;
+    });
 
     it('should throw an error when the db call fails', async () => {
-        const testId = 'test-id';
+        const notesId = 'notes-id';
         const errorMessage = 'DB error';
 
         dbStub.rejects(new Error(errorMessage));
 
         try {
-            await deletetestById(testId);
+            await deleteById(notesId);
         } catch (err) {
             expect(err.message).to.equal(errorMessage);
         }
@@ -274,8 +243,7 @@ describe('deletetestById', () => {
     });
 });
 
-
-describe('getallByBatch', () => {
+describe('getByStudentId', () => {
     let dbStub;
 
     beforeEach(() => {
@@ -286,50 +254,43 @@ describe('getallByBatch', () => {
         dbStub.restore();
     });
 
-    it('should return all tests for a given batchId', async () => {
-        // Given
-        const batchId = 'batch-id';
-        const testItems =  [{ id: batchId, name: 'Test Name'},
-            { id: batchId, name: 'Test Name'}
-        ];
-        const marshalledItems = testItems.map(item => marshall(item));
+    it('should return the notes when found', async () => {
+        //given
+        const studentId = 'student-id';
+        const notesItems = [{ id: studentId, name: 'notes Name' }, { id: studentId, name: 'notes Name'}];
+        const marshalledItems = notesItems.map(item => marshall(item));
         dbStub.resolves({ Items: marshalledItems });
-        // When
-        const result = await getallByBatch(batchId);
 
-        // Then
-        expect(result).to.deep.equal(testItems);
+        //when
+        const result = await getByStudentId(studentId);
+
+
+        //then
+        expect(result).to.deep.equal(notesItems);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(ScanCommand))).to.be.true;
     });
 
-    it('should return an empty array if no tests are found', async () => {
-        // Given
-        const batchId = 'batch-id';
+    it('should return an empty object when the item is not found', async () => {
+        const studentId = 'student-id';
 
         dbStub.resolves({ Items: [] });
 
-        // When
-        const result = await getallByBatch(batchId);
-
-        // Then
+        const result = await getByStudentId(studentId);
         expect(result).to.deep.equal([]);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(ScanCommand))).to.be.true;
     });
 
-    it('should throw an error when the database call fails', async () => {
-        // Given
-        const batchId = 'batch-id';
+    it('should throw an error when the db call fails', async () => {
+        const studentId = 'student-id';
         const errorMessage = 'DB error';
 
         dbStub.rejects(new Error(errorMessage));
 
-        // When
         try {
-            await getallByBatch(batchId);
+            await getByStudentId(studentId);
         } catch (err) {
-            // Then
             expect(err.message).to.equal(errorMessage);
         }
         expect(dbStub.calledOnce).to.be.true;
