@@ -47,7 +47,7 @@ async function update(teacherId, teacherFields) {
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return unmarshall(data.Attributes);
+        return data.Attributes? unmarshall(data.Attributes): {};
     } catch (err) {
         console.error('Unable to update teacher. Error JSON:', JSON.stringify(err, null, 2));
         throw err;

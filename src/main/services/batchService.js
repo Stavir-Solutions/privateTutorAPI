@@ -29,8 +29,12 @@ async function update(batchId, batchFields) {
     for (const [key, value] of Object.entries(batchFields)) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
-        expressionAttributeValues[`:${key}`] = marshall(value, {convertEmptyValues: true});
-    }
+        if (Array.isArray(value)) {
+            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
+        } else {
+            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
+        }
+        }
 
     const params = {
         TableName: tableName,
@@ -44,7 +48,7 @@ async function update(batchId, batchFields) {
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return unmarshall(data.Attributes);
+        return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
         console.error('Unable to update batch. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
