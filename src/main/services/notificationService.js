@@ -47,7 +47,7 @@ async function markNotificationSeen(notificationId) {
         const data = await db.send(new UpdateItemCommand(params));
         return data.Attributes ? unmarshall(data.Attributes) : {}; 
     } catch (err) {
-        console.error('Unable to mark teacher notification as seen. Error:', JSON.stringify(err, null, 2));
+        console.error('Unable to mark  notification as seen. Error:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
