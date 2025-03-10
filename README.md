@@ -39,3 +39,9 @@ This will allow you to run and test your serverless application locally.
    npm install --save-dev sinon
    npm test
 ```
+
+## to check the coverage
+```
+   npm run coverage  
+```
+The results will be in html format stored a directory called coverage. Open index.html in a browser to see the results.
