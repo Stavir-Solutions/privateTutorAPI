@@ -30,11 +30,11 @@ async function update(batchId, batchFields) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
         if (Array.isArray(value)) {
-            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
+            expressionAttributeValues[`:${key}`] = {L: value.map(item => marshall(item, {convertEmptyValues: true}))};
         } else {
-            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
+            expressionAttributeValues[`:${key}`] = marshall(value, {convertEmptyValues: true});
         }
-        }
+    }
 
     const params = {
         TableName: tableName,
