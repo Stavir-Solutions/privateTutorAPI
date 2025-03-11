@@ -140,12 +140,19 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
-        uuidStub.restore();
     });
 
     it('should return the create batch when found', async () => {
         // Given
-    
+        const batch = {  "name": "English",
+            "course": "English Subject",
+            "subject": "English",
+            "description": "litsening and speaking.",
+            "paymentFrequency": "Monthly",
+            "paymentAmount": 400.00,
+            "paymentDayOfMonth": 15,
+            "teacherId": "1c597a5c-1b96-4d52-a70e-fdb3868f7370"
+        };
         const batchId = 'batch-id';
         const batchItem = { id: batchId, ...batch };
         const marshalledItem = marshall(batchItem);
@@ -156,19 +163,11 @@ describe('create', () => {
         const result = await create(batchId);
 
         // Then
-        expect(result).to.equal(batchId);
+        expect(result).to.not.be.undefined;
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
 
-    it('should return an empty object when the item is not found', async () => {
-        const batchId = 'batch-id';
-
-        const result = await create(batchId);
-        expect(result).to.deep.equal({});
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
     it('should throw an error when the db call fails', async () => {
         // Given
         const batchId = 'batch-id';

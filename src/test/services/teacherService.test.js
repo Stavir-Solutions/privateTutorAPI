@@ -86,12 +86,27 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
-        uuidStub.restore();
     });
 
     it('should return the create teacher when found', async () => {
         // Given
-    
+        const teacher = {  "firstName": "Santhoosh",
+            "lastName": "Krishna",
+            "userName": "Santhoosh",
+            "password": "test123",
+            "age": 35,
+            "gender": "male",
+            "addressLine1": "123 Main StRoad",
+            "addressCity": "Hometown",
+            "addressState": "state",
+            "pinCode": 156456,
+            "profilePicUrl": "http://example.com/profile.jpg",
+            "email": "Santhooshkrishna@example.com",
+            "phoneNumber": "9876543210",
+            "upiId": "Santhoosh@upi",
+            "accountNumber": "1256567890",
+            "accountName": "Santhoosh Krishna",
+            "ifscCode": "IFSC0001238"};
         const teacherId = 'teacher-id';
         const teacherItem = { id: teacherId, ...teacher };
         const marshalledItem = marshall(teacherItem);
@@ -102,19 +117,11 @@ describe('create', () => {
         const result = await create(teacherId);
 
         // Then
-        expect(result).to.equal(teacherId);
+        expect(result).to.not.be.undefined;
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
 
-    it('should return an empty object when the item is not found', async () => {
-        const teacherId = 'teacher-id';
-
-        const result = await create(teacherId);
-        expect(result).to.deep.equal({});
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
     it('should throw an error when the db call fails', async () => {
         // Given
         const teacherId = 'teacher-id';

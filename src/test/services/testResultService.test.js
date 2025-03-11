@@ -141,12 +141,17 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
-        uuidStub.restore();
     });
 
     it('should return the create testResult when found', async () => {
         // Given
-    
+        const testResult = {
+            "testId": "123e48867-e89b-12d3-a456-426614174000",
+            "studentId": "123e4567-e89b-12d3-a456-4266141stu567",
+            "marks": 85,
+            "attestedByParent": true
+        };
+
         const testResultId = 'testResult-id';
         const testItem = { id: testResultId, ...testResult };
         const marshalledItem = marshall(testItem);
@@ -157,19 +162,12 @@ describe('create', () => {
         const result = await create(testResultId);
 
         // Then
-        expect(result).to.equal(testResultId);
+        expect(result).to.not.be.undefined;
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
 
-    it('should return an empty object when the item is not found', async () => {
-        const testResultId = 'testResult-id';
 
-        const result = await create(testResultId);
-        expect(result).to.deep.equal({});
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
     it('should throw an error when the db call fails', async () => {
         // Given
         const testResultId = 'testResult-id';

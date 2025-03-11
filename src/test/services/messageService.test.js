@@ -12,6 +12,8 @@ const {PutItemCommand} = require('@aws-sdk/client-dynamodb');
 const {DeleteItemCommand} = require('@aws-sdk/client-dynamodb');
 const {ScanCommand} = require('@aws-sdk/client-dynamodb');
 const {GetItemCommand} = require('@aws-sdk/client-dynamodb');
+const messageService = require('../../main/services/messageService');
+
 
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 
@@ -69,78 +71,66 @@ describe('getByBatchId', () => {
     });
 });
 describe('addReplyToMessage', () => {
-    let dbStub;
+    let dbStub, getByIdStub;
 
     beforeEach(() => {
-        dbStub = sinon.stub(db, 'send');
+        dbStub = sinon.stub(db, 'send'); 
+        getByIdStub = sinon.stub(messageService, 'getById'); 
     });
 
     afterEach(() => {
         dbStub.restore();
+        getByIdStub.restore();
     });
 
     it('should add a reply to an existing message when found', async () => {
-        // given
         const messageId = 'message-id';
-        const replyFields = {content: 'Updated message content'};
-        const messageItem = {
-            id: messageId, replies: [{text: 'Existing reply'}]
-        };
-        sinon.stub(global, 'getById').resolves(messageItem);
+        const reply = { content: 'Updated message content' };
+        const messageItem = { id: messageId, replies: [{ text: 'Existing reply' }] };
 
-        const marshalledItem = marshall(messageItem);
+        getByIdStub.resolves(messageItem);
+        dbStub.resolves({ Attributes: marshall({ ...messageItem, replies: [...messageItem.replies, reply] }) });
 
-        dbStub.resolves({Attributes: marshalledItem});
-        // when
-        const result = await addReplyToMessage(messageId, replyFields);
+        const result = await messageService.addReplyToMessage(messageId, reply);
 
-        // then
-        expect(result).to.deep.equal(messageItem);
+        expect(result).to.have.property('replies').with.length(2);
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(UpdateItemCommand))).to.be.true;
     });
+
     it('should return an empty object when the item is not found', async () => {
-        // Given
         const messageId = 'test-id';
-        const replyFields = {name: 'Updated notes Name'};
-        sinon.stub(global, 'getById').resolves(null);
+        const reply = { content: 'Updated content' };
 
-        dbStub.resolves({Attributes: null});
-        // When
-        const result = await updateNotes(messageId, replyFields);
+        getByIdStub.resolves(null);
+        dbStub.resolves({ Attributes: null });
 
-        // Then
+        const result = await messageService.addReplyToMessage(messageId, reply);
+
         expect(result).to.deep.equal({});
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(UpdateItemCommand))).to.be.true;
     });
 
-    it('should throw an error when the db call fails', async () => {
-        // Given
+    it('should throw an error when the DB call fails', async () => {
         const messageId = 'message-id';
-        const replyFields = {content: 'Updated message content'};
-        const messageItem = {
-            id: messageId, replies: [{text: 'Existing reply'}]
-        };
+        const reply = { content: 'Updated message content' };
+        const messageItem = { id: messageId, replies: [{ text: 'Existing reply' }] };
         const errorMessage = 'DB error';
-        sinon.stub(global, 'getById').resolves(messageItem);
 
+        getByIdStub.resolves(messageItem); 
         dbStub.rejects(new Error(errorMessage));
 
-        // When
         try {
-            await updatemessage(messageId, replyFields);
+            await messageService.addReplyToMessage(messageId, reply);
         } catch (err) {
-            // Then
             expect(err.message).to.equal(errorMessage);
         }
+
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(UpdateItemCommand))).to.be.true;
     });
-
 });
-
-
 describe('create', () => {
     let dbStub;
 
@@ -156,7 +146,27 @@ describe('create', () => {
         // Given
 
         const messageId = 'message-id';
-        let message = {}; //TODO fill proper object with all values
+        let message = {"subject": "Homework Submission",
+            "content": "Please find my attached homework for review.",
+            "sender": "student@example.com",
+            "receiver": "teacher@example.com",
+            "batchId": "batch-12345",
+            "studentId": "student-67890",
+            "timestamp": "2025-03-10T10:30:00.000Z",
+            "attachmentUrls": [
+                "https://example.com/homework1.pdf",
+                "https://example.com/homework2.pdf"
+            ],
+            "replies": [
+                {
+                    "content": "Thanks for submitting your homework. I'll review it soon.",
+                    "sender": "teacher@example.com",
+                    "timestamp": "2025-03-10T12:00:00.000Z",
+                    "attachmentUrls": [
+                        "https://example.com/graded-homework.pdf"
+                    ]
+                }
+            ]}; //TODO fill proper object with all values
         const messageItem = {id: messageId, ...message};
         const marshalledItem = marshall(messageItem);
 
@@ -166,7 +176,7 @@ describe('create', () => {
         const result = await create(messageId);
 
         // Then
-        expect(result).to.not.undefined;
+        expect(result).to.not.be.undefined;
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });

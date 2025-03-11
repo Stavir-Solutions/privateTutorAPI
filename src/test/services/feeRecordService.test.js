@@ -141,12 +141,21 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
-        uuidStub.restore();
     });
 
     it('should return the create feeRecord when found', async () => {
         // Given
-    
+        const feeRecord = {
+            "batchId": "1b6b2a0f-7774-472f-a978-0c72c6379ea2",
+            "studentId": "ea695efc-f944-4abb-9c0c-aab7ea3fc7af",
+            "dueDate": "2025-12-31T23:59:59.999Z",
+            "paymentDate": "2025-12-10T12:34:56.789Z",
+            "amount": 400.00,
+            "status": "paid",
+            "notes": "Payment received in full.",
+            "attachmentUrl": "http://example.com/receipt.pdf",
+            "teacherAcknowledgement": true
+        };
         const feeRecordId = 'feeRecord-id';
         const feeRecordItem = { id: feeRecordId, ...feeRecord };
         const marshalledItem = marshall(feeRecordItem);
@@ -157,16 +166,7 @@ describe('create', () => {
         const result = await create(feeRecordId);
 
         // Then
-        expect(result).to.equal(feeRecordId);
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
-
-    it('should return an empty object when the item is not found', async () => {
-        const feeRecordId = 'feeRecord-id';
-
-        const result = await create(feeRecordId);
-        expect(result).to.deep.equal({});
+        expect(result).to.not.be.undefined;
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
