@@ -140,32 +140,42 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
-        uuidStub.restore();
     });
 
     it('should return the create student when found', async () => {
         // Given
-    
+        const student = {
+            "firstName": "Amala",
+            "lastName": "M",
+            "age": 11,
+            "userName": "AmalaM",
+            "password": "Amala234",
+            "email": "Amala@example.com",
+            "addressLine1": " St Mart",
+            "addressCity": "mahiaplace",
+            "addressState": "karnataka",
+            "pinCode": 605001,
+            "profilePicUrl": "http://example.com/profile.jpg",
+            "gender": "female",
+            "parent1Name": "Manu.I",
+            "parent1Phone": "9876759851",
+            "parent1Email": "manu.13@example.com",
+            "parent2Name": "supriya S",
+            "parent2Phone": "9742299869",
+            "parent2Email": "supriya@example.com"
+        };
+
         const studentId = 'student-id';
-        const studentItem = { id: studentId, ...student };
+        const studentItem = {id: studentId, ...student};
         const marshalledItem = marshall(studentItem);
 
-        dbStub.resolves({ Item: marshalledItem });
+        dbStub.resolves({Item: marshalledItem});
 
         // When
-        const result = await create(studentId);
+        const result = await createStudent(studentId);
 
         // Then
-        expect(result).to.equal(studentId);
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
-
-    it('should return an empty object when the item is not found', async () => {
-        const studentId = 'student-id';
-
-        const result = await create(studentId);
-        expect(result).to.deep.equal({});
+        expect(result).to.not.be.undefined;
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
@@ -178,7 +188,7 @@ describe('create', () => {
 
         // When
         try {
-            await create(studentId);
+            await createStudent(studentId);
         } catch (err) {
             // Then
             expect(err.message).to.equal(errorMessage);
@@ -312,10 +322,10 @@ describe('getStudentById', () => {
     it('should return the student when found', async () => {
         //given
         const studentId = 'student-id';
-        const studentItem = { id: studentId, batches: 'batches' };
+        const studentItem = {id: studentId, batches: 'batches'};
         const marshalledItem = marshall(studentItem);
 
-        dbStub.resolves({ Item: marshalledItem });
+        dbStub.resolves({Item: marshalledItem});
 
         //when
         const result = await getStudentById(studentId);

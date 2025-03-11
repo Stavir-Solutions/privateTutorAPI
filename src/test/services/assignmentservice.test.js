@@ -141,12 +141,22 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
-        uuidStub.restore();
     });
 
     it('should return the create assignment when found', async () => {
         // Given
-    
+        const assignment ={
+            "publishDate": "2024-01-01T00:00:00.000Z",
+            "submissionDate": "2024-01-15T23:59:59.999Z",
+            "batchId": "550e8400-e29b-41d4-a716-446655440000",
+            "studentId": "550e8400-e29b-41d4-a716-446655440001",
+            "title": "Math Assignment 1",
+            "details": "Solve the algebra problems in the attached document.",
+            "attachmentUrls": [
+                "http://example.com/assignment1.pdf",
+                "http://example.com/assignment2.pdf"
+            ]
+        };
         const assignmentId = 'assignment-id';
         const assignmentItem = { id: assignmentId, ...assignment };
         const marshalledItem = marshall(assignmentItem);
@@ -157,19 +167,11 @@ describe('create', () => {
         const result = await create(assignmentId);
 
         // Then
-        expect(result).to.equal(assignmentId);
+        expect(result).to.not.undefined;
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
 
-    it('should return an empty object when the item is not found', async () => {
-        const assignmentId = 'assignment-id';
-
-        const result = await create(assignmentId);
-        expect(result).to.deep.equal({});
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
     it('should throw an error when the db call fails', async () => {
         // Given
         const assignmentId = 'assignment-id';

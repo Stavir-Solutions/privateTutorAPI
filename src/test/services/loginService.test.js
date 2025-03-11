@@ -9,14 +9,19 @@ const {buildStudentRefreshTokenPayload} = require('../../main/services/loginServ
 const {buildTeacherPayload} = require('../../main/services/loginService');
 const {buildStudentPayload} = require('../../main/services/loginService');
 const {validateToken} = require('../../main/services/loginService');
+const {decodeToken} = require('../../main/services/loginService');
 const {generateNewTokenFromRefreshToken} = require('../../main/services/loginService');
 const db = require('../../main/db/dynamodb');
 const jwt = require('jsonwebtoken');
 const { ScanCommand } = require('@aws-sdk/client-dynamodb');
-const UserType = require('../../main/common/UserType'); 
+const UserType = require('../../main/common/UserType');
+const dotenv = require('dotenv');
+const loginService = require('../../main/services/loginService');
+const responseUtils = require('../../main/routes/responseUtils');
 
 
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
+const {getTeacherById} = require("../../main/services/teacherService");
 
 
 describe('getTeacherIfPasswordMatches', () => {
@@ -137,28 +142,50 @@ describe('getStudentIfPasswordMatches', () => {
         }
     });
 });
-describe('generateAccessToken', () => {
-    
-    it('should generate an access token',  () => {
-        // given
-        const payload = { id: 'user-id', userType: 'user-type' };
-        // when
-        const result =  generateAccessToken(payload);
-        // then
-        expect(result).to.be.a('string');
-    });
-});
-describe('generateRefreshToken', () => {
-    it('should generate a refresh token', () => {
-        // given
-        const payload = { id: 'user-id', userType: 'user-type' };
-        // when
-        const result = generateRefreshToken(payload);
-        // then
-        expect(result).to.be.a('string');
-    });
-});
+describe('generateAccessToken', function () {
+    let jwtStub;
 
+    beforeEach(() => {
+        jwtStub = sinon.stub(jwt, 'sign').returns('mocked.jwt.token');
+
+        process.env.JWT_PRIVATE_KEY = Buffer.from('mock-private-key').toString('base64');
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    });
+
+    it('should generate a valid JWT token', async function () {
+        const payload = { userName: 'user-name',userType:'usertype' };
+
+        const token = await generateAccessToken(payload);
+
+        expect(jwtStub.calledOnce).to.be.true;
+        expect(jwtStub.calledWith(payload, sinon.match.string, { algorithm: 'RS256', expiresIn: sinon.match.number })).to.be.true;
+        expect(token).to.equal('mocked.jwt.token');
+    });
+});
+describe('generateRefreshToken', function () {
+    let jwtSignStub;
+
+    beforeEach(() => {
+        process.env.JWT_PRIVATE_KEY = Buffer.from('mock-private-key').toString('base64');
+        jwtSignStub = sinon.stub(jwt, 'sign').returns('mocked.jwt.refresh.token');
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    });
+
+    it('should generate a refresh token with username', async function () {
+        const payload = {userName: 'user-name',userType:'usertype' };
+
+        const token = await generateRefreshToken(payload);
+
+        expect(jwtSignStub.calledOnce).to.be.true;
+        expect(token).to.equal('mocked.jwt.refresh.token');
+    });
+});
 
 describe('buildTeacherRefreshTokenPayload', () => {
     it('should build the teacher refresh token payload', () => {
@@ -269,48 +296,72 @@ describe('buildStudentPayload', () => {
             });
         });
     });
-describe('validateToken', () => {
-    let jwtStub;
+describe('decodeToken', function () {
+    let jwtVerifyStub;
 
     beforeEach(() => {
+        jwtVerifyStub = sinon.stub(jwt, 'verify').returns({ userName: 'user-name' });
+    });
+
+    afterEach(() => {
+        sinon.restore();
+    });
+
+    it('should decode a valid token', async function () {
+        const jwtPublicKey = 'mock-public-key';
+        const token = 'mocked.jwt.token';
+
+        const decoded = await decodeToken(token, jwtPublicKey);
+
+        expect(jwtVerifyStub.calledOnce).to.be.true;
+        expect(decoded).to.deep.equal({ userName: 'user-name' });
+    });
+});
+
+describe('validateToken', () => {
+    let jwtStub;
+    const mockPublicKey = 'mockPublicKey';
+
+    beforeEach(() => {
+        process.env.JWT_PUBLIC_KEY = Buffer.from(mockPublicKey).toString('base64');
+
         jwtStub = sinon.stub(jwt, 'verify');
     });
 
     afterEach(() => {
-        jwtStub.restore();
+        sinon.restore();
     });
 
-    it('should validate the token', () => {
+    it('should validate the token successfully', async () => {
         // given
-        const token = 'token';
+        const token = 'validToken';
         const expectedPayload = { id: 'user-id', userType: 'user-type' };
 
         jwtStub.returns(expectedPayload);
 
         // when
-        const result = validateToken(token);
+        const result = await validateToken(token);
 
         // then
         expect(result).to.deep.equal(expectedPayload);
         expect(jwtStub.calledOnce).to.be.true;
-        expect(jwtStub.calledWith(token)).to.be.true;
+        expect(jwtStub.calledWith(token, mockPublicKey)).to.be.true;
     });
 
-    it('should throw an error for invalid token', () => {
+    it('should return null if token validation fails', async () => {
         // given
-        const token = 'invalid-token';
-        const errorMessage = 'Invalid token';
+        const token = 'invalidToken';
+        jwtStub.throws(new Error('Invalid token'));
 
-        jwtStub.throws(new Error(errorMessage));
+        // when
+        const result = await validateToken(token);
 
-        try {
-            validateToken(token);
-        } catch (err) {
-            expect(err.message).to.equal(errorMessage);
-        }
+        // then
+        expect(result).to.be.null;
+        expect(jwtStub.calledOnce).to.be.true;
+        expect(jwtStub.calledWith(token, mockPublicKey)).to.be.true;
     });
 });
-
 describe('generateNewTokenFromRefreshToken', () => {
     it('should generate a new token from the refresh token', () => {
         // given

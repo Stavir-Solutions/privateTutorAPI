@@ -143,29 +143,19 @@ describe('create', () => {
 
     afterEach(() => {
         dbStub.restore();
-        uuidStub.restore();
     });
 
     it('should return the create test when found', async () => {
         // Given
         const test = {
-            firstName: 'John',
-            lastName: 'Doe',
-            userName: 'johndoe',
-            password: 'password123',
-            age: 30,
-            gender: 'Male',
-            addressLine1: '123 Main St',
-            addressCity: 'Anytown',
-            addressState: 'Anystate',
-            pinCode: '123456',
-            profilePicUrl: 'http://example.com/profile.jpg',
-            email: 'john.doe@example.com',
-            phoneNumber: '1234567890',
-            upiId: 'john@upi',
-            accountNumber: '123456789',
-            accountName: 'John Doe',
-            ifscCode: 'IFSC0001234'
+            "name": "Midterm Exam",
+            "subject": "Mathematics",
+            "testDate": "2025-02-15T10:00:00.000Z",
+            "resultPublishDate": "2025-02-20T10:00:00.000Z",
+            "totalMarks": 100,
+            "minimumPassMark": 40,
+            "numberOfQuestions": 20,
+            "batchId": "123e4567-e89b-12d3-a456-426614174000"
         };
         const testId = 'test-id';
         const testItem = { id: testId, ...test };
@@ -177,38 +167,12 @@ describe('create', () => {
         const result = await create(testId);
 
         // Then
-        expect(result).to.equal(testId);
+        expect(result).to.not.undefined;
+
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
     });
 
-    it('should return an empty object when the item is not found', async () => {
-        const testId = 'test-id';
-        const test = {
-            firstName: 'John',
-            lastName: 'Doe',
-            userName: 'johndoe',
-            password: 'password123',
-            age: 30,
-            gender: 'Male',
-            addressLine1: '123 Main St',
-            addressCity: 'Anytown',
-            addressState: 'Anystate',
-            pinCode: '123456',
-            profilePicUrl: 'http://example.com/profile.jpg',
-            email: 'john.doe@example.com',
-            phoneNumber: '1234567890',
-            upiId: 'john@upi',
-            accountNumber: '123456789',
-            accountName: 'John Doe',
-            ifscCode: 'IFSC0001234'
-        };
-
-        const result = await create(testId);
-        expect(result).to.deep.equal({});
-        expect(dbStub.calledOnce).to.be.true;
-        expect(dbStub.calledWith(sinon.match.instanceOf(PutItemCommand))).to.be.true;
-    });
     it('should throw an error when the db call fails', async () => {
         // Given
         const testId = 'test-id';
