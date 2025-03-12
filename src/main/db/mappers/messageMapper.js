@@ -4,13 +4,20 @@ const {marshall} = require('@aws-sdk/util-dynamodb');
 
 function toReplyEntity(reply) {
     return {
-        id: generateUUID(),
-        content: reply.content,
-        sender: reply.sender,
-        timestamp: reply.timestamp ,
-        attachmentUrls: reply.attachmentUrls,
-        replies: reply.replies ? reply.replies.map(toReplyEntity) :[], 
+        TableName: 'Messages',
+        Item: marshall({
+                id: generateUUID(),
+                content: reply.content,
+                sender: reply.sender,
+                timestamp: reply.timestamp,
+                attachmentUrls: reply.attachmentUrls,
+                replies: reply.replies ? reply.replies.map(toReplyEntity) : [],
+            }
+            , {removeUndefinedValues: true}
+        ),
+
     };
+
 }
 function toMessageEntity(message) {
     return {
