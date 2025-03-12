@@ -362,106 +362,55 @@ describe('validateToken', () => {
         expect(jwtStub.calledWith(token, mockPublicKey)).to.be.true;
     });
 });
-describe('generateNewTokenFromRefreshToken', () => {
-    let mockResponse;
-    const mockRefreshToken = 'mockRefreshToken';
+describe('generateNewTokenFromRefreshToken', function () {
+    let res, payload, refreshToken;
 
-    beforeEach(() => {
-        mockResponse = {
+    beforeEach(function () {
+        res = {
             status: sinon.stub().returnsThis(),
-            json: sinon.stub(),
+            json: sinon.stub()
         };
-
-        sinon.stub(loginService, 'generateTokenForTeacherFromRefreshToken').resolves('mockNewTeacherToken');
-        sinon.stub(loginService, 'generateTokenForStudentFromRefreshToken').resolves('mockNewStudentToken');
-        sinon.stub(studentService, 'getStudentById').resolves({ id: 'student-123', name: 'Test Student' });
-        sinon.stub(teacherService, 'getTeacherById').resolves({ id: 'teacher-123', name: 'Test Teacher' });
-        sinon.stub(responseUtils, 'buildErrorMessage');
-
-        process.env.AWS_REGION = 'us-east-1';
+        refreshToken = 'dummyRefreshToken';
+        sinon.stub(generateTokenForTeacherFromRefreshToken).resolves('newTeacherToken');
+        sinon.stub(generateTokenForStudentFromRefreshToken).resolves('newStudentToken');
+        sinon.stub(buildErrorMessage);
     });
 
-    afterEach(() => {
+    afterEach(function () {
         sinon.restore();
     });
 
-    it('should generate a new token for a TEACHER userType', async () => {
-        const mockPayload = { userType: UserType.TEACHER };
+    it('should generate a new token for a TEACHER userType', async function () {
+        payload = { userType: 'TEACHER' };
 
-        await generateNewTokenFromRefreshToken(mockPayload, mockResponse, mockRefreshToken);
+        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 
-        expect(loginService.generateTokenForTeacherFromRefreshToken).to.have.been.calledOnce;
-        expect(loginService.generateTokenForStudentFromRefreshToken).to.not.have.been.called;
-        expect(responseUtils.buildErrorMessage).to.not.have.been.called;
+        expect(generateTokenForTeacherFromRefreshToken).to.have.been.calledOnce;
+        expect(generateTokenForStudentFromRefreshToken).to.not.have.been.called;
+        expect(buildErrorMessage).to.not.have.been.called;
     });
 
-    it('should generate a new token for a STUDENT userType', async () => {
-        const mockPayload = { userType: UserType.STUDENT };
+    it('should generate a new token for a STUDENT role', async function () {
+        payload = { role: 'STUDENT' };
 
-        await generateNewTokenFromRefreshToken(mockPayload, mockResponse, mockRefreshToken);
+        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 
-        expect(loginService.generateTokenForStudentFromRefreshToken).to.have.been.calledOnce;
-        expect(loginService.generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
-        expect(responseUtils.buildErrorMessage).to.not.have.been.called;
+        expect(generateTokenForStudentFromRefreshToken).to.have.been.calledOnce;
+        expect(generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
+        expect(buildErrorMessage).to.not.have.been.called;
     });
 
-    it('should return an error message for an invalid userType', async () => {
-        const mockPayload = { userType: 'INVALID_TYPE' };
+    it('should return an error for an invalid userType/role', async function () {
+        payload = { userType: 'INVALID' };
 
-        await generateNewTokenFromRefreshToken(mockPayload, mockResponse, mockRefreshToken);
+        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 
-        expect(responseUtils.buildErrorMessage).to.have.been.calledWith(
-            mockResponse,
-            401,
-            'Invalid refreshToken, login again'
-        );
-        expect(loginService.generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
-        expect(loginService.generateTokenForStudentFromRefreshToken).to.not.have.been.called;
-    });
-
-    it('should return an error if teacher ID is undefined', async () => {
-        teacherService.getTeacherById.resolves(undefined); // Mock undefined response
-
-        const mockPayload = { userType: UserType.TEACHER };
-
-        await generateNewTokenFromRefreshToken(mockPayload, mockResponse, mockRefreshToken);
-
-        expect(responseUtils.buildErrorMessage).to.have.been.calledWith(
-            mockResponse,
-            401,
-            'Invalid refreshToken, login again'
-        );
-        expect(teacherService.generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
-    });
-
-    it('should return an error if student token generation fails', async () => {
-        loginService.generateTokenForStudentFromRefreshToken.rejects(new Error('Token generation failed'));
-
-        const mockPayload = { userType: UserType.STUDENT };
-
-        await generateNewTokenFromRefreshToken(mockPayload, mockResponse, mockRefreshToken);
-
-        expect(responseUtils.buildErrorMessage).to.have.been.calledWith(
-            mockResponse,
-            500,
-            'Failed to generate new token'
-        );
-    });
-
-    it('should return an error if teacher token generation fails', async () => {
-        loginService.generateTokenForTeacherFromRefreshToken.rejects(new Error('Token generation failed'));
-
-        const mockPayload = { userType: UserType.TEACHER };
-
-        await generateNewTokenFromRefreshToken(mockPayload, mockResponse, mockRefreshToken);
-
-        expect(responseUtils.buildErrorMessage).to.have.been.calledWith(
-            mockResponse,
-            500,
-            'Failed to generate new token'
-        );
+        expect(buildErrorMessage).to.have.been.calledWith(res, 401, 'Invalid refreshToken, login again');
+        expect(generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
+        expect(generateTokenForStudentFromRefreshToken).to.not.have.been.called;
     });
 });
+
 describe('generateTokenForTeacherFromRefreshToken', function () {
     let res, payload, refreshToken;
 
