@@ -72,22 +72,25 @@ async function addReplyToMessage(messageId, reply) {
     }
 
 }
-
 async function getByStudentId(studentId) {
     const params = {
-        TableName: tableName, FilterExpression: "studentId = :studentId", ExpressionAttributeValues: {
-            ':studentId': marshall(studentId),
-        },
+        TableName: tableName,
+        FilterExpression: "(sender = :studentId AND senderType = :student) OR (receiver= :studentId AND receiverType = :student)",
+        ExpressionAttributeValues: {
+            ":studentId": { S: studentId },
+            ":student": { S: "STUDENT" }  
+        }
     };
 
     try {
         const data = await db.send(new ScanCommand(params));
         return data.Items.map(item => unmarshall(item));
     } catch (err) {
-        console.error('Unable to get by student. Error JSON:', JSON.stringify(err, null, 2));
+        console.error('Unable to fetch messages. Error:', err);
         throw err;
     }
 }
+
 
 async function getByBatchId(batchId) {
 

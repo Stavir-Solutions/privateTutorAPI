@@ -25,7 +25,6 @@ const messageSchema = Joi.object({
     receiverType: Joi.string().valid("TEACHER", "STUDENT").required(),
     receiverName: Joi.string().optional(),
     batchId: Joi.string().required(),
-    studentId: Joi.string().required(),
     timestamp: Joi.date().optional(),
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional(),
     replies: Joi.array().items(Joi.object({

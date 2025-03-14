@@ -13,7 +13,7 @@ const notesSchema = Joi.object({
     publishDate: Joi.date().required(),
     Title: Joi.string().max(500).required(),
     listUrls: Joi.array().items(Joi.string().uri()).optional(),
-    studentId: Joi.string().required(),  
+    studentId: Joi.string().optional(),  
     batchId: Joi.string().required(),    
     content: Joi.string().required()     
 });
