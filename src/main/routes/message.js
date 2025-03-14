@@ -7,7 +7,7 @@ const {
     getById,
     deleteById,
     addReplyToMessage,
-    getByBatchId
+    getByBatchId,
 } = require('../services/messageService');
 const authMiddleware = require("../middleware/authMiddleware");
 
@@ -18,16 +18,20 @@ router.use(authMiddleware);
 const messageSchema = Joi.object({
     subject: Joi.string().max(100).required(),
     content: Joi.string().required(),
-    sender: Joi.string().email().required(),
-    receiver: Joi.string().email().required(),
+    sender: Joi.string().required(),  
+    senderType: Joi.string().valid("TEACHER", "STUDENT").required(),
+    senderName: Joi.string().optional(),
+    receiver: Joi.string().required(),
+    receiverType: Joi.string().valid("TEACHER", "STUDENT").required(),
+    receiverName: Joi.string().optional(),
     batchId: Joi.string().required(),
-    studentId: Joi.string().optional(),
     timestamp: Joi.date().optional(),
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional(),
     replies: Joi.array().items(Joi.object({
         content: Joi.string().required(),
-        sender: Joi.string().email().required(),
-        timestamp: Joi.date().required(),
+        sender: Joi.string().required(),  
+        senderType: Joi.string().valid("TEACHER", "STUDENT").required(),
+        senderName: Joi.string().optional(),        timestamp: Joi.date().required(),
         attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
     })).optional()
 
@@ -35,8 +39,9 @@ const messageSchema = Joi.object({
 
 const replySchema = Joi.object({
     content: Joi.string().required(),
-    sender: Joi.string().email().required(),
-    timestamp: Joi.date().required(),
+    sender: Joi.string().required(),  
+    senderType: Joi.string().valid("TEACHER", "STUDENT").required(),
+    senderName: Joi.string().optional(),     
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
 }).unknown(false);
 
@@ -45,7 +50,9 @@ const messageUpdateSchema = Joi.object({
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional(),
     replies: Joi.array().items(Joi.object({
         content: Joi.string().optional(),
-        sender: Joi.string().email().optional(),
+        sender: Joi.string().optional(),  
+        senderType: Joi.string().valid("TEACHER", "STUDENT").optional(),
+        senderName: Joi.string().optional(), 
         timestamp: Joi.date().optional(),
         attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
     })).optional()
@@ -54,7 +61,9 @@ const messageUpdateSchema = Joi.object({
 
 const replyUpdateSchema = Joi.object({
     content: Joi.string().optional(),
-    sender: Joi.string().email().optional(),
+    sender: Joi.string().optional(),  
+    senderType: Joi.string().valid("TEACHER", "STUDENT").optional(),
+    senderName: Joi.string().optional(), 
     timestamp: Joi.date().optional(),
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional()
 }).unknown(false);
