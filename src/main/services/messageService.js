@@ -1,27 +1,112 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
 const db = require('../db/dynamodb');
 const {
-    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
+PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand,QueryCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
-
 
 const tableName = "Messages";
 
 async function create(message) {
-    let messageEntity = toMessageEntity(message);
-    console.log('converted to entity ', messageEntity);
 
-    await db.send(new PutItemCommand(messageEntity, function (err, data) {
-        if (err) {
-            console.error('Unable to add messages. Error JSON:', JSON.stringify(err, null, 2));
-        } else {
-            console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
+    async function getUserRole(userId) {
+        const params = {
+            TableName: "Notifications",
+            FilterExpression: "studentId = :userId OR teacherId = :userId",
+            ExpressionAttributeValues: {
+                ":userId": { S: userId }
+            }
+        };
+    
+        try {
+            const data = await db.send(new ScanCommand(params));
+    
+            if (data.Items.length > 0) {
+                const item = data.Items[0]; 
+                if (item.studentId && item.studentId.S === userId) return "STUDENT";
+                if (item.teacherId && item.teacherId.S === userId) return "TEACHER";
+            }
+            throw new Error("User role not found in Notifications table.");
+        } catch (error) {
+            console.error("Error fetching user role:", error);
+            throw error;
         }
-    }));
-    return unmarshall(messageEntity.Item).id;
+    }
+    
+    let sender = await getUserRole(message.sender);
+    let receiver = await getUserRole(message.receiver);
+
+    let teacherId = null, studentId = null;
+
+    if (sender === "TEACHER") {
+        teacherId = message.sender;
+    } else if (sender === "STUDENT") {
+        studentId = message.sender;
+    }else {
+        console.error("Invalid message: sender  cannot be teachers or students.");
+        throw new Error("Invalid message: Cannot determine teacher and student.");
+    }
+
+    if (receiver === "TEACHER") {
+        teacherId = message.receiver;
+    } else if (receiver === "STUDENT") {
+        studentId = message.receiver;
+    } else {
+        console.error("Invalid message: receiver cannot be teachers or students.");
+        throw new Error("Invalid message: Cannot determine teacher and student.");
+    }
+    let messageEntity = toMessageEntity(message);
+    console.log("Converted to entity:", messageEntity);
+    const messageId = uuidv4();
+    messageEntity.Item.id = { S: messageId };
+
+
+
+    try {
+        await db.send(new PutItemCommand(messageEntity)); 
+        console.log("Message added successfully.");
+        const messageId = unmarshall(messageEntity.Item).id;
+                
+
+        console.log("Calling createNotification...");
+        await createNotification(messageId,studentId,teacherId); 
+        console.log("Notification created successfully.");
+        
+    } catch (err) {
+        console.error("Unable to add messages. Error JSON:", JSON.stringify(err, null, 2));
+    }
+
+    return messageId;
 }
 
+async function createNotification(messageId, studentId, teacherId) {
+    let notificationEntity = {
+        TableName: "Notifications",
+        Item: marshall({
+            id: uuidv4(), 
+            studentId: studentId,
+            teacherId: teacherId,
+            deepLink: `smart-teacher.com/messages/${messageId}`,
+            notificationSeenTime: "",
+            notificationTime: new Date().toISOString(),
+            objectId: messageId,
+            seen: false,
+            studentId,
+            teacherId,
+            title: `New message from ${teacherId}||${studentId}`,
+            type: notificationEntity.type
+        })
+    };
+
+    try {
+        await db.send(new PutItemCommand(notificationEntity));
+        console.log("Notification created successfully.");
+    } catch (err) {
+        console.error("Unable to add notification. Error JSON:", JSON.stringify(err, null, 2));
+    }
+    return unmarshall(notificationEntity.Item).id;
+
+}
 async function addReplyToMessage(messageId, reply) {
     console.log('add reply to message {}', messageId);
     const message = await getById(messageId);
@@ -139,5 +224,5 @@ async function deleteById(messageId) {
 }
 
 
-module.exports = {create, getByStudentId, getById, deleteById, addReplyToMessage, getByBatchId}
+module.exports = {create, getByStudentId, getById, deleteById, addReplyToMessage, getByBatchId,createNotification}
 

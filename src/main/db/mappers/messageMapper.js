@@ -27,12 +27,12 @@ function toMessageEntity(message) {
             subject: message.subject,
             content: message.content,
             batchId: message.batchId,
-            studentId: message.studentId,
             sender: message.sender,
             receiver: message.receiver,
             timestamp: message.timestamp ,
             attachmentUrls: message.attachmentUrls,
             replies: message.replies ? message.replies.map(toReplyEntity) : [],
+
         },
         { removeUndefinedValues: true }
     ),
