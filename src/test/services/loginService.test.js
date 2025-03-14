@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const {getTeacherIfPasswordMatches} = require('../../main/services/loginService');
+const {getTeacherIfPasswordMatches, generateTokenForTeacherFromRefreshToken, generateTokenForStudentFromRefreshToken} = require('../../main/services/loginService');
 const {getStudentIfPasswordMatches} = require('../../main/services/loginService');
 const {generateAccessToken} = require('../../main/services/loginService');
 const {generateRefreshToken} = require('../../main/services/loginService');
@@ -18,12 +18,12 @@ const UserType = require('../../main/common/UserType');
 const dotenv = require('dotenv');
 const loginService = require('../../main/services/loginService');
 const responseUtils = require('../../main/routes/responseUtils');
-
-
-const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 const {getTeacherById} = require("../../main/services/teacherService");
-
-
+const {getStudentById} = require("../../main/services/studentService");
+const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
+const {teacherService} = require("../../main/services/teacherService");
+const {studentService} = require("../../main/services/studentService");
+const {buildSuccessResponse,buildErrorMessage} = require("../../main/routes/responseUtils");
 describe('getTeacherIfPasswordMatches', () => {
     let dbStub;
 
@@ -220,7 +220,7 @@ describe('buildStudentRefreshTokenPayload', () => {
 describe('buildTeacherPayload', () => {
     it('should build the teacher payload', () => {
         // given
-        const teacher = {  
+        const teacher = {
             userName: 'teacher-username',
             email: 'teacher-email',
             firstName: 'teacher-firstName',
@@ -236,7 +236,7 @@ describe('buildTeacherPayload', () => {
         const result = buildTeacherPayload(teacher, teacherId);
 
         // then
-        expect(result).to.deep.equal({  
+        expect(result).to.deep.equal({
             id: teacherId,
             userName: 'teacher-username',
             email: 'teacher-email',
@@ -246,8 +246,8 @@ describe('buildTeacherPayload', () => {
             profilePicUrl: 'teacherURL',
             age: 30,
             gender: 'male',
-            userType: 'TEACHER',  
-            tokenType: 'ACCESS'  
+            userType: 'TEACHER',
+            tokenType: 'ACCESS'
         });
     });
 });
@@ -255,7 +255,7 @@ describe('buildTeacherPayload', () => {
 describe('buildStudentPayload', () => {
     it('should build the student payload', () => {
         // given
-        const student = {  
+        const student = {
             userName: 'student-username',
             parent1Email: 'parent1-email',
             parent2Email: 'parent2-email',
@@ -271,31 +271,31 @@ describe('buildStudentPayload', () => {
             gender:'male',
             batches:'student-batches',
         };
-            const studentId = 'student-id';
-            // when
-            const result = buildStudentPayload(student, studentId);
-            // then
-            expect(result).to.deep.equal({  
-                id: studentId,
-                userName: 'student-username',
-                parent1Email: 'parent1-email',
-                parent2Email: 'parent2-email',
-                parent1Phone: 'parent1-phone',
-                parent2Phone: 'parent2-phone',
-                parent1Name: 'parent1-name',
-                parent2Name: 'parent2-name',
-                firstName: 'student-firstName',
-                lastName: 'student-lastName',
-                phoneNumber: 'student-phoneNumber',
-                profilePicUrl: 'studentURL',
-                age: 10,
-                gender:'male',
-                batches:'student-batches',
-                userType: 'STUDENT',  
-                tokenType: 'ACCESS'  
-            });
+        const studentId = 'student-id';
+        // when
+        const result = buildStudentPayload(student, studentId);
+        // then
+        expect(result).to.deep.equal({
+            id: studentId,
+            userName: 'student-username',
+            parent1Email: 'parent1-email',
+            parent2Email: 'parent2-email',
+            parent1Phone: 'parent1-phone',
+            parent2Phone: 'parent2-phone',
+            parent1Name: 'parent1-name',
+            parent2Name: 'parent2-name',
+            firstName: 'student-firstName',
+            lastName: 'student-lastName',
+            phoneNumber: 'student-phoneNumber',
+            profilePicUrl: 'studentURL',
+            age: 10,
+            gender:'male',
+            batches:'student-batches',
+            userType: 'STUDENT',
+            tokenType: 'ACCESS'
         });
     });
+});
 describe('decodeToken', function () {
     let jwtVerifyStub;
 
@@ -362,15 +362,130 @@ describe('validateToken', () => {
         expect(jwtStub.calledWith(token, mockPublicKey)).to.be.true;
     });
 });
-describe('generateNewTokenFromRefreshToken', () => {
-    it('should generate a new token from the refresh token', () => {
-        // given
-        const refreshToken = 'refresh-token';
-        const payload = { id: 'user-id', userType: 'user-type' };
-        const res = {};
-        // when
-        const result = generateNewTokenFromRefreshToken(payload, res, refreshToken);
-        // then
-        expect(result).to.be.a('string');
+describe('generateNewTokenFromRefreshToken', function () {
+    let res, payload, refreshToken;
+
+    beforeEach(function () {
+        res = {
+            status: sinon.stub().returnsThis(),
+            json: sinon.stub()
+        };
+        refreshToken = 'dummyRefreshToken';
+        sinon.stub(generateTokenForTeacherFromRefreshToken).resolves('newTeacherToken');
+        sinon.stub(generateTokenForStudentFromRefreshToken).resolves('newStudentToken');
+        sinon.stub(buildErrorMessage);
     });
+
+    afterEach(function () {
+        sinon.restore();
+    });
+
+    it('should generate a new token for a TEACHER userType', async function () {
+        payload = { userType: 'TEACHER' };
+
+        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
+
+        expect(generateTokenForTeacherFromRefreshToken).to.have.been.calledOnce;
+        expect(generateTokenForStudentFromRefreshToken).to.not.have.been.called;
+        expect(buildErrorMessage).to.not.have.been.called;
+    });
+
+    it('should generate a new token for a STUDENT role', async function () {
+        payload = { role: 'STUDENT' };
+
+        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
+
+        expect(generateTokenForStudentFromRefreshToken).to.have.been.calledOnce;
+        expect(generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
+        expect(buildErrorMessage).to.not.have.been.called;
+    });
+
+    it('should return an error for an invalid userType/role', async function () {
+        payload = { userType: 'INVALID' };
+
+        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
+
+        expect(buildErrorMessage).to.have.been.calledWith(res, 401, 'Invalid refreshToken, login again');
+        expect(generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
+        expect(generateTokenForStudentFromRefreshToken).to.not.have.been.called;
+    });
+});
+
+describe('generateTokenForTeacherFromRefreshToken', function () {
+    let res, payload, refreshToken;
+
+    beforeEach(function () {
+        res = {
+            status: sinon.stub().returnsThis(),
+            json: sinon.stub()
+        };
+        payload = { id: 'teacher123' };
+        refreshToken = 'nonRefreshToken';
+        sinon.stub(teacherService, 'getTeacherById');
+        sinon.stub(buildErrorMessage);
+        sinon.stub(buildSuccessResponse);
+        sinon.stub(loginService, 'generateAccessToken').resolves('newAccessToken');
+        sinon.stub(loginService,'buildTeacherPayload').returns({ id: 'teacher-id', userName: 'username '});
+    });
+
+    afterEach(function () {
+        sinon.restore();
+    });
+    it('should return new access token if teacher exists', async function () {
+        teacherService.getTeacherById.resolves({id: 'teacher-id', userName: 'username'});
+        await generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
+
+        expect(buildSuccessResponse.calledWith(res, 200, {
+            token: 'newAccessToken',
+            refreshToken: refreshToken
+        })).to.be.true;
+    });
+
+    it('should return error if teacher does not exist', async function () {
+        getTeacherById.resolves(null);
+
+        await generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
+
+        expect(buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, teach does not exist', payload.id)).to.be.true;
+    });
+});
+describe('generateTokenForStudentFromRefreshToken', function () {
+    let res, payload, refreshToken;
+
+    beforeEach(function () {
+        res = {
+            status: sinon.stub().returnsThis(),
+            json: sinon.stub()
+        };
+        payload = { id: 'student123' };
+        refreshToken = 'nonRefreshToken';
+        sinon.stub(getStudentById);
+        sinon.stub(buildErrorMessage);
+        sinon.stub(buildSuccessResponse);
+        sinon.stub(generateAccessToken).resolves('newAccessToken');
+        sinon.stub(buildStudentPayload).returns({ id: 'student-id', userName: 'username' });
+    });
+
+    afterEach(function () {
+        sinon.restore();
+    });
+
+    it('should return new access token if student exists', async function () {
+        getStudentById.resolves({ id: 'student-id', userName: 'username' });
+        
+        await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
+        
+        expect(buildSuccessResponse.calledWith(res, 200, {
+            token: 'newAccessToken',
+            refreshToken: refreshToken
+        })).to.be.true;
+    });
+    it('should return error if student does not exist', async function () {
+        getStudentById.resolves(null);
+        
+        await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
+        
+        expect(buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, login again')).to.be.true;
+    });
+
 });

@@ -114,7 +114,6 @@ describe('addReplyToMessage', () => {
     it('should throw an error when the DB call fails', async () => {
         const messageId = 'message-id';
         const reply = { content: 'Updated message content' };
-        const messageItem = { id: messageId, replies: [{ text: 'Existing reply' }] };
         const errorMessage = 'DB error';
 
         dbStub.rejects(new Error(errorMessage));
@@ -127,7 +126,7 @@ describe('addReplyToMessage', () => {
 
         expect(dbStub.called).to.be.true;
         // TODO Keerthi - Fix this , this UpdateItemCommand is used on the second call. check that it is called second time
-        // expect(dbStub.calledWith(sinon.match.instanceOf(UpdateItemCommand))).to.be.true;
+       // expect(dbStub.calledWith(sinon.match.instanceOf(UpdateItemCommand))).to.be.true;
     });
 });
 describe('create', () => {

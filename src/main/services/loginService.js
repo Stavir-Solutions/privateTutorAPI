@@ -181,5 +181,7 @@ module.exports = {
     buildStudentPayload,
     validateToken,
     generateNewTokenFromRefreshToken,
-    decodeToken
+    decodeToken,
+    generateTokenForStudentFromRefreshToken,
+    generateTokenForTeacherFromRefreshToken
 }
