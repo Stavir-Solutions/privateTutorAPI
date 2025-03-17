@@ -41,7 +41,7 @@ async function create(message) {
         return messageId;
     } catch (error) {
         console.error('Error saving message or notification:', error);
-        return null; ;
+        return null;
     }
 }
 
