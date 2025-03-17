@@ -1,25 +1,47 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
+const {toNotificationEntity} = require('../db/mappers/notificationMapper');
+const {generateUUID} = require('../../main/db/UUIDGenerator');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
-
-
 const tableName = "Messages";
 
 async function create(message) {
     let messageEntity = toMessageEntity(message);
-    console.log('converted to entity ', messageEntity);
+    console.log('Converted to entity:', messageEntity);
 
-    await db.send(new PutItemCommand(messageEntity, function (err, data) {
-        if (err) {
-            console.error('Unable to add messages. Error JSON:', JSON.stringify(err, null, 2));
-        } else {
-            console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
-        }
-    }));
-    return unmarshall(messageEntity.Item).id;
+    try {
+        await db.send(new PutItemCommand(messageEntity));
+        console.log('Message saved successfully.');
+
+        const messageId = unmarshall(messageEntity.Item).id;
+
+        const notificationId = generateUUID();
+ 
+        const notification = {
+            id: notificationId, 
+            teacherId: message.senderType === 'TEACHER' ? message.sender : message.receiverType === 'TEACHER' ? message.receiver: null,
+            studentId: message.senderType === 'STUDENT' ? message.sender : message.receiverType === 'STUDENT' ? message.receiver : null,
+            type: "MESSAGE",
+            title: 'New Message Received',
+            objectId: messageId, 
+            deeplink: `smart-teacher.com/messages/${messageId}`,
+            seen: false,
+            notificationTime: new Date().toISOString(),
+        };
+
+        const notificationEntity = toNotificationEntity(notification);
+
+        await db.send(new PutItemCommand(notificationEntity));
+        console.log('Notification triggered successfully with ID:', notificationId);
+
+        return messageId;
+    } catch (error) {
+        console.error('Error saving message or notification:', error);
+        throw error;
+    }
 }
 
 async function addReplyToMessage(messageId, reply) {
