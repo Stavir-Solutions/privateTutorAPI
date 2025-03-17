@@ -19,15 +19,16 @@ async function create(message) {
         const messageId = unmarshall(messageEntity.Item).id;
 
         const notificationId = generateUUID();
+        const BASE_URL = process.env.BASE_URL;
  
         const notification = {
             id: notificationId, 
             teacherId: message.senderType === 'TEACHER' ? message.sender : message.receiverType === 'TEACHER' ? message.receiver: null,
             studentId: message.senderType === 'STUDENT' ? message.sender : message.receiverType === 'STUDENT' ? message.receiver : null,
             type: "MESSAGE",
-            title: 'New Message Received',
+            title: `${message.sender} has sent you a message`,
             objectId: messageId, 
-            deeplink: `smart-teacher.com/messages/${messageId}`,
+            deeplink: `${BASE_URL}/messages/${messageId}`,
             seen: false,
             notificationTime: new Date().toISOString(),
         };
@@ -40,7 +41,7 @@ async function create(message) {
         return messageId;
     } catch (error) {
         console.error('Error saving message or notification:', error);
-        throw error;
+        return null; ;
     }
 }
 
