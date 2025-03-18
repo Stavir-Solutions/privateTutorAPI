@@ -29,11 +29,11 @@ async function getByTeacherId(teacherId) {
         throw err;
     }
 }
-async function markNotificationSeen(notificationId) {
+async function markNotificationSeen(id) {
     const params = {
         TableName: tableName,
         Key: {
-            notificationId: marshall(notificationId) 
+            notificationId: marshall(id) 
          },
         UpdateExpression: "SET seen = :seen, notificationSeenTime = :seenTime",
         ExpressionAttributeValues: {
