@@ -31,15 +31,16 @@ async function getByTeacherId(teacherId) {
 }
 async function markNotificationSeen(id) {
     const params = {
-        TableName: tableName,
-        Key: {
-            notificationId: marshall(id) 
-         },
+        TableName: tableName, 
+        Key: marshall({ id }, { removeUndefinedValues: true }), 
         UpdateExpression: "SET seen = :seen, notificationSeenTime = :seenTime",
-        ExpressionAttributeValues: {
-            ':seen': marshall(true) ,
-            ':seenTime': marshall(new Date().toISOString() )
-        },
+        ExpressionAttributeValues: marshall(
+            {
+                ":seen": true,
+                ":seenTime": new Date().toISOString(),
+            },
+            { removeUndefinedValues: true } 
+        ),
         ReturnValues: "UPDATED_NEW"
     };
 
@@ -47,7 +48,7 @@ async function markNotificationSeen(id) {
         const data = await db.send(new UpdateItemCommand(params));
         return data.Attributes ? unmarshall(data.Attributes) : {}; 
     } catch (err) {
-        console.error('Unable to mark  notification as seen. Error:', JSON.stringify(err, null, 2));
+        console.error("Unable to mark notification as seen. Error:", JSON.stringify(err, null, 2));
         throw err;
     }
 }
