@@ -1,25 +1,56 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
+const {toNotificationEntity} = require('../db/mappers/notificationMapper');
+const {generateUUID} = require('../../main/db/UUIDGenerator');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
-
-
 const tableName = "Messages";
-
 async function create(message) {
     let messageEntity = toMessageEntity(message);
-    console.log('converted to entity ', messageEntity);
+    console.log('Converted to entity:', messageEntity);
 
-    await db.send(new PutItemCommand(messageEntity, function (err, data) {
-        if (err) {
-            console.error('Unable to add messages. Error JSON:', JSON.stringify(err, null, 2));
-        } else {
-            console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
-        }
-    }));
-    return unmarshall(messageEntity.Item).id;
+    try {
+        await db.send(new PutItemCommand(messageEntity));
+        console.log('Message saved successfully.');
+
+        const messageId = unmarshall(messageEntity.Item).id;
+
+        const notificationId = generateUUID();
+        const BASE_URL = process.env.BASE_URL;
+        
+        const senderName = messageEntity.Item?.senderName?.S; 
+
+        const recipientId = message.receiver;
+        const recipientType = message.receiverType;
+
+        const notificationTitle = 
+        recipientType === "STUDENT" ? `There is a new message from ${senderName}`
+            : recipientType === "TEACHER"  ? `There is a new message from  ${senderName}`
+            : "NULL";
+
+        const notification = {
+            id: notificationId, 
+            recipientId: recipientId, 
+            recipientType: recipientType, 
+            type: "MESSAGE",
+            title: notificationTitle,
+            objectId: messageId, 
+            deeplink: `${BASE_URL}/messages/${messageId}`,
+            seen: false,
+            notificationTime: new Date().toISOString(),
+        };
+
+        const notificationEntity = toNotificationEntity(notification);
+        await db.send(new PutItemCommand(notificationEntity));
+        console.log('Notification triggered successfully with ID:', notificationId);
+
+        return messageId;
+    } catch (error) {
+        console.error('Error saving message or notification:', error);
+        throw null;
+    }
 }
 
 async function addReplyToMessage(messageId, reply) {
@@ -143,4 +174,3 @@ async function deleteById(messageId) {
 
 
 module.exports = {create, getByStudentId, getById, deleteById, addReplyToMessage, getByBatchId}
-
