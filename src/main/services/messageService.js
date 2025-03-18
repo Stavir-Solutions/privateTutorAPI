@@ -6,7 +6,34 @@ const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
+async function sendNotification(messageId, recipientId, recipientType, senderName) {
+    const notificationId = generateUUID();
+    const BASE_URL = process.env.BASE_URL;
+
+    const notificationTitle =
+        recipientType === "STUDENT" ? `There is a new message from ${senderName}`
+        : recipientType === "TEACHER" ? `There is a new message from ${senderName}`
+        : "NULL";
+
+    const notification = {
+        id: notificationId,
+        recipientId,
+        recipientType,
+        type: "MESSAGE",
+        title: notificationTitle,
+        objectId: messageId,
+        deeplink: `${BASE_URL}/messages/${messageId}`,
+        seen: false,
+        notificationTime: new Date().toISOString(),
+    };
+
+    const notificationEntity = toNotificationEntity(notification);
+    await db.send(new PutItemCommand(notificationEntity));
+    console.log('Notification triggered successfully with ID:', notificationId);
+}
+
 const tableName = "Messages";
+
 async function create(message) {
     let messageEntity = toMessageEntity(message);
     console.log('Converted to entity:', messageEntity);
@@ -16,35 +43,11 @@ async function create(message) {
         console.log('Message saved successfully.');
 
         const messageId = unmarshall(messageEntity.Item).id;
-
-        const notificationId = generateUUID();
-        const BASE_URL = process.env.BASE_URL;
-        
-        const senderName = messageEntity.Item?.senderName?.S; 
-
+        const senderName = messageEntity.Item?.senderName?.S;
         const recipientId = message.receiver;
         const recipientType = message.receiverType;
 
-        const notificationTitle = 
-        recipientType === "STUDENT" ? `There is a new message from ${senderName}`
-            : recipientType === "TEACHER"  ? `There is a new message from  ${senderName}`
-            : "NULL";
-
-        const notification = {
-            id: notificationId, 
-            recipientId: recipientId, 
-            recipientType: recipientType, 
-            type: "MESSAGE",
-            title: notificationTitle,
-            objectId: messageId, 
-            deeplink: `${BASE_URL}/messages/${messageId}`,
-            seen: false,
-            notificationTime: new Date().toISOString(),
-        };
-
-        const notificationEntity = toNotificationEntity(notification);
-        await db.send(new PutItemCommand(notificationEntity));
-        console.log('Notification triggered successfully with ID:', notificationId);
+        await sendNotification(messageId, recipientId, recipientType, senderName);
 
         return messageId;
     } catch (error) {
