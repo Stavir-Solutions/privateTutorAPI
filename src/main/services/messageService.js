@@ -44,7 +44,7 @@ async function create(message) {
         const recipientId = message.receiver;
         const recipientType = message.receiverType;
 
-    const type = "MESSAGE_REPLY";
+    const type = "MESSAGE";
    
     const notificationTitle =
     recipientType === "STUDENT" ? `There is a new message from ${senderName}`
