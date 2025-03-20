@@ -10,6 +10,7 @@ async function sendNotification(messageId, recipientId, recipientType, type, not
     const notificationId = generateUUID();
     const BASE_URL = process.env.BASE_URL;
 
+
     const notification = {
         id: notificationId,
         recipientId,
@@ -25,6 +26,7 @@ async function sendNotification(messageId, recipientId, recipientType, type, not
 
     const notificationEntity = toNotificationEntity(notification);
     console.log('Notification entity:', notificationEntity);
+
     await db.send(new PutItemCommand(notificationEntity));
     console.log('Notification triggered successfully with ID:', notificationId);
 }
@@ -50,6 +52,7 @@ async function create(message) {
     recipientType === "STUDENT" ? `There is a new message from ${senderName}`
     : recipientType === "TEACHER" ? `There is a new message from ${senderName}`
     : "NULL";
+
 
 
         await sendNotification(messageId, recipientId, recipientType,type,notificationTitle);

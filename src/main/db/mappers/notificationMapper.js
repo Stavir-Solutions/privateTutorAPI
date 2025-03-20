@@ -6,8 +6,8 @@ function toNotificationEntity(notification) {
         TableName: 'Notifications', 
         Item: marshall({
             id: generateUUID(), 
-            teacherId: notification.teacherId,
-            studentId: notification.studentId,
+            recipientId: notification.recipientId,
+            recipientType: notification.recipientType,
             type: notification.type,
             title: notification.title,
             objectId: notification.objectId,

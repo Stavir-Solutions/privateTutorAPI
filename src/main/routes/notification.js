@@ -10,6 +10,7 @@ router.use(authMiddleware);
 
 const  NotificationType = {
         MESSAGE: 'MESSAGE',
+        MESSAGE_REPLY: 'MESSAGE_REPLY',
         FEE_PAID: 'FEE_PAID',
         NEW_STUDENT: 'NEW_STUDENT',
         FEE_INVOICE_RELEASED: 'FEE_INVOICE_RELEASED',

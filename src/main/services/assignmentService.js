@@ -1,4 +1,8 @@
-const {toAssignmentEntity} = require('../db/mappers/assignmentMapper');
+const { toAssignmentEntity } = require('../db/mappers/assignmentMapper');
+const { generateUUID } = require('../../main/db/UUIDGenerator');
+const { toNotificationEntity } = require('../db/mappers/notificationMapper');
+const { getById: getBatchById } = require('./batchService');
+const { getByBatchId: getBatchStudents } = require('./studentService');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand,
@@ -7,26 +11,72 @@ const {
     ScanCommand,
     DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
-const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
+const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 
+const BASE_URL = process.env.BASE_URL;
 
 const tableName = "Assignments";
 
-async function create(assignment) {
-    let assignmentEntity = toAssignmentEntity(assignment);
-    console.log('converted to entity ', assignmentEntity);
+async function sendAssignmentNotification(assignment,assignmentId) {
+    const { batchId, studentId, submissionDate } = assignment;
 
-    await db.send(new PutItemCommand(assignmentEntity, function (err, data) {
-        if (err) {
-            console.error('Unable to add assignments. Error JSON:', JSON.stringify(err, null, 2));
-        } else {
-            console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
-        }
-    }));
-    return unmarshall(assignmentEntity.Item).id;
+    let recipients = [];
+    let batchName = "Unknown Batch";
+    console.log("Assignment Details:", assignment);
+
+    if (batchId) {
+        const batchDetails = await getBatchById(batchId);
+        console.log("Batch Details Retrieved:", batchDetails);
+        batchName = batchDetails?.name || "Unknown Batch";
+        
+        const students = await getBatchStudents(batchId);
+        console.log("Batch Students:", students);
+        recipients = students.map(student => ({ id: studentId, type: "STUDENT" }));
+    } else if (studentId) {
+        recipients.push({ id: studentId, type: "STUDENT" });
+    }
+
+    if (recipients.length === 0) {
+        console.error("No recipients found for the assignment notification.");
+        return;
+    }
+
+    const formattedSubmissionDate = new Date(submissionDate).toISOString().split("T")[0];
+    const notificationTitle = `A new assignment in ${batchName}. Submit it by ${formattedSubmissionDate}`;
+
+    for (const recipient of recipients) {
+        const notification = {
+            id: generateUUID(),
+            recipientId: recipient.id,
+            recipientType: recipient.type,
+            type: "ASSIGNMENT",
+            title: notificationTitle,
+            objectId: assignmentId,
+            deeplink: `${BASE_URL}/assignments/${assignmentId}`,
+            seen: false,
+            notificationTime: new Date().toISOString(),
+        };
+
+        const notificationEntity = toNotificationEntity(notification);
+        await db.send(new PutItemCommand(notificationEntity));
+        console.log('Notification triggered successfully with ID:', notification.id);
+    }
 }
 
-
+async function create(assignment) {
+    const assignmentEntity = toAssignmentEntity(assignment);
+    console.log('Converted to entity:', assignmentEntity);
+      const assignmentId = unmarshall(assignmentEntity.Item).id;
+    try {
+        await db.send(new PutItemCommand(assignmentEntity));
+        console.log('Assignment added successfully.');
+        await sendAssignmentNotification(assignment, assignmentId);
+        return assignmentId;
+    } catch (err) {
+        console.error('Unable to add assignment:', err);
+        throw err;
+    }
+}
 async function updateAssignment(assignmentId, assignmentFields) {
     const updateExpression = [];
     const expressionAttributeNames = {};
@@ -55,13 +105,15 @@ async function updateAssignment(assignmentId, assignmentFields) {
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return data.Attributes ? unmarshall(data.Attributes) : {}; 
+        const updatedAssignment = data.Attributes ? unmarshall(data.Attributes) : {};
+        await sendAssignmentNotification(updatedAssignment);
+        return updatedAssignment;
+ 
     } catch (err) {
         console.error('Unable to update assignment. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
-
 
 async function getByBatchIdAndStudentId(batchId, studentId) {
     const params = {
