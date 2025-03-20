@@ -6,28 +6,27 @@ const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
-async function sendNotification(messageId, recipientId, recipientType, senderName) {
+async function sendNotification(messageId, recipientId, recipientType, type, notificationtitle) {
     const notificationId = generateUUID();
     const BASE_URL = process.env.BASE_URL;
 
-    const notificationTitle =
-        recipientType === "STUDENT" ? `There is a new message from ${senderName}`
-        : recipientType === "TEACHER" ? `There is a new message from ${senderName}`
-        : "NULL";
 
     const notification = {
         id: notificationId,
         recipientId,
         recipientType,
-        type: "MESSAGE",
-        title: notificationTitle,
+        type: type,
+        title: notificationtitle,
         objectId: messageId,
         deeplink: `${BASE_URL}/messages/${messageId}`,
         seen: false,
         notificationTime: new Date().toISOString(),
     };
+       console.log('Notification:', notification); 
 
     const notificationEntity = toNotificationEntity(notification);
+    console.log('Notification entity:', notificationEntity);
+
     await db.send(new PutItemCommand(notificationEntity));
     console.log('Notification triggered successfully with ID:', notificationId);
 }
@@ -47,7 +46,16 @@ async function create(message) {
         const recipientId = message.receiver;
         const recipientType = message.receiverType;
 
-        await sendNotification(messageId, recipientId, recipientType, senderName);
+    const type = "MESSAGE";
+   
+    const notificationTitle =
+    recipientType === "STUDENT" ? `There is a new message from ${senderName}`
+    : recipientType === "TEACHER" ? `There is a new message from ${senderName}`
+    : "NULL";
+
+
+
+        await sendNotification(messageId, recipientId, recipientType,type,notificationTitle);
 
         return messageId;
     } catch (error) {
@@ -55,56 +63,71 @@ async function create(message) {
         throw null;
     }
 }
-
 async function addReplyToMessage(messageId, reply) {
-    console.log('add reply to message {}', messageId);
+    console.log(`add reply to message ${messageId}`);
     const message = await getById(messageId);
     if (!message) {
-        console.log('Message with id {} not found', messageId);
+        console.log(`Message with id ${messageId} not found`);
         throw new Error('Message not found');
     }
-    console.log("message:", message);
-
+    
     if (!message.replies) {
         message.replies = [];
         console.log("no replies found, creating new array");
     }
-    message.replies.push(reply);
-
+   message.replies.push(reply);
+   console.log("message.replies",message.replies);
+    
     console.log("adding reply:", reply);
     console.log("to replies:", message.replies);
-
-    console.log("each element in replies");
-
-    let marshalledReplies = [];
-    for (reply of message.replies) {
-        console.log("reply:", reply);
-        let marshalledReply = marshall(reply, {convertEmptyValues: true});
-        marshalledReplies.push(marshalledReply);
-        console.log("marshalledReply:", marshalledReply);
+    
+    const senderId = reply.sender;
+    const senderName = reply.senderName;
+    
+    const recipientId = message.sender === reply.sender ? message.receiver : message.sender;
+    const recipientType = message.senderType === reply.senderType ? message.receiverType : message.senderType;
+    
+    if (!recipientId) {
+        console.error("Error: Cannot determine recipient for notification.");
+        throw new Error("Recipient not found in the original message.");
     }
-
+    
+    let notificationTitle = "";
+    if (recipientType === "STUDENT") {
+        console.log("recipient is student",senderName);
+        notificationTitle = `${senderName} replied to your message`;
+    } else if (recipientType === "TEACHER") {
+        console.log("recipient is teacher",senderName);
+        notificationTitle = `${senderName} replied to your message`;
+    } else {
+        notificationTitle = "NULL";
+    }
+    
+    const type = "MESSAGE_REPLY";
+    
     const params = {
-        TableName: tableName, Key: marshall({id: messageId}), UpdateExpression: 'SET #replies = :replies',
-        ExpressionAttributeNames: {
-            '#replies': 'replies',
-        }, ExpressionAttributeValues: {
-            ':replies': message.replies ? {"L":marshall(message.replies)} : {L: []}
-        }, ReturnValues: 'UPDATED_NEW'
-    }
-
+        TableName: tableName,
+        Key: marshall({ id: messageId }),
+        UpdateExpression: 'SET replies = :replies',
+        ExpressionAttributeValues: marshall({
+            ':replies': message.replies
+        }),
+        ReturnValues: 'UPDATED_NEW'
+    };
+    
     console.log('params:', JSON.stringify(params, null, 2));
-
-    // send the update request to dynamodb
+    
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
+        
+        await sendNotification(messageId, recipientId, recipientType, type, notificationTitle);
+
         return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
         console.error('Unable to update message. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
-
 }
 async function getByStudentId(studentId) {
     const params = {
