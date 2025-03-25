@@ -40,7 +40,7 @@ async function sendAssignmentNotification(assignment, assignmentId) {
     const formattedSubmissionDate = new Date(submissionDate).toISOString().split("T")[0];
 
     for (const recipient of recipients) {
-        await sendNotification(assignmentId, recipient.id, recipient.type, NotificationType.ASSIGNMENT, `A new assignment in ${batchName}. Submit it by ${formattedSubmissionDate}`, `${BASE_URL}/assignments/${assignmentId}`);
+        await sendNotification(assignmentId, recipient.id, recipient.type, NotificationType.ASSIGNMENT, `A new assignment in ${batchName}. Submit it by ${formattedSubmissionDate}`, `${DEEPLINK_BASE_URL}/assignments/${assignmentId}`);
     }
 }
 
