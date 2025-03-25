@@ -1,6 +1,10 @@
-const { expect } = require('chai');
+const {expect} = require('chai');
 const sinon = require('sinon');
-const {getTeacherIfPasswordMatches, generateTokenForTeacherFromRefreshToken, generateTokenForStudentFromRefreshToken} = require('../../main/services/loginService');
+const {
+    getTeacherIfPasswordMatches,
+    generateTokenForTeacherFromRefreshToken,
+    generateTokenForStudentFromRefreshToken
+} = require('../../main/services/loginService');
 const {getStudentIfPasswordMatches} = require('../../main/services/loginService');
 const {generateAccessToken} = require('../../main/services/loginService');
 const {generateRefreshToken} = require('../../main/services/loginService');
@@ -13,17 +17,14 @@ const {decodeToken} = require('../../main/services/loginService');
 const {generateNewTokenFromRefreshToken} = require('../../main/services/loginService');
 const db = require('../../main/db/dynamodb');
 const jwt = require('jsonwebtoken');
-const { ScanCommand } = require('@aws-sdk/client-dynamodb');
-const UserType = require('../../main/common/UserType');
-const dotenv = require('dotenv');
+const {ScanCommand} = require('@aws-sdk/client-dynamodb');
 const loginService = require('../../main/services/loginService');
-const responseUtils = require('../../main/routes/responseUtils');
 const {getTeacherById} = require("../../main/services/teacherService");
 const {getStudentById} = require("../../main/services/studentService");
-const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
+const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 const {teacherService} = require("../../main/services/teacherService");
-const {studentService} = require("../../main/services/studentService");
-const {buildSuccessResponse,buildErrorMessage} = require("../../main/routes/responseUtils");
+const {buildSuccessResponse, buildErrorMessage} = require("../../main/routes/responseUtils");
+const {TokenType, UserType} = require("../../main/common/types");
 describe('getTeacherIfPasswordMatches', () => {
     let dbStub;
 
@@ -39,10 +40,10 @@ describe('getTeacherIfPasswordMatches', () => {
         // given
         const userName = 'teacher-username';
         const password = 'teacher-password';
-        const teacherItem = { userName, password, id: 'teacher-id' };
+        const teacherItem = {userName, password, id: 'teacher-id'};
         const marshalledItem = marshall(teacherItem);
 
-        dbStub.resolves({ Items: [marshalledItem] });
+        dbStub.resolves({Items: [marshalledItem]});
         // when
         const result = await getTeacherIfPasswordMatches(userName, password);
 
@@ -57,7 +58,7 @@ describe('getTeacherIfPasswordMatches', () => {
         const userName = 'teacher-username';
         const password = 'teacher-password';
 
-        dbStub.resolves({ Items: [] });
+        dbStub.resolves({Items: []});
 
         // When
         const result = await getTeacherIfPasswordMatches(userName, password);
@@ -98,10 +99,10 @@ describe('getStudentIfPasswordMatches', () => {
         // given
         const userName = 'student-username';
         const password = 'student-password';
-        const studentItem = { userName, password, id: 'student-id' };
+        const studentItem = {userName, password, id: 'student-id'};
         const marshalledItem = marshall(studentItem);
 
-        dbStub.resolves({ Items: [marshalledItem] });
+        dbStub.resolves({Items: [marshalledItem]});
         // when
         const result = await getStudentIfPasswordMatches(userName, password);
 
@@ -116,7 +117,7 @@ describe('getStudentIfPasswordMatches', () => {
         const userName = 'student-username';
         const password = 'student-password';
 
-        dbStub.resolves({ Items: [] });
+        dbStub.resolves({Items: []});
 
         // When
         const result = await getStudentIfPasswordMatches(userName, password);
@@ -156,12 +157,15 @@ describe('generateAccessToken', function () {
     });
 
     it('should generate a valid JWT token', async function () {
-        const payload = { userName: 'user-name',userType:'usertype' };
+        const payload = {userName: 'user-name', userType: 'usertype'};
 
         const token = await generateAccessToken(payload);
 
         expect(jwtStub.calledOnce).to.be.true;
-        expect(jwtStub.calledWith(payload, sinon.match.string, { algorithm: 'RS256', expiresIn: sinon.match.number })).to.be.true;
+        expect(jwtStub.calledWith(payload, sinon.match.string, {
+            algorithm: 'RS256',
+            expiresIn: sinon.match.number
+        })).to.be.true;
         expect(token).to.equal('mocked.jwt.token');
     });
 });
@@ -178,7 +182,7 @@ describe('generateRefreshToken', function () {
     });
 
     it('should generate a refresh token with username', async function () {
-        const payload = {userName: 'user-name',userType:'usertype' };
+        const payload = {userName: 'user-name', userType: 'usertype'};
 
         const token = await generateRefreshToken(payload);
 
@@ -196,8 +200,7 @@ describe('buildTeacherRefreshTokenPayload', () => {
 
         // then
         expect(result).to.deep.equal({
-            id: 'teacher-id',
-            userType: UserType.TEACHER
+            id: 'teacher-id', userType: UserType.TEACHER
         });
     });
 });
@@ -212,8 +215,7 @@ describe('buildStudentRefreshTokenPayload', () => {
 
         // then
         expect(result).to.deep.equal({
-            id: 'student-id',
-            userType: UserType.STUDENT
+            id: 'student-id', userType: UserType.STUDENT
         });
     });
 });
@@ -246,8 +248,8 @@ describe('buildTeacherPayload', () => {
             profilePicUrl: 'teacherURL',
             age: 30,
             gender: 'male',
-            userType: 'TEACHER',
-            tokenType: 'ACCESS'
+            userType: UserType.Teacher,
+            tokenType: TokenType.ACCESS
         });
     });
 });
@@ -268,8 +270,8 @@ describe('buildStudentPayload', () => {
             phoneNumber: 'student-phoneNumber',
             profilePicUrl: 'studentURL',
             age: 10,
-            gender:'male',
-            batches:'student-batches',
+            gender: 'male',
+            batches: 'student-batches',
         };
         const studentId = 'student-id';
         // when
@@ -289,8 +291,8 @@ describe('buildStudentPayload', () => {
             phoneNumber: 'student-phoneNumber',
             profilePicUrl: 'studentURL',
             age: 10,
-            gender:'male',
-            batches:'student-batches',
+            gender: 'male',
+            batches: 'student-batches',
             userType: 'STUDENT',
             tokenType: 'ACCESS'
         });
@@ -300,7 +302,7 @@ describe('decodeToken', function () {
     let jwtVerifyStub;
 
     beforeEach(() => {
-        jwtVerifyStub = sinon.stub(jwt, 'verify').returns({ userName: 'user-name' });
+        jwtVerifyStub = sinon.stub(jwt, 'verify').returns({userName: 'user-name'});
     });
 
     afterEach(() => {
@@ -314,7 +316,7 @@ describe('decodeToken', function () {
         const decoded = await decodeToken(token, jwtPublicKey);
 
         expect(jwtVerifyStub.calledOnce).to.be.true;
-        expect(decoded).to.deep.equal({ userName: 'user-name' });
+        expect(decoded).to.deep.equal({userName: 'user-name'});
     });
 });
 
@@ -335,7 +337,7 @@ describe('validateToken', () => {
     it('should validate the token successfully', async () => {
         // given
         const token = 'validToken';
-        const expectedPayload = { id: 'user-id', userType: 'user-type' };
+        const expectedPayload = {id: 'user-id', userType: 'user-type'};
 
         jwtStub.returns(expectedPayload);
 
@@ -367,8 +369,7 @@ describe('generateNewTokenFromRefreshToken', function () {
 
     beforeEach(function () {
         res = {
-            status: sinon.stub().returnsThis(),
-            json: sinon.stub()
+            status: sinon.stub().returnsThis(), json: sinon.stub()
         };
         refreshToken = 'dummyRefreshToken';
         sinon.stub(generateTokenForTeacherFromRefreshToken).resolves('newTeacherToken');
@@ -381,7 +382,7 @@ describe('generateNewTokenFromRefreshToken', function () {
     });
 
     it('should generate a new token for a TEACHER userType', async function () {
-        payload = { userType: 'TEACHER' };
+        payload = {userType: 'TEACHER'};
 
         await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 
@@ -391,7 +392,7 @@ describe('generateNewTokenFromRefreshToken', function () {
     });
 
     it('should generate a new token for a STUDENT role', async function () {
-        payload = { role: 'STUDENT' };
+        payload = {role: 'STUDENT'};
 
         await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 
@@ -401,7 +402,7 @@ describe('generateNewTokenFromRefreshToken', function () {
     });
 
     it('should return an error for an invalid userType/role', async function () {
-        payload = { userType: 'INVALID' };
+        payload = {userType: 'INVALID'};
 
         await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 
@@ -416,16 +417,15 @@ describe('generateTokenForTeacherFromRefreshToken', function () {
 
     beforeEach(function () {
         res = {
-            status: sinon.stub().returnsThis(),
-            json: sinon.stub()
+            status: sinon.stub().returnsThis(), json: sinon.stub()
         };
-        payload = { id: 'teacher123' };
+        payload = {id: 'teacher123'};
         refreshToken = 'nonRefreshToken';
         sinon.stub(teacherService, 'getTeacherById');
         sinon.stub(buildErrorMessage);
         sinon.stub(buildSuccessResponse);
         sinon.stub(loginService, 'generateAccessToken').resolves('newAccessToken');
-        sinon.stub(loginService,'buildTeacherPayload').returns({ id: 'teacher-id', userName: 'username '});
+        sinon.stub(loginService, 'buildTeacherPayload').returns({id: 'teacher-id', userName: 'username '});
     });
 
     afterEach(function () {
@@ -436,8 +436,7 @@ describe('generateTokenForTeacherFromRefreshToken', function () {
         await generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
 
         expect(buildSuccessResponse.calledWith(res, 200, {
-            token: 'newAccessToken',
-            refreshToken: refreshToken
+            token: 'newAccessToken', refreshToken: refreshToken
         })).to.be.true;
     });
 
@@ -454,16 +453,15 @@ describe('generateTokenForStudentFromRefreshToken', function () {
 
     beforeEach(function () {
         res = {
-            status: sinon.stub().returnsThis(),
-            json: sinon.stub()
+            status: sinon.stub().returnsThis(), json: sinon.stub()
         };
-        payload = { id: 'student123' };
+        payload = {id: 'student123'};
         refreshToken = 'nonRefreshToken';
         sinon.stub(getStudentById);
         sinon.stub(buildErrorMessage);
         sinon.stub(buildSuccessResponse);
         sinon.stub(generateAccessToken).resolves('newAccessToken');
-        sinon.stub(buildStudentPayload).returns({ id: 'student-id', userName: 'username' });
+        sinon.stub(buildStudentPayload).returns({id: 'student-id', userName: 'username'});
     });
 
     afterEach(function () {
@@ -471,20 +469,19 @@ describe('generateTokenForStudentFromRefreshToken', function () {
     });
 
     it('should return new access token if student exists', async function () {
-        getStudentById.resolves({ id: 'student-id', userName: 'username' });
-        
+        getStudentById.resolves({id: 'student-id', userName: 'username'});
+
         await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
-        
+
         expect(buildSuccessResponse.calledWith(res, 200, {
-            token: 'newAccessToken',
-            refreshToken: refreshToken
+            token: 'newAccessToken', refreshToken: refreshToken
         })).to.be.true;
     });
     it('should return error if student does not exist', async function () {
         getStudentById.resolves(null);
-        
+
         await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
-        
+
         expect(buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, login again')).to.be.true;
     });
 

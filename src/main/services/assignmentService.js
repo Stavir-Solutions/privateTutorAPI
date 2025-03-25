@@ -1,24 +1,19 @@
-const { toAssignmentEntity } = require('../db/mappers/assignmentMapper');
-const { generateUUID } = require('../../main/db/UUIDGenerator');
-const { toNotificationEntity } = require('../db/mappers/notificationMapper');
-const { getById: getBatchById } = require('./batchService');
-const { getByBatchId: getBatchStudents } = require('./studentService');
+const {toAssignmentEntity} = require('../db/mappers/assignmentMapper');
+const {getById: getBatchById} = require('./batchService');
+const {getByBatchId: getBatchStudents} = require('./studentService');
 const db = require('../db/dynamodb');
 const {
-    PutItemCommand,
-    UpdateItemCommand,
-    GetItemCommand,
-    ScanCommand,
-    DeleteItemCommand
+    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
-const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
+const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
+const {sendNotification} = require("./notificationService");
 
 const BASE_URL = process.env.BASE_URL;
 
 const tableName = "Assignments";
 
-async function sendAssignmentNotification(assignment,assignmentId) {
-    const { batchId, studentId, submissionDate } = assignment;
+async function sendAssignmentNotification(assignment, assignmentId) {
+    const {batchId, studentId, submissionDate} = assignment;
 
     let recipients = [];
     let batchName = "Unknown Batch";
@@ -28,12 +23,12 @@ async function sendAssignmentNotification(assignment,assignmentId) {
         const batchDetails = await getBatchById(batchId);
         console.log("Batch Details Retrieved:", batchDetails);
         batchName = batchDetails?.name || "Unknown Batch";
-        
+
         const students = await getBatchStudents(batchId);
         console.log("Batch Students:", students);
-        recipients = students.map(student => ({ id: studentId, type: "STUDENT" }));
+        recipients = students.map(student => ({id: studentId, type: "STUDENT"}));
     } else if (studentId) {
-        recipients.push({ id: studentId, type: "STUDENT" });
+        recipients.push({id: studentId, type: "STUDENT"});
     }
 
     if (recipients.length === 0) {
@@ -42,31 +37,16 @@ async function sendAssignmentNotification(assignment,assignmentId) {
     }
 
     const formattedSubmissionDate = new Date(submissionDate).toISOString().split("T")[0];
-    const notificationTitle = `A new assignment in ${batchName}. Submit it by ${formattedSubmissionDate}`;
 
     for (const recipient of recipients) {
-        const notification = {
-            id: generateUUID(),
-            recipientId: recipient.id,
-            recipientType: recipient.type,
-            type: "ASSIGNMENT",
-            title: notificationTitle,
-            objectId: assignmentId,
-            deeplink: `${BASE_URL}/assignments/${assignmentId}`,
-            seen: false,
-            notificationTime: new Date().toISOString(),
-        };
-
-        const notificationEntity = toNotificationEntity(notification);
-        await db.send(new PutItemCommand(notificationEntity));
-        console.log('Notification triggered successfully with ID:', notification.id);
+        await sendNotification(assignmentId, recipient.id, recipient.type, NotificationType.ASSIGNMENT, `A new assignment in ${batchName}. Submit it by ${formattedSubmissionDate}`, `${BASE_URL}/assignments/${assignmentId}`);
     }
 }
 
 async function create(assignment) {
     const assignmentEntity = toAssignmentEntity(assignment);
     console.log('Converted to entity:', assignmentEntity);
-      const assignmentId = unmarshall(assignmentEntity.Item).id;
+    const assignmentId = unmarshall(assignmentEntity.Item).id;
     try {
         await db.send(new PutItemCommand(assignmentEntity));
         console.log('Assignment added successfully.');
@@ -77,6 +57,7 @@ async function create(assignment) {
         throw err;
     }
 }
+
 async function updateAssignment(assignmentId, assignmentFields) {
     const updateExpression = [];
     const expressionAttributeNames = {};
@@ -87,9 +68,9 @@ async function updateAssignment(assignmentId, assignmentFields) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
         if (Array.isArray(value)) {
-            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
+            expressionAttributeValues[`:${key}`] = {L: value.map(item => marshall(item, {convertEmptyValues: true}))};
         } else {
-            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
+            expressionAttributeValues[`:${key}`] = marshall(value, {convertEmptyValues: true});
         }
     }
 
@@ -108,7 +89,7 @@ async function updateAssignment(assignmentId, assignmentFields) {
         const updatedAssignment = data.Attributes ? unmarshall(data.Attributes) : {};
         await sendAssignmentNotification(updatedAssignment);
         return updatedAssignment;
- 
+
     } catch (err) {
         console.error('Unable to update assignment. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
@@ -120,8 +101,7 @@ async function getByBatchIdAndStudentId(batchId, studentId) {
         TableName: tableName,
         FilterExpression: "batchId = :batchId AND studentId = :studentId",
         ExpressionAttributeValues: {
-            ':batchId': marshall(batchId),
-            ':studentId': marshall(studentId),
+            ':batchId': marshall(batchId), ':studentId': marshall(studentId),
         },
     };
 
@@ -153,11 +133,10 @@ async function getByBatchId(batchId) {
 
 async function getById(assignmentId) {
     const params = {
-        TableName: tableName,
-        Key: marshall({ id: assignmentId })
+        TableName: tableName, Key: marshall({id: assignmentId})
     };
 
-   
+
     try {
         const data = await db.send(new GetItemCommand(params));
         return data.Item ? unmarshall(data.Item) : {};
@@ -184,5 +163,5 @@ async function deleteById(assignmentId) {
 }
 
 
-module.exports = {create, getByBatchIdAndStudentId , getById, deleteById, updateAssignment, getByBatchId}
+module.exports = {create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId}
 
