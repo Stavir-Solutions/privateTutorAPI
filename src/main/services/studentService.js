@@ -67,24 +67,14 @@ async function updateStudent(studentId, studentFields) {
 
 async function getStudentById(studentId) {
     const params = {
-        TableName: tableName,
-        Key: marshall({ id: studentId }),
+        TableName: tableName, Key: marshall({id: studentId}),
     };
 
     try {
         const data = await db.send(new GetItemCommand(params));
-        if (!data.Item) return {};
-
-        const student = unmarshall(data.Item);
-        const batchIds = student.batches || [];
-
-        
-
-        student.batches = await getBatchNames(batchIds);
-
-        return student;
+        return data.Item ? unmarshall(data.Item) : {};
     } catch (err) {
-        console.error("Error fetching student:", err);
+        console.error('Unable to get student. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
@@ -122,25 +112,17 @@ async function getByBatchId(batchId) {
             
         },
     };
-
     try {
         const data = await db.send(new ScanCommand(params));
-        const students = data.Items.map(item => unmarshall(item));
-        const batchParams = {
+        if (!data.Items || data.Items.length === 0) return [];
 
-            Key: marshall({ id: batchId }),
-            TableName: batchesTable,
-            ProjectionExpression: "#batchName",
-            ExpressionAttributeNames: {
-                "#batchName": "name", 
-            },
-        };
-        
-        const batchData = await db.send(new GetItemCommand(batchParams));
-        const batchName = batchData.Item ? unmarshall(batchData.Item).name : "Unknown Batch";
+        let students = data.Items.map(item => unmarshall(item));
+        const batchNames = await getBatchNames([batchId]);
+
         students.forEach(student => {
-            student.batchName = batchName;
+            student.batches = batchNames;
         });
+        
         return students;
     } catch (err) {
         console.error('Unable to get students by batch. Error JSON:', JSON.stringify(err, null, 2));
