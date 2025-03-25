@@ -22,7 +22,7 @@ async function create(message) {
         console.log('Message saved successfully.');
 
         const senderName = messageEntity.Item?.senderName?.S;
-        await sendNotification(messageId, message.receiver, message.receiverType, NotificationType.MESSAGE, `There is a new message from ${senderName}`, `${BASE_URL}/messages/${messageId}`);
+        await sendNotification(messageId, message.receiver, message.receiverType, NotificationType.MESSAGE, `There is a new message from ${senderName}`, `${DEEPLINK_BASE_URL}/messages/${messageId}`);
         return messageId;
     } catch (error) {
         console.error('Error saving message or notification:', error);
