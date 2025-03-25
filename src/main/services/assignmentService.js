@@ -9,7 +9,7 @@ const {
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 const {sendNotification} = require("./notificationService");
 
-const BASE_URL = process.env.BASE_URL;
+const DeepLink_BASE_URL = process.env.DeepLink_BASE_URL;
 
 const tableName = "Assignments";
 
