@@ -7,7 +7,7 @@ const {
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 //TODO rename it to deeplink base url
-const DeepLink_BASE_URL = process.env.DeepLink_BASE_URL;
+const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 
 const tableName = "Messages";
