@@ -1,35 +1,14 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
-const {toNotificationEntity} = require('../db/mappers/notificationMapper');
-const {generateUUID} = require('../../main/db/UUIDGenerator');
 const db = require('../db/dynamodb');
+const {sendNotification} = require('./notificationService');
+const {NotificationType} = require('../common/types');
 const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
-async function sendNotification(messageId, recipientId, recipientType, type, notificationtitle) {
-    const notificationId = generateUUID();
-    const BASE_URL = process.env.BASE_URL;
+//TODO rename it to deeplink base url
+const deepLink_BASE_URL = process.env.deepLink_BASE_URL;
 
-
-    const notification = {
-        id: notificationId,
-        recipientId,
-        recipientType,
-        type: type,
-        title: notificationtitle,
-        objectId: messageId,
-        deeplink: `${BASE_URL}/messages/${messageId}`,
-        seen: false,
-        notificationTime: new Date().toISOString(),
-    };
-       console.log('Notification:', notification); 
-
-    const notificationEntity = toNotificationEntity(notification);
-    console.log('Notification entity:', notificationEntity);
-
-    await db.send(new PutItemCommand(notificationEntity));
-    console.log('Notification triggered successfully with ID:', notificationId);
-}
 
 const tableName = "Messages";
 
@@ -39,30 +18,19 @@ async function create(message) {
 
     try {
         await db.send(new PutItemCommand(messageEntity));
+        const messageId = unmarshall(messageEntity.Item).id;
         console.log('Message saved successfully.');
 
-        const messageId = unmarshall(messageEntity.Item).id;
         const senderName = messageEntity.Item?.senderName?.S;
-        const recipientId = message.receiver;
-        const recipientType = message.receiverType;
-
-    const type = "MESSAGE";
-   
-    const notificationTitle =
-    recipientType === "STUDENT" ? `There is a new message from ${senderName}`
-    : recipientType === "TEACHER" ? `There is a new message from ${senderName}`
-    : "NULL";
-
-
-
-        await sendNotification(messageId, recipientId, recipientType,type,notificationTitle);
-
+        await sendNotification(messageId, message.receiver, message.receiverType, NotificationType.MESSAGE, `There is a new message from ${senderName}`, `${BASE_URL}/messages/${messageId}`);
         return messageId;
     } catch (error) {
         console.error('Error saving message or notification:', error);
         throw null;
     }
 }
+
+
 async function addReplyToMessage(messageId, reply) {
     console.log(`add reply to message ${messageId}`);
     const message = await getById(messageId);
@@ -70,58 +38,35 @@ async function addReplyToMessage(messageId, reply) {
         console.log(`Message with id ${messageId} not found`);
         throw new Error('Message not found');
     }
-    
+
     if (!message.replies) {
         message.replies = [];
         console.log("no replies found, creating new array");
     }
-   message.replies.push(reply);
-   console.log("message.replies",message.replies);
-    
+    message.replies.push(reply);
+    console.log("message.replies", message.replies);
+
     console.log("adding reply:", reply);
     console.log("to replies:", message.replies);
-    
-    const senderId = reply.sender;
-    const senderName = reply.senderName;
-    
-    const recipientId = message.sender === reply.sender ? message.receiver : message.sender;
-    const recipientType = message.senderType === reply.senderType ? message.receiverType : message.senderType;
-    
-    if (!recipientId) {
-        console.error("Error: Cannot determine recipient for notification.");
-        throw new Error("Recipient not found in the original message.");
-    }
-    
-    let notificationTitle = "";
-    if (recipientType === "STUDENT") {
-        console.log("recipient is student",senderName);
-        notificationTitle = `${senderName} replied to your message`;
-    } else if (recipientType === "TEACHER") {
-        console.log("recipient is teacher",senderName);
-        notificationTitle = `${senderName} replied to your message`;
-    } else {
-        notificationTitle = "NULL";
-    }
-    
-    const type = "MESSAGE_REPLY";
-    
+
+
     const params = {
         TableName: tableName,
-        Key: marshall({ id: messageId }),
+        Key: marshall({id: messageId}),
         UpdateExpression: 'SET replies = :replies',
         ExpressionAttributeValues: marshall({
             ':replies': message.replies
         }),
         ReturnValues: 'UPDATED_NEW'
     };
-    
+
     console.log('params:', JSON.stringify(params, null, 2));
-    
+
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        
-        await sendNotification(messageId, recipientId, recipientType, type, notificationTitle);
+
+        await sendMessageReplyNotification(reply, message, messageId);
 
         return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
@@ -129,13 +74,20 @@ async function addReplyToMessage(messageId, reply) {
         throw err;
     }
 }
+
+async function sendMessageReplyNotification(reply, message, messageId) {
+    const recipientId = message.sender === reply.sender ? message.receiver : message.sender;
+    const recipientType = message.senderType === reply.senderType ? message.receiverType : message.senderType;
+
+    await sendNotification(messageId, recipientId, recipientType, NotificationType.MESSAGE_REPLY, `${reply.senderName} replied to your message`, `${BASE_URL}/messages/${messageId}`);
+}
+
 async function getByStudentId(studentId) {
     const params = {
         TableName: tableName,
         FilterExpression: "(sender = :studentId AND senderType = :student) OR (receiver= :studentId AND receiverType = :student)",
         ExpressionAttributeValues: {
-            ":studentId": { S: studentId },
-            ":student": { S: "STUDENT" }  
+            ":studentId": {S: studentId}, ":student": {S: "STUDENT"}
         }
     };
 
