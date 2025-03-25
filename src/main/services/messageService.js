@@ -1,12 +1,13 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
 const db = require('../db/dynamodb');
 const {sendNotification} = require('./notificationService');
+const {NotificationType} = require('../common/types');
 const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 //TODO rename it to deeplink base url
-const BASE_URL = process.env.BASE_URL;
+const deepLink_BASE_URL = process.env.deepLink_BASE_URL;
 
 
 const tableName = "Messages";

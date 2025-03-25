@@ -1,6 +1,7 @@
 const {toAssignmentEntity} = require('../db/mappers/assignmentMapper');
 const {getById: getBatchById} = require('./batchService');
 const {getByBatchId: getBatchStudents} = require('./studentService');
+const {NotificationType} = require('../common/types');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
