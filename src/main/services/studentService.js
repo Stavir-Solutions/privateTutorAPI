@@ -5,12 +5,14 @@ const {
     UpdateItemCommand,
     GetItemCommand,
     ScanCommand,
-    DeleteItemCommand
+    DeleteItemCommand,
+    BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
 
 const tableName = "Students";
+const batchesTable = "Batches";
 
 async function createStudent(student) {
     let studentEntity = toStudentEntity(student);
@@ -65,30 +67,81 @@ async function updateStudent(studentId, studentFields) {
 
 async function getStudentById(studentId) {
     const params = {
-        TableName: tableName, Key: marshall({id: studentId}),
+        TableName: tableName,
+        Key: marshall({ id: studentId }),
     };
 
     try {
         const data = await db.send(new GetItemCommand(params));
-        return data.Item ? unmarshall(data.Item) : {};
+        if (!data.Item) return {};
+
+        const student = unmarshall(data.Item);
+        const batchIds = student.batches || [];
+
+        
+
+        student.batches = await getBatchNames(batchIds);
+
+        return student;
     } catch (err) {
-        console.error('Unable to get student. Error JSON:', JSON.stringify(err, null, 2));
+        console.error("Error fetching student:", err);
         throw err;
     }
 }
 
+async function getBatchNames(batchIds) {
+    if (batchIds.length === 0) return [];
+
+    const batchParams = {
+        RequestItems: {
+            [batchesTable]: {
+                Keys: batchIds.map(id => marshall({ id })),
+                ProjectionExpression: "#batchId, #batchName",
+                ExpressionAttributeNames: { "#batchId": "id", "#batchName": "name" },
+            },
+        },
+    };
+    
+
+    try {
+        const batchData = await db.send(new BatchGetItemCommand(batchParams));
+        console.log("Batch Response:", JSON.stringify(batchData, null, 2));
+
+        return (batchData.Responses?.[batchesTable] || []).map(item => unmarshall(item));
+    } catch (err) {
+        console.error("Error fetching batch names:", err);
+        return batchIds.map(id => ({ id, name: "Unknown Batch" }));
+    }
+}
 async function getByBatchId(batchId) {
     const params = {
         TableName: tableName,
         FilterExpression: "contains(batches, :batchId)",
         ExpressionAttributeValues: {
             ':batchId': { S: batchId }, 
+            
         },
     };
 
     try {
         const data = await db.send(new ScanCommand(params));
-        return data.Items.map(item => unmarshall(item)); 
+        const students = data.Items.map(item => unmarshall(item));
+        const batchParams = {
+
+            Key: marshall({ id: batchId }),
+            TableName: batchesTable,
+            ProjectionExpression: "#batchName",
+            ExpressionAttributeNames: {
+                "#batchName": "name", 
+            },
+        };
+        
+        const batchData = await db.send(new GetItemCommand(batchParams));
+        const batchName = batchData.Item ? unmarshall(batchData.Item).name : "Unknown Batch";
+        students.forEach(student => {
+            student.batchName = batchName;
+        });
+        return students;
     } catch (err) {
         console.error('Unable to get students by batch. Error JSON:', JSON.stringify(err, null, 2));
         throw err; 
