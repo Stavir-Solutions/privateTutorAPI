@@ -1,12 +1,17 @@
 const {toMessageEntity} = require('../db/mappers/messageMapper');
 const db = require('../db/dynamodb');
 const {sendNotification} = require('./notificationService');
+
+
+const {NotificationType} = require('../common/types');
+
 const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
-//TODO rename it to deeplink base url
-const BASE_URL = process.env.BASE_URL;
+
+const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
+
 
 
 const tableName = "Messages";
@@ -21,7 +26,8 @@ async function create(message) {
         console.log('Message saved successfully.');
 
         const senderName = messageEntity.Item?.senderName?.S;
-        await sendNotification(messageId, message.receiver, message.receiverType, NotificationType.MESSAGE, `There is a new message from ${senderName}`, `${BASE_URL}/messages/${messageId}`);
+
+        await sendNotification(messageId, message.receiver, message.receiverType, NotificationType.MESSAGE, `There is a new message from ${senderName}`, `${DEEPLINK_BASE_URL}/messages/${messageId}`);
         return messageId;
     } catch (error) {
         console.error('Error saving message or notification:', error);

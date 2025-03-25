@@ -1,6 +1,8 @@
 const {toAssignmentEntity} = require('../db/mappers/assignmentMapper');
 const {getById: getBatchById} = require('./batchService');
 const {getByBatchId: getBatchStudents} = require('./studentService');
+
+const {NotificationType} = require('../common/types');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
@@ -8,7 +10,7 @@ const {
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 const {sendNotification} = require("./notificationService");
 
-const BASE_URL = process.env.BASE_URL;
+const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Assignments";
 
@@ -39,7 +41,9 @@ async function sendAssignmentNotification(assignment, assignmentId) {
     const formattedSubmissionDate = new Date(submissionDate).toISOString().split("T")[0];
 
     for (const recipient of recipients) {
-        await sendNotification(assignmentId, recipient.id, recipient.type, NotificationType.ASSIGNMENT, `A new assignment in ${batchName}. Submit it by ${formattedSubmissionDate}`, `${BASE_URL}/assignments/${assignmentId}`);
+
+        await sendNotification(assignmentId, recipient.id, recipient.type, NotificationType.ASSIGNMENT, `A new assignment in ${batchName}. Submit it by ${formattedSubmissionDate}`, `${DEEPLINK_BASE_URL}/assignments/${assignmentId}`);
+
     }
 }
 
