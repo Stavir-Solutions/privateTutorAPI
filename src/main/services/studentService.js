@@ -79,7 +79,7 @@ async function getStudentById(studentId) {
     }
 }
 
-async function getBatchNames(batchIds) {
+async function getBatchIdNamePairs(batchIds) {
     if (batchIds.length === 0) return [];
 
     const batchParams = {
@@ -117,10 +117,10 @@ async function getByBatchId(batchId) {
         if (!data.Items || data.Items.length === 0) return [];
 
         let students = data.Items.map(item => unmarshall(item));
-        const batchNames = await getBatchNames([batchId]);
+        const batchIdNamePairs = await getBatchIdNamePairs([batchId]);
 
         students.forEach(student => {
-            student.batches = batchNames;
+            student.batches = batchIdNamePairs;
         });
         
         return students;
