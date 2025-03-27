@@ -78,7 +78,6 @@ async function getStudentById(studentId) {
         throw err;
     }
 }
-
 async function getBatchIdNamePairs(batchIds) {
     if (batchIds.length === 0) return [];
 
@@ -91,7 +90,6 @@ async function getBatchIdNamePairs(batchIds) {
             },
         },
     };
-    
 
     try {
         const batchData = await db.send(new BatchGetItemCommand(batchParams));
@@ -103,30 +101,63 @@ async function getBatchIdNamePairs(batchIds) {
         return batchIds.map(id => ({ id, name: "Unknown Batch" }));
     }
 }
+
 async function getByBatchId(batchId) {
+    console.log("Querying Batch ID:", batchId);
+
     const params = {
         TableName: tableName,
         FilterExpression: "contains(batches, :batchId)",
         ExpressionAttributeValues: {
-            ':batchId': { S: batchId }, 
-            
+            ':batchId': { S: batchId },
         },
     };
+
     try {
         const data = await db.send(new ScanCommand(params));
+        console.log("Raw Data from DynamoDB:", JSON.stringify(data.Items, null, 2));
+
         if (!data.Items || data.Items.length === 0) return [];
 
         let students = data.Items.map(item => unmarshall(item));
-        const batchIdNamePairs = await getBatchIdNamePairs([batchId]);
+
+        // ✅ Extract all unique batch IDs from students' batches field
+        let batchIds = new Set();
+        students.forEach(student => {
+            if (student.batches && Array.isArray(student.batches)) {
+                student.batches.forEach(batch => {
+                    if (typeof batch === "string") {
+                        batchIds.add(batch); 
+                    } else if (batch?.id) {
+                        batchIds.add(batch.id); 
+                    } else {
+                        console.log("Invalid Batch Format:", batch);
+                    }
+                });
+            }
+        });
+
+        batchIds = Array.from(batchIds);
+        console.log("Extracted Batch IDs:", batchIds);
+
+        const batchIdNamePairs = await getBatchIdNamePairs(batchIds);
+        console.log("Batch ID-Name Pairs Retrieved:", batchIdNamePairs);
 
         students.forEach(student => {
-            student.batches = batchIdNamePairs;
+            if (student.batches && Array.isArray(student.batches)) {
+                student.batches = student.batches.map(batch => {
+                    const batchId = typeof batch === "string" ? batch : batch.id;
+                    const batchInfo = batchIdNamePairs.find(b => b.id === batchId);
+                    return batchInfo ? batchInfo : { id: batchId, name: "Unknown Batch" };
+                });
+            }
         });
-        
+
+        console.log("Final Student Data:", JSON.stringify(students, null, 2));
         return students;
     } catch (err) {
         console.error('Unable to get students by batch. Error JSON:', JSON.stringify(err, null, 2));
-        throw err; 
+        throw err;
     }
 }
 
