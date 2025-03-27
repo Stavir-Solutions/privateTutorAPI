@@ -79,7 +79,7 @@ async function sendMessageReplyNotification(reply, message, messageId) {
     const recipientId = message.sender === reply.sender ? message.receiver : message.sender;
     const recipientType = message.senderType === reply.senderType ? message.receiverType : message.senderType;
 
-    await sendNotification(messageId, recipientId, recipientType, NotificationType.MESSAGE_REPLY, `${reply.senderName} replied to your message`, `${BASE_URL}/messages/${messageId}`);
+    await sendNotification(messageId, recipientId, recipientType, NotificationType.MESSAGE_REPLY, `${reply.senderName} replied to your message`, `${DEEPLINK_BASE_URL}/messages/${messageId}`);
 }
 
 async function getByStudentId(studentId) {
