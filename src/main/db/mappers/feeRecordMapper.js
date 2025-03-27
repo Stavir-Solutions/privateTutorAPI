@@ -12,6 +12,7 @@ function toFeeRecordEntity(feeRecord) {
             amount: feeRecord.amount, 
             status: feeRecord.status,
             notes: feeRecord.notes,
+            month: feeRecord.month,
             attachmentUrls: feeRecord.attachmentUrls, 
            teacherAcknowledgement: feeRecord.teacherAcknowledgement,
          },
