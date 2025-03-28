@@ -2,13 +2,12 @@ const db = require('../db/dynamodb');
 const jwt = require('jsonwebtoken');
 const {ScanCommand} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
-const UserType = require("../common/UserType");
-const TokenType = require("../common/TokenType");
+const {TokenType, UserType} = require("../common/types");
 const {getTeacherById} = require("./teacherService");
 const {buildErrorMessage, buildSuccessResponse} = require("../routes/responseUtils");
 const {getStudentById} = require("./studentService");
-const { ACCESS_TOKEN_VALIDITY_SECONDS } = require('../common/config');
-const { REFRESH_TOKEN_VALIDITY_SECONDS } = require('../common/config');
+const {ACCESS_TOKEN_VALIDITY_SECONDS} = require('../common/config');
+const {REFRESH_TOKEN_VALIDITY_SECONDS} = require('../common/config');
 
 async function getTeacherIfPasswordMatches(userName, password) {
     let scanParams = {
@@ -102,7 +101,7 @@ function buildStudentRefreshTokenPayload(id) {
     };
 }
 
-    async function generateAccessToken(payload) {
+async function generateAccessToken(payload) {
 
     const jwtPublicKey = Buffer.from(process.env.JWT_PRIVATE_KEY, 'base64').toString('utf-8');
     console.log('jwtPublicKey:', jwtPublicKey);

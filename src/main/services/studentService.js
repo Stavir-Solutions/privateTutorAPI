@@ -107,6 +107,29 @@ async function getStudentById(studentId) {
         throw err;
     }
 }
+async function getBatchIdNamePairs(batchIds) {
+    if (batchIds.length === 0) return [];
+
+    const batchParams = {
+        RequestItems: {
+            [batchesTable]: {
+                Keys: batchIds.map(id => marshall({ id })),
+                ProjectionExpression: "#batchId, #batchName",
+                ExpressionAttributeNames: { "#batchId": "id", "#batchName": "name" },
+            },
+        },
+    };
+
+    try {
+        const batchData = await db.send(new BatchGetItemCommand(batchParams));
+        console.log("Batch Response:", JSON.stringify(batchData, null, 2));
+
+        return (batchData.Responses?.[batchesTable] || []).map(item => unmarshall(item));
+    } catch (err) {
+        console.error("Error fetching batch names:", err);
+        return batchIds.map(id => ({ id, name: "Unknown Batch" }));
+    }
+}
 
 async function getByBatchId(batchId) {
     console.log("Querying Batch ID:", batchId);
@@ -127,14 +150,17 @@ async function getByBatchId(batchId) {
 
         let students = data.Items.map(item => unmarshall(item));
 
+
         let batchIds = new Set();
         students.forEach(student => {
             if (student.batches && Array.isArray(student.batches)) {
                 student.batches.forEach(batch => {
                     if (typeof batch === "string") {
+
                         batchIds.add(batch);
                     } else if (batch?.id) {
                         batchIds.add(batch.id);
+
                     } else {
                         console.log("Invalid Batch Format:", batch);
                     }
@@ -230,4 +256,6 @@ async function deleteById(studentId) {
 }
 
 
+
 module.exports = { createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId }
+
