@@ -5,6 +5,13 @@ const { unmarshall, marshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient({ region: "us-east-1" });
 const tableName = "FeeRecords";
+const StatusEnum= {
+    PENDING: 'pending', 
+    PAID: 'paid',
+    SUCCESS: 'success',
+    ERROR: 'error'
+};
+
 async function create(feeRecord) {
     try {
         const checkParams = {
@@ -33,14 +40,13 @@ async function create(feeRecord) {
 
         await db.send(new PutItemCommand(params));
         console.log("Fee record inserted:", feeRecord);
-        return { status: "success", message: "Fee record inserted successfully." };
+        return { status: StatusEnum.SUCCESS, message: "Fee record inserted successfully." };
     } catch (error) {
         console.error("Error inserting fee record:", error);
-        return { status: "error", message: error.message };
-
+        return { status: StatusEnum.ERROR, message: error.message };
     }
-
 }
+
 async function fetchBatches() {
     const batchParams = { TableName: "Batches" };
     const batchData = await db.send(new ScanCommand(batchParams));
@@ -78,7 +84,6 @@ async function generateFeeRecords() {
         const batches = await fetchBatches();
         console.log("Batches found:", batches);
 
-        let feeRecords = [];
         for (const batch of batches) {
             if (!batch.id || !batch.paymentAmount) {
                 console.warn("Skipping batch with missing ID or payment amount", batch);
@@ -86,7 +91,7 @@ async function generateFeeRecords() {
             }
 
             const students = await fetchStudents(batch.id);
-            console.log(`Students for batch ${batch.id}:`, students);
+            console.log(`Students found for batch ${batch.id}:`, students);
 
             const alreadyGeneratedStudentIds = await fetchGeneratedStudentIds(batch.id, currentMonth);
             console.log(`Already generated student IDs for batch ${batch.id}:`, alreadyGeneratedStudentIds);
@@ -108,7 +113,7 @@ async function generateFeeRecords() {
                     dueDate: new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString(),
                     paymentDate: new Date(today.getFullYear(), today.getMonth() + 1, 5).toISOString(),
                     amount: batch.paymentAmount,
-                    status: "pending",
+                    status: StatusEnum.PENDING,
                     createdAt: today.toISOString(),
                     teacherAcknowledgement: true,
                     notes: `Your fee invoice for the month of ${currentMonth}`,
@@ -116,15 +121,14 @@ async function generateFeeRecords() {
 
                 console.log("Creating Fee Record:", feeRecord);
                 await create(feeRecord);
-                feeRecords.push(feeRecord);
             }
         }
 
-        console.log(`${feeRecords.length} fee records created.`);
-        return { status: "success" };
+        console.log(`Fee records created.`);
+        return { status: StatusEnum.SUCCESS };
     } catch (error) {
         console.error("Error:", error);
-        return { status: "error", message: error.message };
+        return { status: StatusEnum.ERROR, message: error.message };
     }
 }
 
