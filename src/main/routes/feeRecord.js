@@ -19,6 +19,7 @@ const feeRecordCreateSchema = Joi.object({
     studentId: Joi.string().guid().required(),
     dueDate: Joi.date().required(),
     paymentDate: Joi.date().required(),
+    month: Joi.string().max(50).required(),
     amount: Joi.number().required(),
     status: Joi.string().valid(...Object.values(FeeRecordStatus)).required(),
     notes: Joi.string().max(500).optional(),
@@ -29,6 +30,7 @@ const feeRecordCreateSchema = Joi.object({
 
 const feeRecordUpdateSchema = Joi.object({
     dueDate: Joi.date().optional(),
+    month: Joi.string().max(50).optional(),
     paymentDate: Joi.date().optional(),
     status: Joi.string().valid(...Object.values(FeeRecordStatus)).optional(),
     notes: Joi.string().max(500).optional(),
