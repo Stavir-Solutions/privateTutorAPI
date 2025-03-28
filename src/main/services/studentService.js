@@ -1,16 +1,18 @@
-const {toStudentEntity} = require('../db/mappers/studentMapper');
+const { toStudentEntity } = require('../db/mappers/studentMapper');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand,
     UpdateItemCommand,
     GetItemCommand,
     ScanCommand,
-    DeleteItemCommand
+    DeleteItemCommand,
+    BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
-const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
+const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 
 
 const tableName = "Students";
+const batchesTable = "Batches";
 
 async function createStudent(student) {
     let studentEntity = toStudentEntity(student);
@@ -45,7 +47,7 @@ async function updateStudent(studentId, studentFields) {
 
     const params = {
         TableName: tableName,
-        Key: marshall({id: studentId}),
+        Key: marshall({ id: studentId }),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -56,45 +58,113 @@ async function updateStudent(studentId, studentFields) {
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return data.Attributes ? unmarshall(data.Attributes):{};
+        return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
         console.error('Unable to update student. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
     }
 }
+async function getBatchIdNamePairs(batchIds) {
+    if (batchIds.length === 0) return [];
 
+    const batchParams = {
+        RequestItems: {
+            [batchesTable]: {
+                Keys: batchIds.map(id => marshall({ id })),
+                ProjectionExpression: "#batchId, #batchName",
+                ExpressionAttributeNames: { "#batchId": "id", "#batchName": "name" },
+            },
+        },
+    };
+
+    try {
+        const batchData = await db.send(new BatchGetItemCommand(batchParams));
+        console.log("Batch Response:", JSON.stringify(batchData, null, 2));
+
+        return (batchData.Responses?.[batchesTable] || []).map(item => unmarshall(item));
+    } catch (err) {
+        console.error("Error fetching batch names:", err);
+        return batchIds.map(id => ({ id, name: "Unknown Batch" }));
+    }
+}
 async function getStudentById(studentId) {
     const params = {
-        TableName: tableName, Key: marshall({id: studentId}),
+        TableName: tableName,
+        Key: marshall({ id: studentId }),
     };
 
     try {
         const data = await db.send(new GetItemCommand(params));
-        return data.Item ? unmarshall(data.Item) : {};
+        if (!data.Item) return {};
+
+        const student = unmarshall(data.Item);
+        const batchIds = student.batches || [];
+        student.batches = await getBatchIdNamePairs(batchIds);
+
+        return student;
     } catch (err) {
-        console.error('Unable to get student. Error JSON:', JSON.stringify(err, null, 2));
+        console.error("Error fetching student:", err);
         throw err;
     }
 }
 
 async function getByBatchId(batchId) {
+    console.log("Querying Batch ID:", batchId);
+
     const params = {
         TableName: tableName,
         FilterExpression: "contains(batches, :batchId)",
         ExpressionAttributeValues: {
-            ':batchId': { S: batchId }, 
+            ':batchId': { S: batchId },
         },
     };
 
     try {
         const data = await db.send(new ScanCommand(params));
-        return data.Items.map(item => unmarshall(item)); 
+        console.log("Raw Data from DynamoDB:", JSON.stringify(data.Items, null, 2));
+
+        if (!data.Items || data.Items.length === 0) return [];
+
+        let students = data.Items.map(item => unmarshall(item));
+
+        let batchIds = new Set();
+        students.forEach(student => {
+            if (student.batches && Array.isArray(student.batches)) {
+                student.batches.forEach(batch => {
+                    if (typeof batch === "string") {
+                        batchIds.add(batch);
+                    } else if (batch?.id) {
+                        batchIds.add(batch.id);
+                    } else {
+                        console.log("Invalid Batch Format:", batch);
+                    }
+                });
+            }
+        });
+
+        batchIds = Array.from(batchIds);
+        console.log("Extracted Batch IDs:", batchIds);
+
+        const batchIdNamePairs = await getBatchIdNamePairs(batchIds);
+        console.log("Batch ID-Name Pairs Retrieved:", batchIdNamePairs);
+
+        students.forEach(student => {
+            if (student.batches && Array.isArray(student.batches)) {
+                student.batches = student.batches.map(batch => {
+                    const batchId = typeof batch === "string" ? batch : batch.id;
+                    const batchInfo = batchIdNamePairs.find(b => b.id === batchId);
+                    return batchInfo ? batchInfo : { id: batchId, name: "Unknown Batch" };
+                });
+            }
+        });
+
+        console.log("Final Student Data:", JSON.stringify(students, null, 2));
+        return students;
     } catch (err) {
         console.error('Unable to get students by batch. Error JSON:', JSON.stringify(err, null, 2));
-        throw err; 
+        throw err;
     }
 }
-
 async function getAll() {
     const params = {
         TableName: tableName,
@@ -102,17 +172,51 @@ async function getAll() {
 
     try {
         const data = await db.send(new ScanCommand(params));
-        console.log('scan result', data);
-        return data.Items.map(item => unmarshall(item));
+        console.log("Scan result:", data);
+
+        let students = data.Items.map(items => unmarshall(items));
+
+
+        let batchIds = new Set();
+        students.forEach(student => {
+            if (student.batches && Array.isArray(student.batches)) {
+                student.batches.forEach(batch => {
+                    if (typeof batch === "string") {
+                        batchIds.add(batch);
+                    } else if (batch?.id) {
+                        batchIds.add(batch.id);
+                    } else {
+                        console.log("Invalid Batch Format:", batch);
+                    }
+                });
+            }
+        });
+
+
+        batchIds = Array.from(batchIds);
+        console.log("Extracted Batch IDs:", batchIds);
+
+        const batchIdNamePairs = await getBatchIdNamePairs(batchIds);
+
+        students.forEach(student => {
+            if (student.batches && Array.isArray(student.batches)) {
+                student.batches = student.batches.map(batch => {
+                    const batchId = typeof batch === "string" ? batch : batch.id;
+                    const batchInfo = batchIdNamePairs.find(b => b.id === batchId);
+                    return batchInfo ? batchInfo : { id: batchId, name: "Unknown Batch" };
+                });
+            }
+        });
+
+        return students;
     } catch (err) {
-        console.error('Unable to get students. Error JSON:', JSON.stringify(err, null, 2));
+        console.error("Unable to get students. Error JSON:", JSON.stringify(err, null, 2));
         throw err;
     }
 }
-
 async function deleteById(studentId) {
     const params = {
-        TableName: tableName, Key: marshall({id: studentId}),
+        TableName: tableName, Key: marshall({ id: studentId }),
     };
 
     try {
@@ -126,4 +230,4 @@ async function deleteById(studentId) {
 }
 
 
-module.exports = {createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId}
+module.exports = { createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId }
