@@ -28,7 +28,7 @@ jobs:
           echo "S3BucketName=private-teacher-data" >> .env
           echo "JWT_PRIVATE_KEY=${{ secrets.JWT_PRIVATE_KEY }}" >> .env
           echo "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> .env
-          echo "BASE_URL=${{ secrets.BASE_URL }}" >> .env
+          echo "DEEPLINK_BASE_URL=${{ secrets.DEEPLINK_BASE_URL }}" >> .env
 
         shell: bash
         env:

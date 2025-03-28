@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse} = require("./responseUtils");
-const {getByTeacherId ,markNotificationSeen,getByStudentId} = require('../services/notificationService');
+const {getByTeacherId, markNotificationSeen, getByStudentId} = require('../services/notificationService');
 const authMiddleware = require("../middleware/authMiddleware");
 
 
@@ -8,23 +8,11 @@ const router = express.Router();
 router.use(express.json());
 router.use(authMiddleware);
 
-const  NotificationType = {
-        MESSAGE: 'MESSAGE',
-        MESSAGE_REPLY: 'MESSAGE_REPLY',
-        FEE_PAID: 'FEE_PAID',
-        NEW_STUDENT: 'NEW_STUDENT',
-        FEE_INVOICE_RELEASED: 'FEE_INVOICE_RELEASED',
-        FEE_PAYMENT_CONFIRMED: 'FEE_PAYMENT_CONFIRMED',
-        ASSIGNMENT: 'ASSIGNMENT'
-};
-
-
-
-router.get('/teachers/:teacherId', async(req, res) => {
+router.get('/teachers/:teacherId', async (req, res) => {
     const teacherNotifications = await getByTeacherId(req.params.teacherId)
     buildSuccessResponse(res, 200, teacherNotifications);
     console.log('Retrieved {} notifications for teacher {}', teacherNotifications.length, req.params.teacherId);
-}); 
+});
 
 
 router.patch('/:notificationId/seen', async (req, res) => {

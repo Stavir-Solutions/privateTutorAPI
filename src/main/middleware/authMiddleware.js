@@ -1,6 +1,6 @@
 const {validateToken} = require('../services/loginService');
 const {buildErrorMessage} = require('../routes/responseUtils');
-const UserType = require("../common/UserType");
+const {UserType} = require("../common/types");
 
 const teacherOnlyUrls = ["/teachers/"] //TODO add more.
 const studentOnlyUrls = ["/students/"] //TODO add more.
