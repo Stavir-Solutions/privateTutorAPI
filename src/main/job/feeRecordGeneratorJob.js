@@ -14,7 +14,7 @@ async function create(feeRecord) {
             TableName: tableName,
             FilterExpression: "studentId = :studentId AND #month = :month",
             ExpressionAttributeNames: {
-                "#month": "month" 
+                "#month": "month"
             },
             ExpressionAttributeValues: marshall({
                 ":studentId": feeRecord.studentId,
@@ -72,30 +72,30 @@ async function generateFeeRecords() {
             const students = studentData.Items ? studentData.Items.map(item => unmarshall(item)) : [];
             console.log("Students found:", JSON.stringify(students, null, 2));
 
-                  const feeParams = {
-                                TableName: tableName,
-                                FilterExpression: "batchId = :batchId AND #month = :month",
-                                ExpressionAttributeNames: {
-                                    "#month": "month" 
-                                },
-                                ExpressionAttributeValues: marshall({
-                                    ":batchId": batchId,
-                                    ":month": currentmonth
-                                }, { removeUndefinedValues: true })
-                            };
-                            const feeData = await db.send(new ScanCommand(feeParams));
-                            const alreadyGeneratedStudentIds = feeData.Items ? feeData.Items.map(item => unmarshall(item).studentId) : [];
-                            console.log(`Already generated students for batch ${batchId}:`, alreadyGeneratedStudentIds);
- 
-                            const remainingStudents = students.filter(student => !alreadyGeneratedStudentIds.includes(student.id));
-                            console.log(`Remaining students for batch ${batchId}:`, remainingStudents);
-                            
-                            for (const student of remainingStudents) {
-                                const studentId = student.id;
-                                if (!studentId) {
-                                    console.warn("Skipping student with missing studentId", student);
-                                    continue;
-                                }                
+            const feeParams = {
+                TableName: tableName,
+                FilterExpression: "batchId = :batchId AND #month = :month",
+                ExpressionAttributeNames: {
+                    "#month": "month"
+                },
+                ExpressionAttributeValues: marshall({
+                    ":batchId": batchId,
+                    ":month": currentmonth
+                }, { removeUndefinedValues: true })
+            };
+            const feeData = await db.send(new ScanCommand(feeParams));
+            const alreadyGeneratedStudentIds = feeData.Items ? feeData.Items.map(item => unmarshall(item).studentId) : [];
+            console.log(`Already generated students for batch ${batchId}:`, alreadyGeneratedStudentIds);
+
+            const remainingStudents = students.filter(student => !alreadyGeneratedStudentIds.includes(student.id));
+            console.log(`Remaining students for batch ${batchId}:`, remainingStudents);
+
+            for (const student of remainingStudents) {
+                const studentId = student.id;
+                if (!studentId) {
+                    console.warn("Skipping student with missing studentId", student);
+                    continue;
+                }
 
                 const feeRecord = {
                     id: uuidv4(),
@@ -120,7 +120,7 @@ async function generateFeeRecords() {
 
         console.log(`${feeRecords.length} fee records created.`);
         return { status: "Success", data: feeRecords };
-    
+
     } catch (error) {
         console.error("Error:", error);
         return { status: "Error", message: error.message };
