@@ -37,6 +37,9 @@ functions:
           path: /batches/teacher/{teacherId}
           method: get
       - http:
+          path: /batches/student/{studentId}
+          method: get          
+      - http:
           path: /batches/{id}
           method: get
       - http:

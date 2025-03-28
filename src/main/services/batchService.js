@@ -1,11 +1,13 @@
 const {toBatchEntity} = require('../db/mappers/batchMapper');
 const db = require('../db/dynamodb');
 const {
-    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
+    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand,QueryCommand,BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
+const{getStudentById} = require('./studentService');
 
 const tableName = "Batches";
+const STUDENTS_TABLE = "Students";
 
 async function create(batch) {
     let batchEntity = toBatchEntity(batch);
@@ -84,6 +86,44 @@ async function getByTeacherId(teacherId) {
         throw err;
     }
 }
+async function getByStudentId(studentId) {
+    try {
+        const student = await getStudentById(studentId);
+
+        if (!student) {
+            return { success: false, message: "Student not found" };
+        }
+
+        if (!student.batches || !Array.isArray(student.batches)) {
+            return { success: true, student, batches: [], message: "No batches found for this student" };
+        }
+
+        const batchIds = student.batches.map(batch => batch);
+        if (batchIds.length === 0) {
+            return { success: true, student, batches: [], message: "No batches found" };
+        }
+
+        console.log("Batch IDs to fetch:", batchIds);
+
+        const batchParams = {
+            RequestItems: {
+                [tableName]: {
+                    Keys: batchIds.map(batchId => ({ id: { S: batchId } }))
+                }
+            }
+        };
+
+        const batchData = await db.send(new BatchGetItemCommand(batchParams));
+        console.log("Raw batch data:", JSON.stringify(batchData, null, 2));
+
+        const batches = batchData.Responses?.[tableName]?.map(item => unmarshall(item)) || [];
+        return {batches };
+
+    } catch (error) {
+        console.error("Error fetching student and batches:", error);
+        return { error: error.message };
+    }
+}
 
 async function deleteById(batchId) {
     const params = {
@@ -100,5 +140,5 @@ async function deleteById(batchId) {
     }
 }
 
-module.exports = {create, getById, deleteById, update, getByTeacherId}
+module.exports = {create, getById, deleteById, update, getByTeacherId,getByStudentId}
 

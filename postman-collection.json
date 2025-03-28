@@ -226,6 +226,38 @@
 			"response": []
 		},
 		{
+			"name": "Get Batches by Student ID",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "bearer {{auth_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/batches/student/:studentId",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"batches",
+						"student",
+						":studentId"
+					],
+					"variable": [
+						{
+							"key": "studentId",
+							"value": "92599937-dbc6-495c-b701-fe25f9ea83da"
+						}
+					]
+				}
+			},
+			"response": []
+		},		
+
+		{
 			"name": "Create Batch",
 			"request": {
 				"method": "POST",
