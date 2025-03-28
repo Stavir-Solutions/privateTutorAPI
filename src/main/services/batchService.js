@@ -4,6 +4,7 @@ const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand,QueryCommand,BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
+const{getStudentById} = require('./studentService');
 
 const tableName = "Batches";
 const STUDENTS_TABLE = "Students";
@@ -85,32 +86,19 @@ async function getByTeacherId(teacherId) {
         throw err;
     }
 }
-
 async function getByStudentId(studentId) {
     try {
-        const studentParams = {
-            TableName: STUDENTS_TABLE,
-            KeyConditionExpression: "id = :studentId",
-            ExpressionAttributeValues: {
-                ":studentId": { S: studentId }
-            }
-        };
+        const student = await getStudentById(studentId);
 
-        const studentData = await db.send(new QueryCommand(studentParams));
-        console.log("Raw student data:", JSON.stringify(studentData, null, 2));
-
-        if (!studentData.Items || studentData.Items.length === 0) {
+        if (!student) {
             return { success: false, message: "Student not found" };
         }
-
-        const student = unmarshall(studentData.Items[0]);
-        console.log("Unmarshalled student:", JSON.stringify(student, null, 2));
 
         if (!student.batches || !Array.isArray(student.batches)) {
             return { success: true, student, batches: [], message: "No batches found for this student" };
         }
 
-        const batchIds = student.batches.map(batch => batch); 
+        const batchIds = student.batches.map(batch => batch);
         if (batchIds.length === 0) {
             return { success: true, student, batches: [], message: "No batches found" };
         }
@@ -126,15 +114,14 @@ async function getByStudentId(studentId) {
         };
 
         const batchData = await db.send(new BatchGetItemCommand(batchParams));
-
         console.log("Raw batch data:", JSON.stringify(batchData, null, 2));
 
         const batches = batchData.Responses?.[tableName]?.map(item => unmarshall(item)) || [];
+        return {batches };
 
-        return {   batches };
     } catch (error) {
         console.error("Error fetching student and batches:", error);
-        return {  error: error.message };
+        return { error: error.message };
     }
 }
 
