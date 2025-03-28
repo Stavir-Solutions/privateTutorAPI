@@ -1,12 +1,9 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const db = new DynamoDBClient({ region: "us-east-1" });
 const { v4: uuidv4 } = require("uuid");
-const {
-    PutItemCommand,
-    ScanCommand
-} = require("@aws-sdk/client-dynamodb");
+const { PutItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
 const { unmarshall, marshall } = require("@aws-sdk/util-dynamodb");
 
+const db = new DynamoDBClient({ region: "us-east-1" });
 const tableName = "FeeRecords";
 async function create(feeRecord) {
     try {
@@ -44,72 +41,77 @@ async function create(feeRecord) {
     }
 
 }
+async function fetchBatches() {
+    const batchParams = { TableName: "Batches" };
+    const batchData = await db.send(new ScanCommand(batchParams));
+    return batchData.Items ? batchData.Items.map(item => unmarshall(item)) : [];
+}
+
+async function fetchStudents(batchId) {
+    const studentParams = {
+        TableName: "Students",
+        FilterExpression: "contains(batches, :batchId)",
+        ExpressionAttributeValues: marshall({ ":batchId": batchId }, { removeUndefinedValues: true }),
+    };
+
+    const studentData = await db.send(new ScanCommand(studentParams));
+    return studentData.Items ? studentData.Items.map(item => unmarshall(item)) : [];
+}
+
+async function fetchGeneratedStudentIds(batchId, month) {
+    const feeParams = {
+        TableName: tableName,
+        FilterExpression: "batchId = :batchId AND #month = :month",
+        ExpressionAttributeNames: { "#month": "month" },
+        ExpressionAttributeValues: marshall({ ":batchId": batchId, ":month": month }, { removeUndefinedValues: true }),
+    };
+
+    const feeData = await db.send(new ScanCommand(feeParams));
+    return feeData.Items ? feeData.Items.map(item => unmarshall(item).studentId) : [];
+}
 
 async function generateFeeRecords() {
     try {
         const today = new Date();
-        const currentmonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+        const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
-        const batchParams = { TableName: "Batches" };
-        const batchData = await db.send(new ScanCommand(batchParams));
-        const batches = batchData.Items ? batchData.Items.map(item => unmarshall(item)) : [];
-        console.log("Batches found:", JSON.stringify(batches, null, 2));
+        const batches = await fetchBatches();
+        console.log("Batches found:", batches);
 
         let feeRecords = [];
         for (const batch of batches) {
-            const batchId = batch.id;
-            if (!batchId || !batch.paymentAmount) {
-                console.warn("Skipping batch with missing batchId or paymentAmount", batch);
+            if (!batch.id || !batch.paymentAmount) {
+                console.warn("Skipping batch with missing ID or payment amount", batch);
                 continue;
             }
 
-            const studentParams = {
-                TableName: "Students",
-                FilterExpression: "contains(batches, :batchId)",
-                ExpressionAttributeValues: marshall({ ":batchId": batch.id }, { removeUndefinedValues: true })
-            };
-            const studentData = await db.send(new ScanCommand(studentParams));
-            const students = studentData.Items ? studentData.Items.map(item => unmarshall(item)) : [];
-            console.log("Students found:", JSON.stringify(students, null, 2));
+            const students = await fetchStudents(batch.id);
+            console.log(`Students for batch ${batch.id}:`, students);
 
-            const feeParams = {
-                TableName: tableName,
-                FilterExpression: "batchId = :batchId AND #month = :month",
-                ExpressionAttributeNames: {
-                    "#month": "month"
-                },
-                ExpressionAttributeValues: marshall({
-                    ":batchId": batchId,
-                    ":month": currentmonth
-                }, { removeUndefinedValues: true })
-            };
-            const feeData = await db.send(new ScanCommand(feeParams));
-            const alreadyGeneratedStudentIds = feeData.Items ? feeData.Items.map(item => unmarshall(item).studentId) : [];
-            console.log(`Already generated students for batch ${batchId}:`, alreadyGeneratedStudentIds);
+            const alreadyGeneratedStudentIds = await fetchGeneratedStudentIds(batch.id, currentMonth);
+            console.log(`Already generated student IDs for batch ${batch.id}:`, alreadyGeneratedStudentIds);
 
             const remainingStudents = students.filter(student => !alreadyGeneratedStudentIds.includes(student.id));
-            console.log(`Remaining students for batch ${batchId}:`, remainingStudents);
+            console.log(`Remaining students for batch ${batch.id}:`, remainingStudents);
 
             for (const student of remainingStudents) {
-                const studentId = student.id;
-                if (!studentId) {
-                    console.warn("Skipping student with missing studentId", student);
+                if (!student.id) {
+                    console.warn("Skipping student with missing ID", student);
                     continue;
                 }
 
                 const feeRecord = {
                     id: uuidv4(),
-                    batchId: batchId,
-                    studentId: studentId,
-                    month: currentmonth,
-                    dueDate: new Date(today.getFullYear(), today.getMonth(), 28).toISOString(),
-                    paymentDate: new Date(today.getFullYear(), today.getMonth(), 10).toISOString(),
+                    batchId: batch.id,
+                    studentId: student.id,
+                    month: currentMonth,
+                    dueDate: new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString(),
+                    paymentDate: new Date(today.getFullYear(), today.getMonth() + 1, 5).toISOString(),
                     amount: batch.paymentAmount,
                     status: "pending",
                     createdAt: today.toISOString(),
                     teacherAcknowledgement: true,
-                    notes: "Payment pending.",
-                    attachmentUrl: "http://example.com/receipt.pdf",
+                    notes: `Your fee invoice for the month of ${currentMonth}`,
                 };
 
                 console.log("Creating Fee Record:", feeRecord);
@@ -119,11 +121,10 @@ async function generateFeeRecords() {
         }
 
         console.log(`${feeRecords.length} fee records created.`);
-        return { status: "Success", data: feeRecords };
-
+        return { status: "success" };
     } catch (error) {
         console.error("Error:", error);
-        return { status: "Error", message: error.message };
+        return { status: "error", message: error.message };
     }
 }
 
