@@ -1,6 +1,6 @@
 const express = require('express');
 const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getById, deleteById, update, getByTeacherId} = require('../services/batchService');
+const {create, getById, deleteById, update, getByTeacherId,getByStudentId} = require('../services/batchService');
 const {updateStudent, getStudentById} = require('../services/studentService');
 
 const router = express.Router();
@@ -43,6 +43,12 @@ router.get('/:id', async (req, res) => {
 
 router.get('/teacher/:teacherId', async (req, res) => {
     let batches = await getByTeacherId(req.params.teacherId);
+    console.log('batches ', batches);
+    buildSuccessResponse(res, 200, batches);
+});
+
+router.get('/student/:studentId', async (req, res) => {
+    let batches = await getByStudentId(req.params.studentId);
     console.log('batches ', batches);
     buildSuccessResponse(res, 200, batches);
 });

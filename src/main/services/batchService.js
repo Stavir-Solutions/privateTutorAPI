@@ -1,11 +1,12 @@
 const {toBatchEntity} = require('../db/mappers/batchMapper');
 const db = require('../db/dynamodb');
 const {
-    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand
+    PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand,QueryCommand,BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 
 const tableName = "Batches";
+const STUDENTS_TABLE = "Students";
 
 async function create(batch) {
     let batchEntity = toBatchEntity(batch);
@@ -85,6 +86,58 @@ async function getByTeacherId(teacherId) {
     }
 }
 
+async function getByStudentId(studentId) {
+    try {
+        const studentParams = {
+            TableName: STUDENTS_TABLE,
+            KeyConditionExpression: "id = :studentId",
+            ExpressionAttributeValues: {
+                ":studentId": { S: studentId }
+            }
+        };
+
+        const studentData = await db.send(new QueryCommand(studentParams));
+        console.log("Raw student data:", JSON.stringify(studentData, null, 2));
+
+        if (!studentData.Items || studentData.Items.length === 0) {
+            return { success: false, message: "Student not found" };
+        }
+
+        const student = unmarshall(studentData.Items[0]);
+        console.log("Unmarshalled student:", JSON.stringify(student, null, 2));
+
+        if (!student.batches || !Array.isArray(student.batches)) {
+            return { success: true, student, batches: [], message: "No batches found for this student" };
+        }
+
+        const batchIds = student.batches.map(batch => batch); 
+        if (batchIds.length === 0) {
+            return { success: true, student, batches: [], message: "No batches found" };
+        }
+
+        console.log("Batch IDs to fetch:", batchIds);
+
+        const batchParams = {
+            RequestItems: {
+                [tableName]: {
+                    Keys: batchIds.map(batchId => ({ id: { S: batchId } }))
+                }
+            }
+        };
+
+        const batchData = await db.send(new BatchGetItemCommand(batchParams));
+
+        console.log("Raw batch data:", JSON.stringify(batchData, null, 2));
+
+        const batches = batchData.Responses?.[tableName]?.map(item => unmarshall(item)) || [];
+
+        return {   batches };
+    } catch (error) {
+        console.error("Error fetching student and batches:", error);
+        return {  error: error.message };
+    }
+}
+
 async function deleteById(batchId) {
     const params = {
         TableName: tableName, Key: marshall({id: batchId}),
@@ -100,5 +153,5 @@ async function deleteById(batchId) {
     }
 }
 
-module.exports = {create, getById, deleteById, update, getByTeacherId}
+module.exports = {create, getById, deleteById, update, getByTeacherId,getByStudentId}
 
