@@ -1,15 +1,12 @@
-const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { v4: uuidv4 } = require("uuid");
-const { PutItemCommand, ScanCommand } = require("@aws-sdk/client-dynamodb");
-const { unmarshall, marshall } = require("@aws-sdk/util-dynamodb");
+const {DynamoDBClient} = require("@aws-sdk/client-dynamodb");
+const {v4: uuidv4} = require("uuid");
+const {PutItemCommand, ScanCommand} = require("@aws-sdk/client-dynamodb");
+const {unmarshall, marshall} = require("@aws-sdk/util-dynamodb");
 
-const db = new DynamoDBClient({ region: "us-east-1" });
+const db = new DynamoDBClient({region: "us-east-1"});
 const tableName = "FeeRecords";
-const StatusEnum= {
-    PENDING: 'pending', 
-    PAID: 'paid',
-    SUCCESS: 'success',
-    ERROR: 'error'
+const StatusEnum = {
+    PENDING: 'pending', PAID: 'paid', SUCCESS: 'success', ERROR: 'error'
 };
 
 async function create(feeRecord) {
@@ -21,34 +18,33 @@ async function create(feeRecord) {
                 "#month": "month"
             },
             ExpressionAttributeValues: marshall({
-                ":studentId": feeRecord.studentId,
-                ":month": feeRecord.month
-            }, { removeUndefinedValues: true })
+                ":studentId": feeRecord.studentId, ":month": feeRecord.month
+            }, {removeUndefinedValues: true})
         };
 
         const existingRecords = await db.send(new ScanCommand(checkParams));
 
         if (existingRecords.Items && existingRecords.Items.length > 0) {
             console.log("Duplicate fee record found. Skipping:", feeRecord);
-            return { success: false, message: "Duplicate fee record exists. Skipping insertion." };
+            return {success: false, message: "Duplicate fee record exists. Skipping insertion."};
         }
 
         const params = {
-            TableName: tableName,
-            Item: marshall(feeRecord),
+            TableName: tableName, Item: marshall(feeRecord),
         };
 
         await db.send(new PutItemCommand(params));
         console.log("Fee record inserted:", feeRecord);
-        return { status: StatusEnum.SUCCESS, message: "Fee record inserted successfully." };
+        return {status: StatusEnum.SUCCESS, message: "Fee record inserted successfully."};
+        //TODO generate notification. call the notification services crate notification.
     } catch (error) {
         console.error("Error inserting fee record:", error);
-        return { status: StatusEnum.ERROR, message: error.message };
+        return {status: StatusEnum.ERROR, message: error.message};
     }
 }
 
 async function fetchBatches() {
-    const batchParams = { TableName: "Batches" };
+    const batchParams = {TableName: "Batches"};
     const batchData = await db.send(new ScanCommand(batchParams));
     return batchData.Items ? batchData.Items.map(item => unmarshall(item)) : [];
 }
@@ -57,7 +53,7 @@ async function fetchStudents(batchId) {
     const studentParams = {
         TableName: "Students",
         FilterExpression: "contains(batches, :batchId)",
-        ExpressionAttributeValues: marshall({ ":batchId": batchId }, { removeUndefinedValues: true }),
+        ExpressionAttributeValues: marshall({":batchId": batchId}, {removeUndefinedValues: true}),
     };
 
     const studentData = await db.send(new ScanCommand(studentParams));
@@ -68,8 +64,8 @@ async function fetchGeneratedStudentIds(batchId, month) {
     const feeParams = {
         TableName: tableName,
         FilterExpression: "batchId = :batchId AND #month = :month",
-        ExpressionAttributeNames: { "#month": "month" },
-        ExpressionAttributeValues: marshall({ ":batchId": batchId, ":month": month }, { removeUndefinedValues: true }),
+        ExpressionAttributeNames: {"#month": "month"},
+        ExpressionAttributeValues: marshall({":batchId": batchId, ":month": month}, {removeUndefinedValues: true}),
     };
 
     const feeData = await db.send(new ScanCommand(feeParams));
@@ -125,11 +121,11 @@ async function generateFeeRecords() {
         }
 
         console.log(`Fee records created.`);
-        return { status: StatusEnum.SUCCESS };
+        return {status: StatusEnum.SUCCESS};
     } catch (error) {
         console.error("Error:", error);
-        return { status: StatusEnum.ERROR, message: error.message };
+        return {status: StatusEnum.ERROR, message: error.message};
     }
 }
 
-module.exports = { generateFeeRecords, create };
+module.exports = {generateFeeRecords, create};
