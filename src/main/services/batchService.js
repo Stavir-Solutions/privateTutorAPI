@@ -98,7 +98,7 @@ async function getByStudentId(studentId) {
             return { success: true, student, batches: [], message: "No batches found for this student" };
         }
 
-        const batchIds = student.batches.map(batch => batch);
+        const batchIds = student.batches.map(batch => batch.id);
         if (batchIds.length === 0) {
             return { success: true, student, batches: [], message: "No batches found" };
         }
