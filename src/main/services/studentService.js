@@ -98,9 +98,20 @@ async function getStudentById(studentId) {
         if (!data.Item) return {};
 
         const student = unmarshall(data.Item);
+
+        return student;
+    } catch (err) {
+        console.error("Error fetching student:", err);
+        throw err;
+    }
+}
+
+async function getStudentByIdWithBatchName(studentId) {
+
+    try {
+        const student = await getStudentById(studentId);
         const batchIds = student.batches || [];
         student.batches = await getBatchIdNamePairs(batchIds);
-
         return student;
     } catch (err) {
         console.error("Error fetching student:", err);
@@ -257,5 +268,5 @@ async function deleteById(studentId) {
 
 
 
-module.exports = { createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId }
+module.exports = { createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId,getStudentByIdWithBatchName }
 

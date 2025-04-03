@@ -15,27 +15,31 @@ const FeeRecordStatus = Object.freeze({
 });
 
 const feeRecordCreateSchema = Joi.object({
-    batchId: Joi.string().guid().required(),
-    studentId: Joi.string().guid().required(),
-    dueDate: Joi.date().required(),
-    paymentDate: Joi.date().required(),
-    month: Joi.string().max(50).required(),
-    amount: Joi.number().required(),
-    status: Joi.string().valid(...Object.values(FeeRecordStatus)).required(),
-    notes: Joi.string().max(500).optional(),
-    attachmentUrl: Joi.string().uri().optional(),
-    teacherAcknowledgement: Joi.boolean().optional()
+    batchId: Joi.string().guid().required().messages({'string.guid': 'Batch ID must be a valid UUID.'}),
+    studentId: Joi.string().guid().required().messages({'string.guid': 'Student ID must be a valid UUID.'}),
+    dueDate: Joi.date().required().messages({'date.base': 'Due date must be a valid date.'}),
+    paymentDate: Joi.date().required().messages({'date.base': 'Payment date must be a valid date.'}),
+    month: Joi.string().max(50).required().messages({'string.max': 'Month should not exceed 50 characters.'}),
+    amount: Joi.number().required().messages({'number.base': 'Amount must be a number.'}),
+    status: Joi.string().valid(...Object.values(FeeRecordStatus)).required().messages({
+        'any.only': `Status must be one of the following: ${Object.values(FeeRecordStatus).join(', ')}` 
+    }),
+    notes: Joi.string().max(500).optional().messages({'string.max': 'Notes should not exceed 500 characters.'}),
+    attachmentUrl: Joi.string().uri().optional().messages({'string.uri': 'Attachment URL must be a valid URI.'}),
+    teacherAcknowledgement: Joi.boolean().optional().messages({'boolean.base': 'Teacher acknowledgement must be a boolean.'})
 });
 
 
 const feeRecordUpdateSchema = Joi.object({
-    dueDate: Joi.date().optional(),
-    month: Joi.string().max(50).optional(),
-    paymentDate: Joi.date().optional(),
-    status: Joi.string().valid(...Object.values(FeeRecordStatus)).optional(),
-    notes: Joi.string().max(500).optional(),
-    attachmentUrl: Joi.string().uri().optional(),
-    teacherAcknowledgement: Joi.boolean().optional()
+    dueDate: Joi.date().optional().messages({'date.base': 'Due date must be a valid date.'}),
+    month: Joi.string().max(50).optional().messages({'string.max': 'Month should not exceed 50 characters.'}),
+    paymentDate: Joi.date().optional().messages({'date.base': 'Payment date must be a valid date.'}),
+    status: Joi.string().valid(...Object.values(FeeRecordStatus)).optional().messages({
+        'any.only': `Status must be one of the following: ${Object.values(FeeRecordStatus).join(', ')}` 
+    }),
+    notes: Joi.string().max(500).optional().messages({'string.max': 'Notes should not exceed 500 characters.'}),
+    attachmentUrl: Joi.string().uri().optional().messages({'string.uri': 'Attachment URL must be a valid URI.'}),
+    teacherAcknowledgement: Joi.boolean().optional().messages({'boolean.base': 'Teacher acknowledgement must be a boolean.'}),
 }).or('dueDate', 'paymentDate', 'status', 'notes', 'attachmentUrl', 'teacherAcknowledgement');
 
 var feeRecord = '{\n' + '  "id": "d3b07384-d9a0-4c9b-8a0d-6e5b5d6e5b5d",\n' + '  "batchId": "550e8400-e29b-41d4-a716-446655440000",\n' + '  "studentId": "550e8400-e29b-41d4-a716-446655440001",\n' + '  "dueDate": "2024-12-31T23:59:59.999Z",\n' + '  "paymentDate": "2024-12-25T12:34:56.789Z",\n' + '  "amount": 1500.00,\n' + '  "status": "paid",\n' + '  "notes": "Payment received in full.",\n' + '  "attachmentUrl": "http://example.com/receipt.pdf",\n' + '  "teacherAcknowledgement": true\n' + '}';

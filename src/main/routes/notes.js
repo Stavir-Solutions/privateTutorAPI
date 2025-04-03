@@ -10,21 +10,21 @@ router.use(express.json());
 router.use(authMiddleware);
 
 const notesSchema = Joi.object({
-    publishDate: Joi.date().required(),
-    Title: Joi.string().max(500).required(),
-    listUrls: Joi.array().items(Joi.string().uri()).optional(),
-    studentId: Joi.string().optional(),  
-    batchId: Joi.string().required(),    
-    content: Joi.string().required()     
+    publishDate: Joi.date().required().messages({'date.base': 'Publish date must be a valid date.'}),
+    Title: Joi.string().max(500).required().messages({'string.max': 'Title should not exceed 500 characters.'}),
+    listUrls: Joi.array().items(Joi.string().uri()).optional().messages({'string.uri': 'Attachment URLs must be valid URIs.'}),
+    studentId: Joi.string().optional().messages({'string.guid': 'Student ID must be a valid UUID.'}),
+    batchId: Joi.string().required().messages({'string.guid': 'Batch ID must be a valid UUID.'}),    
+    content: Joi.string().required().messages({'string.base': 'Content must be a string.'}),     
 });
 
 const notesUpdateSchema = Joi.object({
-    publishDate: Joi.date().optional(),
-    Title: Joi.string().max(500).optional(),
-    listUrls: Joi.array().items(Joi.string().uri()).optional(),
-    studentId: Joi.string().optional(),
-    batchId: Joi.string().optional(),
-    content: Joi.string().optional()
+    publishDate: Joi.date().optional().messages({'date.base': 'Publish date must be a valid date.'}),
+    Title: Joi.string().max(500).optional().messages({'string.max': 'Title should not exceed 500 characters.'}),
+    listUrls: Joi.array().items(Joi.string().uri()).optional().messages({'string.uri': 'Attachment URLs must be valid URIs.'}),
+    studentId: Joi.string().optional().messages({'string.guid': 'Student ID must be a valid UUID.'}),
+    batchId: Joi.string().optional().messages({'string.guid': 'Batch ID must be a valid UUID.'}),
+    content: Joi.string().optional().messages({'string.base': 'Content must be a string.'}),
 }).or(
     'publishDate', 'Title', 'listUrls', 'studentId', 'batchId', 'content'
 ).unknown(false);
