@@ -3,6 +3,7 @@ const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
 const Joi = require('joi');
 const { create, updateNotes, getByStudentId, deleteById, getByBatchId } = require('../services/notesService');
 const authMiddleware = require("../middleware/authMiddleware");
+const {dateValidator} = require("../common/dateValidator");
 
 
 const router = express.Router();
@@ -10,7 +11,7 @@ router.use(express.json());
 router.use(authMiddleware);
 
 const notesSchema = Joi.object({
-    publishDate: Joi.date().required().messages({ 'date.base': 'Publish date must be a valid date.' }),
+    publishDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Publish date must be a valid date.' }),
     Title: Joi.string().max(500).required().messages({ 'string.max': 'Title should not exceed 500 characters.' }),
     listUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
     studentId: Joi.string().optional().messages({ 'string.guid': 'Student ID must be a valid UUID.' }),
@@ -19,7 +20,7 @@ const notesSchema = Joi.object({
 });
 
 const notesUpdateSchema = Joi.object({
-    publishDate: Joi.date().optional().messages({ 'date.base': 'Publish date must be a valid date.' }),
+    publishDate: Joi.string().custom(dateValidator).optional().messages({ 'date.base': 'Publish date must be a valid date.' }),
     Title: Joi.string().max(500).optional().messages({ 'string.max': 'Title should not exceed 500 characters.' }),
     listUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
     studentId: Joi.string().optional().messages({ 'string.guid': 'Student ID must be a valid UUID.' }),

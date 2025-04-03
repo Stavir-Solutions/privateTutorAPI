@@ -3,6 +3,7 @@ const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
 const Joi = require('joi');
 const { create, updateTest, getById, deletetestById, getallByBatch } = require('../services/testService');
 const authMiddleware = require("../middleware/authMiddleware");
+const {dateValidator} = require("../common/dateValidator");
 
 const router = express.Router();
 router.use(express.json());
@@ -11,8 +12,8 @@ router.use(authMiddleware);
 const testSchema = Joi.object({
     name: Joi.string().max(500).required().messages({ 'string.max': 'Name should not exceed 50 characters.' }),
     subject: Joi.string().max(100).required().messages({ 'string.max': 'Subject should not exceed 50 characters.' }),
-    testDate: Joi.date().required().messages({ 'date.base': 'Test date must be a valid date.' }),
-    resultPublishDate: Joi.date().required().messages({ 'date.base': 'Result Publish Date must be a valid date.' }),
+    testDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Test date must be a valid date.' }),
+    resultPublishDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Result Publish Date must be a valid date.' }),
     totalMarks: Joi.number().positive().required().messages({
         'number.base': 'Total marks must be a positive number.',
         'number.positive': 'Total marks must be greater than 0.'
@@ -33,8 +34,8 @@ const testSchema = Joi.object({
 const testUpdateSchema = Joi.object({
     name: Joi.string().max(500).required().messages({ 'string.max': 'Name should not exceed 50 characters.' }),
     subject: Joi.string().max(100).required().messages({ 'string.max': 'Subject should not exceed 50 characters.' }),
-    testDate: Joi.date().required().messages({ 'date.base': 'Test date must be a valid date.' }),
-    resultPublishDate: Joi.date().required().messages({ 'date.base': 'Result Publish Date must be a valid date.' }),
+    testDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Test date must be a valid date.' }),
+    resultPublishDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Result Publish Date must be a valid date.' }),
     totalMarks: Joi.number().positive().required().messages({
         'number.base': 'Total marks must be a positive number.',
         'number.positive': 'Total marks must be greater than 0.'
