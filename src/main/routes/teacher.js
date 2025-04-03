@@ -1,7 +1,7 @@
 const express = require('express');
-const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getTeacherById, getAll, deleteById, update} = require('../services/teacherService');
-const {validateToken} = require('../services/loginService')
+const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
+const { create, getTeacherById, getAll, deleteById, update } = require('../services/teacherService');
+const { validateToken } = require('../services/loginService')
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -10,44 +10,117 @@ router.use(express.json());
 router.use(authMiddleware);
 
 const teacherSchema = Joi.object({
-    firstName: Joi.string().optional(),
-    lastName: Joi.string().optional(),
-    userName: Joi.string().alphanum().min(3).max(30).required(),
-    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9]{6,20}$')).required(),
-    age: Joi.number().integer().min(18).optional(),
-    gender: Joi.string().valid('male', 'female', 'do not reveal').optional(),
-    addressLine1: Joi.string().optional(),
-    addressCity: Joi.string().optional(),
-    addressState: Joi.string().optional(),
-    pinCode: Joi.number().optional(),
-    profilePicUrl: Joi.string().uri().optional(),
-    email: Joi.string().email().optional(),
-    phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required(),
-    upiId: Joi.string().optional(),
-    accountNumber: Joi.string().optional(),
-    accountName: Joi.string().optional(),
-    ifscCode: Joi.string().optional()
+    firstName: Joi.string().optional().messages({ 'string.max': 'First name should not exceed 50 characters.' }),
+    lastName: Joi.string().optional().messages({ 'string.max': 'Last name should not exceed 50 characters' }),
+    userName: Joi.string().alphanum().min(3).max(30).required().messages({
+        'string.alphanum': 'Username must be alphanumeric.',
+        'string.min': 'Username must be at least 3 characters long.',
+        'string.max': 'Username must not exceed 30 characters.'
+    }),
+    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+={}:;,.<>?`~|-]*$')).required().messages({
+        'string.min': 'Password must be at least 6 characters long.',
+        'string.max': 'Password must not exceed 20 characters.',
+        'string.pattern.name': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+    }),
+    age: Joi.number().integer().min(18).optional().messages({
+        'number.base': 'Age must be a number.',
+        'number.min': 'Age must be at least 18.'
+    }),
+    gender: Joi.string().valid('male', 'female', 'do not reveal').optional().messages({
+        'string.base': 'Gender must be a string.',
+        'any.only': 'Gender must be one of the following: male, female, or do not reveal.'
+    }),
+    addressLine1: Joi.string().optional().messages({
+        'string.base': 'Address line 1 must be a string.'
+    }),
+    addressCity: Joi.string().optional().messages({
+        'string.base': 'City must be a string.'
+    }),
+    addressState: Joi.string().optional().messages({
+        'string.base': 'State must be a string.'
+    }),
+    pinCode: Joi.number().optional().messages({
+        'number.base': 'Pin code must be a number.'
+    }),
+    profilePicUrl: Joi.string().uri().optional().messages({
+        'string.uri': 'Profile picture URL must be a valid URI.'
+    }),
+    email: Joi.string().email().optional().messages({
+        'string.email': 'Email must be a valid email address.'
+    }),
+    phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required().messages({
+        'string.pattern.base': 'Phone number must be a valid 10-digit number.'
+    }),
+    upiId: Joi.string().optional().messages({
+        'string.base': 'UPI ID must be a string.'
+    }),
+    accountNumber: Joi.string().optional().messages({
+        'string.base': 'Account number must be a string.'
+    }),
+    accountName: Joi.string().optional().messages({
+        'string.base': 'Account name must be a string.'
+    }),
+    ifscCode: Joi.string().optional().messages({
+        'string.base': 'IFSC code must be a string.'
+    }),
 
 }).unknown(false);
 
+
 const teacherUpdateSchema = Joi.object({
-    firstName: Joi.string().optional(),
-    lastName: Joi.string().optional(),
-    userName: Joi.string().alphanum().min(3).max(30).optional(),
-    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9]{6,20}$')).optional(),
-    age: Joi.number().integer().min(18).optional(),
-    gender: Joi.string().valid('male', 'female', 'do not reveal').optional(),
-    addressLine1: Joi.string().optional(),
-    addressCity: Joi.string().optional(),
-    addressState: Joi.string().optional(),
-    pinCode: Joi.number().optional(),
-    profilePicUrl: Joi.string().uri().optional(),
-    email: Joi.string().email().optional(),
-    phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).optional(),
-    upiId: Joi.string().optional(),
-    accountNumber: Joi.string().optional(),
-    accountName: Joi.string().optional(),
-    ifscCode: Joi.string().optional()
+    firstName: Joi.string().optional().messages({ 'string.max': 'First name should not exceed 50 characters.' }),
+    lastName: Joi.string().optional().messages({ 'string.max': 'Last name should not exceed 50 characters.' }),
+    userName: Joi.string().alphanum().min(3).max(30).required().messages({
+        'string.alphanum': 'Username must be alphanumeric.',
+        'string.min': 'Username must be at least 3 characters long.',
+        'string.max': 'Username must not exceed 30 characters.'
+    }),
+    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+={}:;,.<>?`~|-]*$')).optional().messages({
+        'string.min': 'Password must be at least 6 characters long.',
+        'string.max': 'Password must not exceed 20 characters.',
+        'string.pattern.name': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+    }),
+    age: Joi.number().integer().min(18).optional().messages({
+        'number.base': 'Age must be a number.',
+        'number.min': 'Age must be at least 18.'
+    }),
+    gender: Joi.string().valid('male', 'female', 'do not reveal').optional().messages({
+        'string.base': 'Gender must be a string.',
+        'any.only': 'Gender must be one of the following: male, female, or do not reveal.'
+    }),
+    addressLine1: Joi.string().optional().messages({
+        'string.base': 'Address line 1 must be a string.'
+    }),
+    addressCity: Joi.string().optional().messages({
+        'string.base': 'City must be a string.'
+    }),
+    addressState: Joi.string().optional().messages({
+        'string.base': 'State must be a string.'
+    }),
+    pinCode: Joi.number().optional().messages({
+        'number.base': 'Pin code must be a number.'
+    }),
+    profilePicUrl: Joi.string().uri().optional().messages({
+        'string.uri': 'Profile picture URL must be a valid URI.'
+    }),
+    email: Joi.string().email().optional().messages({
+        'string.email': 'Email must be a valid email address.'
+    }),
+    phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required().messages({
+        'string.pattern.base': 'Phone number must be a valid 10-digit number.'
+    }),
+    upiId: Joi.string().optional().messages({
+        'string.base': 'UPI ID must be a string.'
+    }),
+    accountNumber: Joi.string().optional().messages({
+        'string.base': 'Account number must be a string.'
+    }),
+    accountName: Joi.string().optional().messages({
+        'string.base': 'Account name must be a string.'
+    }),
+    ifscCode: Joi.string().optional().messages({
+        'string.base': 'IFSC code must be a string.'
+    }),
 
 }).or('firstName', 'lastName', 'userName', 'password', 'age', 'gender', 'addressLine1', 'addressCity', 'addressState', 'pinCode', 'profilePicUrl', 'phoneNumber', 'upiId', 'accountNumber', 'accountName', 'ifscCode').unknown(false);
 
@@ -73,7 +146,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     console.log(JSON.stringify(req.body))
-    const {error} = teacherSchema.validate(req.body);
+    const { error } = teacherSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
@@ -87,7 +160,7 @@ router.post('/', async (req, res) => {
 
 /* API to update the teacher */
 router.put('/:id', async (req, res) => {
-    const {error} = teacherUpdateSchema.validate(req.body);
+    const { error } = teacherUpdateSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);

@@ -4,7 +4,7 @@ const {
     PutItemCommand, UpdateItemCommand, GetItemCommand, ScanCommand, DeleteItemCommand,QueryCommand,BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
-const{getStudentById} = require('./studentService');
+const{getStudentById, getStudentByIdWithBatchName} = require('./studentService');
 
 const tableName = "Batches";
 const STUDENTS_TABLE = "Students";
@@ -88,7 +88,7 @@ async function getByTeacherId(teacherId) {
 }
 async function getByStudentId(studentId) {
     try {
-        const student = await getStudentById(studentId);
+        const student = await getStudentByIdWithBatchName(studentId);
 
         if (!student) {
             return { success: false, message: "Student not found" };
