@@ -1,7 +1,7 @@
 const express = require('express');
-const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
-const {create, getByBatchIdAndStudentId , getById, deleteById, updateAssignment, getByBatchId} = require('../services/assignmentService');
-
+const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
+const { create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId } = require('../services/assignmentService');
+const { dateValidator } = require('../common/dateValidator')
 
 
 const router = express.Router();
@@ -11,24 +11,24 @@ router.use(express.json());
 router.use(authMiddleware);
 
 const assignmentSchema = Joi.object({
-    publishDate: Joi.date().required().messages({'date.base': 'Publish date must be a valid date.' }),
-    submissionDate: Joi.date().required().messages({'date.base': 'Submission date must be a valid date.' }),
-    batchId: Joi.string().guid({version: 'uuidv4'}).required().messages({'string.guid': 'Batch ID must be a valid UUID.' }),
-    studentId: Joi.string().guid({version: 'uuidv4'}).optional().messages({'string.guid': 'Student ID must be a valid UUID.' }),
-    title: Joi.string().max(100).required().messages({'string.max': 'Title must not exceed 100 characters.'}),
-    details: Joi.string().max(1000).optional().messages({'string.max': 'Details must not exceed 1000 characters.' }),
-    attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({'string.uri': 'Attachment URLs must be valid URIs.' }),
+    publishDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Publish date must be a valid date.' }),
+    submissionDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Submission date must be a valid date.' }),
+    batchId: Joi.string().guid({ version: 'uuidv4' }).required().messages({ 'string.guid': 'Batch ID must be a valid UUID.' }),
+    studentId: Joi.string().guid({ version: 'uuidv4' }).optional().messages({ 'string.guid': 'Student ID must be a valid UUID.' }),
+    title: Joi.string().max(100).required().messages({ 'string.max': 'Title must not exceed 100 characters.' }),
+    details: Joi.string().max(1000).optional().messages({ 'string.max': 'Details must not exceed 1000 characters.' }),
+    attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
 });
 
 
 const assignmentUpdateSchema = Joi.object({
-    publishDate: Joi.date().optional().messages({'date.base': 'Publish date must be a valid date.'}),
-    submissionDate: Joi.date().optional().messages({'date.base': 'Submission date must be a valid date.'}),
-    batchId: Joi.string().guid({ version: 'uuidv4' }).optional() .messages({'string.guid': 'Batch ID must be a valid UUID.' }),
-    studentId: Joi.string().guid({ version: 'uuidv4' }).optional().messages({'string.guid': 'Student ID must be a valid UUID.' }),
-    title: Joi.string().max(100).optional().messages({'string.max': 'Title must not exceed 100 characters.'}),
-    details: Joi.string().max(1000).optional()  .messages({'string.max': 'Details must not exceed 1000 characters.' }),
-    attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({'string.uri': 'Attachment URLs must be valid URIs.' }),
+    publishDate: Joi.string().custom(dateValidator).optional().messages({ 'date.base': 'Publish date must be a valid date.' }),
+    submissionDate: Joi.string().custom(dateValidator).optional().messages({ 'date.base': 'Submission date must be a valid date.' }),
+    batchId: Joi.string().guid({ version: 'uuidv4' }).optional().messages({ 'string.guid': 'Batch ID must be a valid UUID.' }),
+    studentId: Joi.string().guid({ version: 'uuidv4' }).optional().messages({ 'string.guid': 'Student ID must be a valid UUID.' }),
+    title: Joi.string().max(100).optional().messages({ 'string.max': 'Title must not exceed 100 characters.' }),
+    details: Joi.string().max(1000).optional().messages({ 'string.max': 'Details must not exceed 1000 characters.' }),
+    attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
 }).or(
     'publishDate', 'submissionDate', 'batchId', 'studentId', 'title', 'details', 'attachmentUrls'
 ).unknown(false);
@@ -56,7 +56,7 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     console.log(JSON.stringify(req.body))
-    const {error} = assignmentSchema.validate(req.body);
+    const { error } = assignmentSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
@@ -67,7 +67,7 @@ router.post('/', async (req, res) => {
 });
 /* API to update the assigment */
 router.put('/:id', async (req, res) => {
-    const {error} = assignmentUpdateSchema.validate(req.body);
+    const { error } = assignmentUpdateSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
@@ -82,8 +82,8 @@ router.delete('/:id', async (req, res) => {
     console.log('Deleting assigment with id {}', req.params.id);
     let response = await deleteById(req.params.id);
     buildSuccessResponse(res, 200, response)
-    console.log('deleted assigment {}', req.params.id );
+    console.log('deleted assigment {}', req.params.id);
 });
-   
+
 
 module.exports = router;

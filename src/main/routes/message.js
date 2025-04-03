@@ -10,6 +10,7 @@ const {
     getByBatchId,
 } = require('../services/messageService');
 const authMiddleware = require("../middleware/authMiddleware");
+const { dateValidator } = require("../common/dateValidator");
 
 const router = express.Router();
 router.use(express.json());
@@ -31,7 +32,7 @@ const messageSchema = Joi.object({
     }),
     receiverName: Joi.string().optional().messages({ 'string.base': 'Receiver name must be a string.' }),
     batchId: Joi.string().required().messages({ 'string.guid': 'Batch ID must be a valid UUID.' }),
-    timestamp: Joi.date().optional().messages({ 'date.base': 'Timestamp must be a valid date.' }),
+    timestamp: Joi.string().custom(dateValidator).optional().messages({ 'date.base': 'Timestamp must be a valid date.' }),
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
     replies: Joi.array().items(Joi.object({
         content: Joi.string().required().messages({ 'string.base': 'Content must be a string.' }),
@@ -41,7 +42,7 @@ const messageSchema = Joi.object({
             'any.only': 'Sender type must be either "TEACHER" or "STUDENT".'
         }),
         senderName: Joi.string().optional().messages({ 'string.base': 'Sender name must be a string.' }),
-        timestamp: Joi.date().required().messages({ 'date.base': 'Timestamp must be a valid date.' }),
+        timestamp: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Timestamp must be a valid date.' }),
         attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
     })).optional()
 
@@ -69,7 +70,7 @@ const messageUpdateSchema = Joi.object({
             'any.only': 'Sender type must be either "TEACHER" or "STUDENT".'
         }),
         senderName: Joi.string().optional().messages({ 'string.base': 'Sender name must be a string.' }),
-        timestamp: Joi.date().optional().messages({ 'date.base': 'Timestamp must be a valid date.' }),
+        timestamp: Joi.string().custom(dateValidator).optional().messages({ 'date.base': 'Timestamp must be a valid date.' }),
         attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
     })).optional()
 }).or('content', 'attachmentUrls', 'replies').unknown(false);
@@ -83,7 +84,7 @@ const replyUpdateSchema = Joi.object({
         'any.only': 'Sender type must be either "TEACHER" or "STUDENT".'
     }),
     senderName: Joi.string().optional().messages({ 'string.base': 'Sender name must be a string.' }),
-    timestamp: Joi.date().optional().messages({ 'date.base': 'Timestamp must be a valid date.' }),
+    timestamp: Joi.string().custom(dateValidator).optional().messages({ 'date.base': 'Timestamp must be a valid date.' }),
     attachmentUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
 }).unknown(false);
 
