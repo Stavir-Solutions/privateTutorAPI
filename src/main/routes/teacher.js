@@ -70,13 +70,11 @@ const teacherSchema = Joi.object({
 const teacherUpdateSchema = Joi.object({
     firstName: Joi.string().optional().messages({ 'string.max': 'First name should not exceed 50 characters.' }),
     lastName: Joi.string().optional().messages({ 'string.max': 'Last name should not exceed 50 characters.' }),
-   userName: Joi.string().alphanum().min(3).max(30).required().messages({
-           'string.alphanum': 'Username must be alphanumeric.',
-           'string.min': 'Username must be at least 3 characters long.',
-           'string.max': 'Username must not exceed 30 characters.'
-       }),
-   
-
+    userName: Joi.string().alphanum().min(3).max(30).required().messages({
+        'string.alphanum': 'Username must be alphanumeric.',
+        'string.min': 'Username must be at least 3 characters long.',
+        'string.max': 'Username must not exceed 30 characters.'
+    }),
     password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+={}:;,.<>?`~|-]*$')).optional().messages({
         'string.min': 'Password must be at least 6 characters long.',
         'string.max': 'Password must not exceed 20 characters.',
@@ -85,9 +83,9 @@ const teacherUpdateSchema = Joi.object({
     age: Joi.number().integer().min(18).optional().messages({
         'number.base': 'Age must be a number.',
         'number.min': 'Age must be at least 18.'
-}),
+    }),
     gender: Joi.string().valid('male', 'female', 'do not reveal').optional().messages({
-      'string.base': 'Gender must be a string.',
+        'string.base': 'Gender must be a string.',
         'any.only': 'Gender must be one of the following: male, female, or do not reveal.'
     }),
     addressLine1: Joi.string().optional().messages({

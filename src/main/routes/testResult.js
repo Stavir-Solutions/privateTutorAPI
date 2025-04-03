@@ -7,7 +7,7 @@ const { marshall } = require('@aws-sdk/util-dynamodb');
 
 const router = express.Router();
 router.use(express.json());
-router.use(authMiddleware);const testResultSchema = Joi.object({
+router.use(authMiddleware); const testResultSchema = Joi.object({
     testId: Joi.string().guid({ version: 'uuidv4' }).required().messages({
         'string.guid': 'Test ID must be a valid UUID.'
     }),
