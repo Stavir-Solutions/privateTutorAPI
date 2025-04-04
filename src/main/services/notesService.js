@@ -10,7 +10,7 @@ const {
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 const { NotificationType } = require('../common/types');
 const { sendNotification } = require("./notificationService");
-const {getById: getBatchById} = require('./batchService');
+const { getById: getBatchById } = require('./batchService');
 
 const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 

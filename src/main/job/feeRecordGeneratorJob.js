@@ -1,6 +1,6 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
 const { v4: uuidv4 } = require("uuid");
-const { PutItemCommand, ScanCommand ,GetItemCommand} = require("@aws-sdk/client-dynamodb");
+const { PutItemCommand, ScanCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
 const { unmarshall, marshall } = require("@aws-sdk/util-dynamodb");
 const db = new DynamoDBClient({ region: "us-east-1" });
 const tableName = "FeeRecords";
@@ -14,21 +14,21 @@ const NotificationType = {
 
 function toNotificationEntity(notification) {
     return {
-        TableName : 'Notifications', 
+        TableName: 'Notifications',
         Item: marshall({
-            id: notification.id, 
+            id: notification.id,
             recipientId: notification.recipientId,
             recipientType: notification.recipientType,
             type: notification.type,
             title: notification.title,
             objectId: notification.objectId,
-            deeplink: notification.deeplink ,
+            deeplink: notification.deeplink,
             seen: notification.seen,
-            notificationTime:notification.notificationTime
+            notificationTime: notification.notificationTime
         },
-        { removeUndefinedValues: true }
+            { removeUndefinedValues: true }
 
-    )
+        )
     };
 }
 
@@ -48,7 +48,8 @@ async function create(feeRecord) {
 
         const existingRecords = await db.send(new ScanCommand(checkParams));
 
-        if (existingRecords.Items && existingRecords.Items.length > 0) {            console.log("Duplicate fee record found. Skipping:", feeRecord);
+        if (existingRecords.Items && existingRecords.Items.length > 0) {
+            console.log("Duplicate fee record found. Skipping:", feeRecord);
             await sendFeeRecordNotification(feeRecord);
             return { success: false, message: "Duplicate fee record exists. Skipping insertion." };
         }
@@ -72,7 +73,7 @@ async function create(feeRecord) {
 
 async function getById(batchId) {
     const params = {
-        TableName: "Batches", Key: marshall({id: batchId}),
+        TableName: "Batches", Key: marshall({ id: batchId }),
     };
 
     try {
@@ -110,36 +111,36 @@ async function sendNotification(objectId, recipientId, recipientType, type, noti
         console.error('Error saving notification:', error);
     }
 }
-    async function fetchBatches() {
-        const batchParams = { TableName: "Batches" };
-        const batchData = await db.send(new ScanCommand(batchParams));
-        return batchData.Items ? batchData.Items.map(item => unmarshall(item)) : [];
-    }
+async function fetchBatches() {
+    const batchParams = { TableName: "Batches" };
+    const batchData = await db.send(new ScanCommand(batchParams));
+    return batchData.Items ? batchData.Items.map(item => unmarshall(item)) : [];
+}
 
-    async function fetchStudents(batchId) {
-        const studentParams = {
-            TableName: "Students",
-            FilterExpression: "contains(batches, :batchId)",
-            ExpressionAttributeValues: marshall({ ":batchId": batchId }, { removeUndefinedValues: true }),
-        };
+async function fetchStudents(batchId) {
+    const studentParams = {
+        TableName: "Students",
+        FilterExpression: "contains(batches, :batchId)",
+        ExpressionAttributeValues: marshall({ ":batchId": batchId }, { removeUndefinedValues: true }),
+    };
 
-        const studentData = await db.send(new ScanCommand(studentParams));
-        return studentData.Items ? studentData.Items.map(item => unmarshall(item)) : [];
-    }
+    const studentData = await db.send(new ScanCommand(studentParams));
+    return studentData.Items ? studentData.Items.map(item => unmarshall(item)) : [];
+}
 
-    async function fetchGeneratedStudentIds(batchId, month) {
-        const feeParams = {
-            TableName: tableName,
-            FilterExpression: "batchId = :batchId AND #month = :month",
-            ExpressionAttributeNames: { "#month": "month" },
-            ExpressionAttributeValues: marshall({ ":batchId": batchId, ":month": month }, { removeUndefinedValues: true }),
-        };
+async function fetchGeneratedStudentIds(batchId, month) {
+    const feeParams = {
+        TableName: tableName,
+        FilterExpression: "batchId = :batchId AND #month = :month",
+        ExpressionAttributeNames: { "#month": "month" },
+        ExpressionAttributeValues: marshall({ ":batchId": batchId, ":month": month }, { removeUndefinedValues: true }),
+    };
 
-        const feeData = await db.send(new ScanCommand(feeParams));
-        return feeData.Items ? feeData.Items.map(item => unmarshall(item).studentId) : [];
-    }
+    const feeData = await db.send(new ScanCommand(feeParams));
+    return feeData.Items ? feeData.Items.map(item => unmarshall(item).studentId) : [];
+}
 
-    
+
 async function sendFeeRecordNotification(feeRecord) {
     const { batchId, studentId, amount, dueDate, month } = feeRecord;
     let recipients = [];
@@ -158,68 +159,68 @@ async function sendFeeRecordNotification(feeRecord) {
 
     for (const recipient of recipients) {
 
-        await sendNotification(feeRecord.id, recipient.id, recipient.type,NotificationType. FEE_INVOICE_RELEASED,
+        await sendNotification(feeRecord.id, recipient.id, recipient.type, NotificationType.FEE_INVOICE_RELEASED,
             `Fee invoice of Rs.${amount} has been generated for the month of ${month}`,
-             `smart-teacher.com/fee-invoice/${feeRecord.id}` 
+            `smart-teacher.com/fee-invoice/${feeRecord.id}`
         );
 
     }
 
 }
-    async function generateFeeRecords() {
-        try {
-            const today = new Date();
-            const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+async function generateFeeRecords() {
+    try {
+        const today = new Date();
+        const currentMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
 
-            const batches = await fetchBatches();
-            console.log("Batches found:", batches);
+        const batches = await fetchBatches();
+        console.log("Batches found:", batches);
 
-            for (const batch of batches) {
-                if (!batch.id || !batch.paymentAmount) {
-                    console.warn("Skipping batch with missing ID or payment amount", batch);
+        for (const batch of batches) {
+            if (!batch.id || !batch.paymentAmount) {
+                console.warn("Skipping batch with missing ID or payment amount", batch);
+                continue;
+            }
+
+            const students = await fetchStudents(batch.id);
+            console.log(`Students found for batch ${batch.id}:`, students);
+
+            const alreadyGeneratedStudentIds = await fetchGeneratedStudentIds(batch.id, currentMonth);
+            console.log(`Already generated student IDs for batch ${batch.id}:`, alreadyGeneratedStudentIds);
+
+            const remainingStudents = students.filter(student => !alreadyGeneratedStudentIds.includes(student.id));
+            console.log(`Remaining students for batch ${batch.id}:`, remainingStudents);
+
+            for (const student of remainingStudents) {
+                if (!student.id) {
+                    console.warn("Skipping student with missing ID", student);
                     continue;
                 }
 
-                const students = await fetchStudents(batch.id);
-                console.log(`Students found for batch ${batch.id}:`, students);
+                const feeRecord = {
+                    id: uuidv4(),
+                    batchId: batch.id,
+                    studentId: student.id,
+                    month: currentMonth,
+                    dueDate: new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString(),
+                    paymentDate: new Date(today.getFullYear(), today.getMonth() + 1, 5).toISOString(),
+                    amount: batch.paymentAmount,
+                    status: StatusEnum.PENDING,
+                    createdAt: today.toISOString(),
+                    teacherAcknowledgement: true,
+                    notes: `Your fee invoice for the month of ${currentMonth}`,
+                };
 
-                const alreadyGeneratedStudentIds = await fetchGeneratedStudentIds(batch.id, currentMonth);
-                console.log(`Already generated student IDs for batch ${batch.id}:`, alreadyGeneratedStudentIds);
-
-                const remainingStudents = students.filter(student => !alreadyGeneratedStudentIds.includes(student.id));
-                console.log(`Remaining students for batch ${batch.id}:`, remainingStudents);
-
-                for (const student of remainingStudents) {
-                    if (!student.id) {
-                        console.warn("Skipping student with missing ID", student);
-                        continue;
-                    }
-
-                    const feeRecord = {
-                        id: uuidv4(),
-                        batchId: batch.id,
-                        studentId: student.id,
-                        month: currentMonth,
-                        dueDate: new Date(today.getFullYear(), today.getMonth() + 1, 0).toISOString(),
-                        paymentDate: new Date(today.getFullYear(), today.getMonth() + 1, 5).toISOString(),
-                        amount: batch.paymentAmount,
-                        status: StatusEnum.PENDING,
-                        createdAt: today.toISOString(),
-                        teacherAcknowledgement: true,
-                        notes: `Your fee invoice for the month of ${currentMonth}`,
-                    };
-
-                    console.log("Creating Fee Record:", feeRecord);
-                    await create(feeRecord);
-                }
+                console.log("Creating Fee Record:", feeRecord);
+                await create(feeRecord);
             }
-
-            console.log(`Fee records created.`);
-            return { status: StatusEnum.SUCCESS };
-        } catch (error) {
-            console.error("Error:", error);
-            return { status: StatusEnum.ERROR, message: error.message };
         }
-    }
 
-    module.exports = { generateFeeRecords, create };
+        console.log(`Fee records created.`);
+        return { status: StatusEnum.SUCCESS };
+    } catch (error) {
+        console.error("Error:", error);
+        return { status: StatusEnum.ERROR, message: error.message };
+    }
+}
+
+module.exports = { generateFeeRecords, create };
