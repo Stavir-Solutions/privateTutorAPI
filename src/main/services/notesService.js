@@ -1,4 +1,4 @@
-const {toNotesEntity} = require('../db/mappers/notesMapper');
+const { toNotesEntity } = require('../db/mappers/notesMapper');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand,
@@ -7,25 +7,55 @@ const {
     ScanCommand,
     DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
-const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
+const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
+const { NotificationType } = require('../common/types');
+const { sendNotification } = require("./notificationService");
+const {getById: getBatchById} = require('./batchService');
 
+const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Notes";
 
-async function create(notes) {
-    let notesEntity = toNotesEntity(notes);
-    console.log('converted to entity ', notesEntity);
+async function sendNotesNotification(notes, notesId) {
+    const { batchId, studentId } = notes;
 
-    await db.send(new PutItemCommand(notesEntity, function (err, data) {
-        if (err) {
-            console.error('Unable to add notes. Error JSON:', JSON.stringify(err, null, 2));
-        } else {
-            console.log('PutItem succeeded:', JSON.stringify(data, null, 2));
-        }
-    }));
-    return unmarshall(notesEntity.Item).id;
+    let recipients = [];
+    let batchName = "Unknown Batch";
+    console.log("Notes Details:", notes);
+
+    if (batchId) {
+        const batchDetails = await getBatchById(batchId);
+        console.log("Batch Details Retrieved:", batchDetails);
+        batchName = batchDetails?.name || "Unknown Batch";
+    }
+
+    if (studentId) {
+        recipients.push({ id: studentId, type: "STUDENT" });
+    }
+
+    if (recipients.length === 0) {
+        console.error("No recipients found for the notes notification.");
+        return;
+    }
+    for (const recipient of recipients) {
+        await sendNotification(notesId, recipient.id, recipient.type, NotificationType.NOTES, `A new notes is added to ${batchName}`, `${DEEPLINK_BASE_URL}/notes/${notesId}`);
+    }
 }
 
+async function create(notes) {
+    const notesEntity = toNotesEntity(notes);
+    console.log('Converted to entity:', notesEntity);
+    const notesId = unmarshall(notesEntity.Item).id;
+    try {
+        await db.send(new PutItemCommand(notesEntity));
+        console.log('notes added successfully.');
+        await sendNotesNotification(notes, notesId);
+        return notesId;
+    } catch (err) {
+        console.error('Unable to add notes:', err);
+        throw err;
+    }
+}
 
 async function updateNotes(notesId, notesFields) {
     const updateExpression = [];
@@ -45,7 +75,7 @@ async function updateNotes(notesId, notesFields) {
 
     const params = {
         TableName: tableName,
-        Key: {id: {S: notesId}},
+        Key: { id: { S: notesId } },
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -55,7 +85,9 @@ async function updateNotes(notesId, notesFields) {
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return data.Attributes ? unmarshall(data.Attributes) : {}; 
+        const updatedNotes = data.Attributes ? unmarshall(data.Attributes) : {};
+        await sendNotesNotification(updatedNotes);
+        return updatedNotes;
     } catch (err) {
         console.error('Unable to update notes. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
@@ -101,8 +133,8 @@ async function getByStudentId(studentId) {
 
 async function deleteById(notesId) {
     const params = {
-        TableName: tableName, 
-        Key: marshall({id: notesId}),
+        TableName: tableName,
+        Key: marshall({ id: notesId }),
     };
 
     try {
@@ -116,5 +148,4 @@ async function deleteById(notesId) {
 }
 
 
-module.exports = {create,updateNotes, getByStudentId, deleteById,getByBatchId}
-
+module.exports = { create, updateNotes, getByStudentId, deleteById, getByBatchId }
