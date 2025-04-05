@@ -5,7 +5,8 @@ const NotificationType = {
     NEW_STUDENT: 'NEW_STUDENT',
     FEE_INVOICE_RELEASED: 'FEE_INVOICE_RELEASED',
     FEE_PAYMENT_CONFIRMED: 'FEE_PAYMENT_CONFIRMED',
-    ASSIGNMENT: 'ASSIGNMENT'
+    ASSIGNMENT: 'ASSIGNMENT',
+    NOTES: 'NOTES',
 };
 
 const TokenType = {
@@ -17,4 +18,4 @@ const UserType = {
 };
 
 
-module.exports = {NotificationType, TokenType, UserType};
+module.exports = { NotificationType, TokenType, UserType };
