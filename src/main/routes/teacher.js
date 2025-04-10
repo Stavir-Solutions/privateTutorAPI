@@ -70,7 +70,7 @@ const teacherSchema = Joi.object({
 const teacherUpdateSchema = Joi.object({
     firstName: Joi.string().optional().messages({ 'string.max': 'First name should not exceed 50 characters.' }),
     lastName: Joi.string().optional().messages({ 'string.max': 'Last name should not exceed 50 characters.' }),
-    userName: Joi.string().alphanum().min(3).max(30).required().messages({
+    userName: Joi.string().alphanum().min(3).max(30).optional().messages({
         'string.alphanum': 'Username must be alphanumeric.',
         'string.min': 'Username must be at least 3 characters long.',
         'string.max': 'Username must not exceed 30 characters.'
