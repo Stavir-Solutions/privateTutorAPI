@@ -58,7 +58,7 @@ const studentUpdateSchema = Joi.object({
         'string.min': 'Username must be at least 3 characters long.',
         'string.max': 'Username must not exceed 30 characters.'
     }),
-    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+={}:;,.<>?`~|-]*$')).required().messages({
+    password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+={}:;,.<>?`~|-]*$')).optional().messages({
         'string.min': 'Password must be at least 6 characters long.',
         'string.max': 'Password must not exceed 20 characters.',
         'string.pattern.name': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
