@@ -26,8 +26,11 @@ const upload = multer({
 });
 
 router.post('/', upload.single('file'), async (req, res) => {
+    let uploadId = UUIDGenerator.generate();
+    const { userType, userId, uploadType } = req.body;
+    let fileLocation = userType+'/'+userId+'/'+uploadType+'/'+uploadId+'/'+req.file.originalname;
     const params = {
-        Bucket: process.env.S3BucketName, Key: req.file.originalname, Body: req.file.buffer,
+        Bucket: process.env.S3BucketName, Key: fileLocation, Body: req.file.buffer,
     };
 
     try {
