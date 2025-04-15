@@ -162,7 +162,7 @@ async function generateTokenForStudentFromRefreshToken(payload, res, refreshToke
 async function generateNewTokenFromRefreshToken(payload, res, refreshToken) {
     if (payload.userType === UserType.TEACHER) {
         return await generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
-    } else if (payload.role === UserType.STUDENT) {
+    } else if (payload.userType === UserType.STUDENT) {
         return await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
     } else {
         return buildErrorMessage(res, 401, 'Invalid refreshToken, login again');
