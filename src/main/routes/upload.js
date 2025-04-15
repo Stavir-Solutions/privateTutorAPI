@@ -8,7 +8,7 @@ const {UserType} = require('../common/types');  // Assuming you have types for u
 const router = express.Router();
 router.use(express.json());
 router.use(authMiddleware);
-
+const {getFileLocation} = require('../utils/fileUtils');
 const s3Config = {
     region: process.env.region,
     credentials: {
@@ -30,31 +30,6 @@ const upload = multer({
     },
 });
 
-const getFileLocation = (userType, userId, uploadType, uploadId, fileName) => {
-    let fileLocation = '';
-
-    if (userType === UserType.TEACHER) {
-        if (uploadType === 'notes') {
-            fileLocation = `teachers/${userId}/notes/${uploadId}/${fileName}`;
-        } else if (uploadType === 'assignments') {
-            fileLocation = `teachers/${userId}/assignments/${uploadId}/${fileName}`;
-        } else {
-            throw new Error('Invalid upload type for teacher');
-        }
-    } else if (userType === UserType.STUDENT) {
-        if (uploadType === 'notes') {
-            fileLocation = `students/${userId}/notes/${uploadId}/${fileName}`;
-        } else if (uploadType === 'assignments') {
-            fileLocation = `students/${userId}/assignments/${uploadId}/${fileName}`;
-        } else {
-            throw new Error('Invalid upload type for student');
-        }
-    } else {
-        throw new Error('Invalid user type');
-    }
-
-    return fileLocation;
-};
 router.post('/', upload.single('file'), async (req, res) => {
     let uploadId = generateUUID();
     const {userType, userId, uploadType} = req.body;
