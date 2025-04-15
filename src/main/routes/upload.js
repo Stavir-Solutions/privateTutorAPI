@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const { NodeHttpHandler } = require('@aws-sdk/node-http-handler');
+const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
+const {NodeHttpHandler} = require('@aws-sdk/node-http-handler');
 const authMiddleware = require("../middleware/authMiddleware");
 const {generateUUID} = require('../db/UUIDGenerator');
 const {UserType} = require('../common/types');  // Assuming you have types for user type
@@ -30,61 +30,60 @@ const upload = multer({
     },
 });
 
-router.post('/', upload.single('file'), async (req, res) => {
-    let uploadId = generateUUID();  // Generates a unique upload ID for each upload
-    const { userType, userId, uploadType } = req.body;
-
-    // Validate required fields
-    if (!userType || !userId || !uploadType || !req.file) {
-        return res.status(400).send('Missing required fields: userType, userId, uploadType, or file');
-    }
-
-    // Default file location, separate for teacher and student
+const getFileLocation = (userType, userId, uploadType, uploadId, fileName) => {
     let fileLocation = '';
 
-    // For teacher or student, and based on upload type (notes or assignments)
     if (userType === UserType.TEACHER) {
         if (uploadType === 'notes') {
-            fileLocation = `teachers/${userId}/notes/${uploadId}/${req.file.originalname}`;
+            fileLocation = `teachers/${userId}/notes/${uploadId}/${fileName}`;
         } else if (uploadType === 'assignments') {
-            fileLocation = `teachers/${userId}/assignments/${uploadId}/${req.file.originalname}`;
+            fileLocation = `teachers/${userId}/assignments/${uploadId}/${fileName}`;
         } else {
-            // Handle other upload types if necessary
-            return res.status(400).send('Invalid upload type for teacher');
+            throw new Error('Invalid upload type for teacher');
         }
     } else if (userType === UserType.STUDENT) {
         if (uploadType === 'notes') {
-            fileLocation = `students/${userId}/notes/${uploadId}/${req.file.originalname}`;
+            fileLocation = `students/${userId}/notes/${uploadId}/${fileName}`;
         } else if (uploadType === 'assignments') {
-            fileLocation = `students/${userId}/assignments/${uploadId}/${req.file.originalname}`;
+            fileLocation = `students/${userId}/assignments/${uploadId}/${fileName}`;
         } else {
-            // Handle other upload types if necessary
-            return res.status(400).send('Invalid upload type for student');
+            throw new Error('Invalid upload type for student');
         }
     } else {
-        // Handle case for invalid userType
-        return res.status(400).send('Invalid user type');
+        throw new Error('Invalid user type');
     }
 
-    const params = {
-        Bucket: process.env.S3BucketName,
-        Key: fileLocation,
-        Body: req.file.buffer,
-    };
+    return fileLocation;
+};
+router.post('/', upload.single('file'), async (req, res) => {
+    let uploadId = generateUUID();
+    const {userType, userId, uploadType} = req.body;
 
+    if (!userType || !userId || !uploadType || !req.file) {
+        return res.status(400).send('Missing required fields: userType, userId, uploadType, or file');
+    }
     try {
+        const fileLocation = getFileLocation(userType, userId, uploadType, uploadId, req.file.originalname);
+
+
+        const params = {
+            Bucket: process.env.S3BucketName,
+            Key: fileLocation,
+            Body: req.file.buffer,
+        };
+
+
         console.log('Uploading file with params:', params);
         let response = await s3Client.send(new PutObjectCommand(params));
         console.log('File uploaded successfully:', response);
 
-        // Construct the URL of the uploaded file
         const fileUrl = `https://${params.Bucket}.s3.${process.env.region}.amazonaws.com/${encodeURIComponent(params.Key)}`;
 
-        // Respond with the file URL
-        res.send({ url: fileUrl });
+        res.send({url: fileUrl});
     } catch (err) {
         console.error('Error:', err);
         res.status(500).send('Error uploading file to S3');
+
     }
 });
 
