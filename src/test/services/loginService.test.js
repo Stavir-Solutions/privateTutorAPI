@@ -24,6 +24,7 @@ const {getStudentById} = require("../../main/services/studentService");
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 const {teacherService} = require("../../main/services/teacherService");
 const {buildSuccessResponse, buildErrorMessage} = require("../../main/routes/responseUtils");
+const responseUtils = require("../../main/routes/responseUtils");
 const {TokenType, UserType} = require("../../main/common/types");
 describe('getTeacherIfPasswordMatches', () => {
     let dbStub;
@@ -248,7 +249,7 @@ describe('buildTeacherPayload', () => {
             profilePicUrl: 'teacherURL',
             age: 30,
             gender: 'male',
-            userType: UserType.Teacher,
+            userType: UserType.TEACHER,
             tokenType: TokenType.ACCESS
         });
     });
@@ -364,53 +365,6 @@ describe('validateToken', () => {
         expect(jwtStub.calledWith(token, mockPublicKey)).to.be.true;
     });
 });
-describe('generateNewTokenFromRefreshToken', function () {
-    let res, payload, refreshToken;
-
-    beforeEach(function () {
-        res = {
-            status: sinon.stub().returnsThis(), json: sinon.stub()
-        };
-        refreshToken = 'dummyRefreshToken';
-        sinon.stub(generateTokenForTeacherFromRefreshToken).resolves('newTeacherToken');
-        sinon.stub(generateTokenForStudentFromRefreshToken).resolves('newStudentToken');
-        sinon.stub(buildErrorMessage);
-    });
-
-    afterEach(function () {
-        sinon.restore();
-    });
-
-    it('should generate a new token for a TEACHER userType', async function () {
-        payload = {userType: 'TEACHER'};
-
-        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
-
-        expect(generateTokenForTeacherFromRefreshToken).to.have.been.calledOnce;
-        expect(generateTokenForStudentFromRefreshToken).to.not.have.been.called;
-        expect(buildErrorMessage).to.not.have.been.called;
-    });
-
-    it('should generate a new token for a STUDENT role', async function () {
-        payload = {role: 'STUDENT'};
-
-        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
-
-        expect(generateTokenForStudentFromRefreshToken).to.have.been.calledOnce;
-        expect(generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
-        expect(buildErrorMessage).to.not.have.been.called;
-    });
-
-    it('should return an error for an invalid userType/role', async function () {
-        payload = {userType: 'INVALID'};
-
-        await generateNewTokenFromRefreshToken(payload, res, refreshToken);
-
-        expect(buildErrorMessage).to.have.been.calledWith(res, 401, 'Invalid refreshToken, login again');
-        expect(generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
-        expect(generateTokenForStudentFromRefreshToken).to.not.have.been.called;
-    });
-});
 
 describe('generateTokenForTeacherFromRefreshToken', function () {
     let res, payload, refreshToken;
@@ -419,11 +373,12 @@ describe('generateTokenForTeacherFromRefreshToken', function () {
         res = {
             status: sinon.stub().returnsThis(), json: sinon.stub()
         };
+
         payload = {id: 'teacher123'};
         refreshToken = 'nonRefreshToken';
         sinon.stub(teacherService, 'getTeacherById');
-        sinon.stub(buildErrorMessage);
-        sinon.stub(buildSuccessResponse);
+        sinon.stub(responseUtils,'buildErrorMessage');
+        sinon.stub(responseUtils,'buildSuccessResponse');
         sinon.stub(loginService, 'generateAccessToken').resolves('newAccessToken');
         sinon.stub(loginService, 'buildTeacherPayload').returns({id: 'teacher-id', userName: 'username '});
     });
@@ -433,9 +388,9 @@ describe('generateTokenForTeacherFromRefreshToken', function () {
     });
     it('should return new access token if teacher exists', async function () {
         teacherService.getTeacherById.resolves({id: 'teacher-id', userName: 'username'});
-        await generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
+        await loginService. generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
 
-        expect(buildSuccessResponse.calledWith(res, 200, {
+        expect(responseUtils.buildSuccessResponse.calledWith(res, 200, {
             token: 'newAccessToken', refreshToken: refreshToken
         })).to.be.true;
     });
@@ -443,13 +398,14 @@ describe('generateTokenForTeacherFromRefreshToken', function () {
     it('should return error if teacher does not exist', async function () {
         getTeacherById.resolves(null);
 
-        await generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
+        await loginService.generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
 
-        expect(buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, teach does not exist', payload.id)).to.be.true;
+        expect(responseUtils.buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, teach does not exist', payload.id)).to.be.true;
     });
 });
 describe('generateTokenForStudentFromRefreshToken', function () {
     let res, payload, refreshToken;
+
 
     beforeEach(function () {
         res = {
@@ -457,11 +413,11 @@ describe('generateTokenForStudentFromRefreshToken', function () {
         };
         payload = {id: 'student123'};
         refreshToken = 'nonRefreshToken';
-        sinon.stub(getStudentById);
-        sinon.stub(buildErrorMessage);
-        sinon.stub(buildSuccessResponse);
-        sinon.stub(generateAccessToken).resolves('newAccessToken');
-        sinon.stub(buildStudentPayload).returns({id: 'student-id', userName: 'username'});
+        sinon.stub(studentService,'getStudentById');
+        sinon.stub(responseUtils,'buildErrorMessage');
+        sinon.stub(responseUtils,'buildSuccessResponse');
+        sinon.stub(loginService,'generateAccessToken').resolves('newAccessToken');
+        sinon.stub(loginService,'buildStudentPayload').returns({id: 'student-id', userName: 'username'});
     });
 
     afterEach(function () {
@@ -471,18 +427,66 @@ describe('generateTokenForStudentFromRefreshToken', function () {
     it('should return new access token if student exists', async function () {
         getStudentById.resolves({id: 'student-id', userName: 'username'});
 
-        await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
+        await loginService.generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
 
-        expect(buildSuccessResponse.calledWith(res, 200, {
+        expect(responseUtils.buildSuccessResponse.calledWith(res, 200, {
             token: 'newAccessToken', refreshToken: refreshToken
         })).to.be.true;
     });
     it('should return error if student does not exist', async function () {
         getStudentById.resolves(null);
 
-        await generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
+        await loginService.generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
 
-        expect(buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, login again')).to.be.true;
+        expect(responseUtils.buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, login again')).to.be.true;
+    });
+});
+
+
+describe('generateNewTokenFromRefreshToken', function () {
+    let res, payload, refreshToken;
+
+    beforeEach(function () {
+        res = {
+            status: sinon.stub().returnsThis(), json: sinon.stub()
+        };
+        refreshToken = 'dummyRefreshToken';
+        sinon.stub(loginService,'generateTokenForTeacherFromRefreshToken').resolves('newTeacherToken');
+        sinon.stub(loginService,'generateTokenForStudentFromRefreshToken').resolves('newStudentToken');
+        sinon.stub(responseUtils,'buildErrorMessage');
     });
 
+    afterEach(function () {
+        sinon.restore();
+    });
+
+    it('should generate a new token for a TEACHER userType', async function () {
+        payload = {userType: 'TEACHER'};
+
+        await loginService. generateNewTokenFromRefreshToken(payload, res, refreshToken);
+
+        expect(loginService.generateTokenForTeacherFromRefreshToken).to.have.been.calledOnce;
+        expect(loginService.generateTokenForStudentFromRefreshToken).to.not.have.been.called;
+        expect(responseUtils.buildErrorMessage).to.not.have.been.called;
+    });
+
+    it('should generate a new token for a STUDENT userType', async function () {
+        payload = {UserType: 'STUDENT'};
+
+        await loginService.generateNewTokenFromRefreshToken(payload, res, refreshToken);
+
+        expect(loginService.generateTokenForStudentFromRefreshToken).to.have.been.calledOnce;
+        expect(loginService.generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
+        expect(responseUtils.buildErrorMessage).to.not.have.been.called;
+    });
+
+    it('should return an error for an invalid userType', async function () {
+        payload = {userType: 'INVALID'};
+
+        await loginService.generateNewTokenFromRefreshToken(payload, res, refreshToken);
+
+        expect(responseUtils.buildErrorMessage).to.have.been.calledWith(res, 401, 'Invalid refreshToken, login again');
+        expect(loginService.generateTokenForTeacherFromRefreshToken).to.not.have.been.called;
+        expect(loginService.generateTokenForStudentFromRefreshToken).to.not.have.been.called;
+    });
 });

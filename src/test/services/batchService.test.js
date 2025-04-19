@@ -5,13 +5,15 @@ const { create} = require('../../main/services/batchService');
 const { deleteById} = require('../../main/services/batchService');
 const { getById} = require('../../main/services/batchService');
 const { getByTeacherId} = require('../../main/services/batchService');
-
+const { getByStudentId} = require('../../main/services/batchService');
+const studentService = require('../../main/services/studentService');
 const db = require('../../main/db/dynamodb');
 const { GetItemCommand } = require('@aws-sdk/client-dynamodb');
 const {UpdateItemCommand} = require('@aws-sdk/client-dynamodb');
 const {PutItemCommand} = require('@aws-sdk/client-dynamodb');
 const {DeleteItemCommand} = require('@aws-sdk/client-dynamodb');
 const { ScanCommand } = require('@aws-sdk/client-dynamodb');
+const {BatchGetItemCommand} = require('@aws-sdk/client-dynamodb');
 
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 
@@ -257,10 +259,10 @@ describe('getById', () => {
     it('should return the batch when found', async () => {
         //given
         const batchId = 'batch-id';
-        const batchItem = { id: batchId, name: 'batch name' };
+        const batchItem = {id: batchId, name: 'batch name'};
         const marshalledItem = marshall(batchItem);
 
-        dbStub.resolves({ Item: marshalledItem });
+        dbStub.resolves({Item: marshalledItem});
 
         //when
         const result = await getById(batchId);
@@ -296,5 +298,102 @@ describe('getById', () => {
         }
         expect(dbStub.calledOnce).to.be.true;
         expect(dbStub.calledWith(sinon.match.instanceOf(GetItemCommand))).to.be.true;
+    });
+});
+describe('getByStudentId', () => {
+    let dbStub;
+    let studentServiceStub;
+
+    beforeEach(() => {
+        dbStub = sinon.stub(db, 'send');
+        studentServiceStub = sinon.stub(studentService, 'getStudentByIdWithBatchName');
+    });
+
+    afterEach(() => {
+        dbStub.restore();
+        studentServiceStub.restore();
+    });
+
+    it('should return an error if the student is not found', async () => {
+        const studentId = 'student-id';
+        studentServiceStub.resolves(null);
+
+        const result = await getByStudentId(studentId);
+
+        expect(result).to.deep.equal({success: false, message: 'Student not found',});
+        expect(studentServiceStub.calledOnce).to.be.true;
+        expect(dbStub.notCalled).to.be.true;
+    });
+
+    it('should return no batches if the student has no associated batches', async () => {
+        // Arrange
+        const studentId = 'student-id';
+        studentServiceStub.resolves({ batches: [] });
+
+        // Act
+        const result = await getByStudentId(studentId);
+
+        // Assert
+        expect(result).to.deep.equal({
+            success: true,
+            student: { batches: [] },
+            batches: [],
+            message: 'No batches found',
+        });
+        expect(studentServiceStub.calledOnce).to.be.true;
+        expect(dbStub.notCalled).to.be.true;
+    });
+
+    it('should fetch and return batch details when student has batches', async () => {
+        // Arrange
+        const studentId = 'student-id';
+        const studentData = {
+            batches: [{ id: 'batch1' }, { id: 'batch2' }],
+        };
+
+        studentServiceStub.resolves(studentData);
+
+        const batchData = {
+            Responses: {
+                Batches: [
+                    { id: { S: 'batch1' }, name: { S: 'Batch 1' } },
+                    { id: { S: 'batch2' }, name: { S: 'Batch 2' } },
+                ],
+            },
+        };
+
+        dbStub.resolves(batchData);
+
+        // Act
+        const result = await getByStudentId(studentId);
+
+        // Assert
+        expect(result).to.deep.equal({
+            batches: [
+                { id: 'batch1', name: 'Batch 1' },
+                { id: 'batch2', name: 'Batch 2' },
+            ],
+        });
+        expect(studentServiceStub.calledOnce).to.be.true;
+        expect(dbStub.calledOnce).to.be.true;
+        expect(dbStub.calledWith(sinon.match.instanceOf(BatchGetItemCommand))).to.be.true;
+    });
+
+    it('should throw an error when the db call fails', async () => {
+        const studentId = 'student-id';
+        studentServiceStub.resolves({
+            batches: [{ id: 'batch1' }],
+        });
+        const errorMessage = 'DB error';
+        dbStub.rejects(new Error(errorMessage));
+
+        const result = await getByStudentId(studentId);
+
+        expect(result).to.deep.equal({
+            error: errorMessage,
+        });
+        expect(studentServiceStub.calledOnce).to.be.false;
+        expect(dbStub.calledOnce).to.be.true;
+        expect(dbStub.calledWith(sinon.match.instanceOf(BatchGetItemCommand))).to.be.true;
     });
 });
