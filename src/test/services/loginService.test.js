@@ -377,8 +377,8 @@ describe('generateTokenForTeacherFromRefreshToken', function () {
         payload = {id: 'teacher123'};
         refreshToken = 'nonRefreshToken';
         sinon.stub(teacherService, 'getTeacherById');
-        sinon.stub(responseUtils,'buildErrorMessage');
-        sinon.stub(responseUtils,'buildSuccessResponse');
+        sinon.stub(responseUtils, 'buildErrorMessage');
+        sinon.stub(responseUtils, 'buildSuccessResponse');
         sinon.stub(loginService, 'generateAccessToken').resolves('newAccessToken');
         sinon.stub(loginService, 'buildTeacherPayload').returns({id: 'teacher-id', userName: 'username '});
     });
@@ -388,7 +388,7 @@ describe('generateTokenForTeacherFromRefreshToken', function () {
     });
     it('should return new access token if teacher exists', async function () {
         teacherService.getTeacherById.resolves({id: 'teacher-id', userName: 'username'});
-        await loginService. generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
+        await loginService.generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
 
         expect(responseUtils.buildSuccessResponse.calledWith(res, 200, {
             token: 'newAccessToken', refreshToken: refreshToken
@@ -413,11 +413,11 @@ describe('generateTokenForStudentFromRefreshToken', function () {
         };
         payload = {id: 'student123'};
         refreshToken = 'nonRefreshToken';
-        sinon.stub(studentService,'getStudentById');
-        sinon.stub(responseUtils,'buildErrorMessage');
-        sinon.stub(responseUtils,'buildSuccessResponse');
-        sinon.stub(loginService,'generateAccessToken').resolves('newAccessToken');
-        sinon.stub(loginService,'buildStudentPayload').returns({id: 'student-id', userName: 'username'});
+        sinon.stub(studentService, 'getStudentById');
+        sinon.stub(responseUtils, 'buildErrorMessage');
+        sinon.stub(responseUtils, 'buildSuccessResponse');
+        sinon.stub(loginService, 'generateAccessToken').resolves('newAccessToken');
+        sinon.stub(loginService, 'buildStudentPayload').returns({id: 'student-id', userName: 'username'});
     });
 
     afterEach(function () {
@@ -451,9 +451,9 @@ describe('generateNewTokenFromRefreshToken', function () {
             status: sinon.stub().returnsThis(), json: sinon.stub()
         };
         refreshToken = 'dummyRefreshToken';
-        sinon.stub(loginService,'generateTokenForTeacherFromRefreshToken').resolves('newTeacherToken');
-        sinon.stub(loginService,'generateTokenForStudentFromRefreshToken').resolves('newStudentToken');
-        sinon.stub(responseUtils,'buildErrorMessage');
+        sinon.stub(loginService, 'generateTokenForTeacherFromRefreshToken').resolves('newTeacherToken');
+        sinon.stub(loginService, 'generateTokenForStudentFromRefreshToken').resolves('newStudentToken');
+        sinon.stub(responseUtils, 'buildErrorMessage');
     });
 
     afterEach(function () {
@@ -463,7 +463,7 @@ describe('generateNewTokenFromRefreshToken', function () {
     it('should generate a new token for a TEACHER userType', async function () {
         payload = {userType: 'TEACHER'};
 
-        await loginService. generateNewTokenFromRefreshToken(payload, res, refreshToken);
+        await loginService.generateNewTokenFromRefreshToken(payload, res, refreshToken);
 
         expect(loginService.generateTokenForTeacherFromRefreshToken).to.have.been.calledOnce;
         expect(loginService.generateTokenForStudentFromRefreshToken).to.not.have.been.called;
