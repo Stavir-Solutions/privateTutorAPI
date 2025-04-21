@@ -7,6 +7,7 @@ const {getById} = require('../../main/services/batchService');
 const {getByTeacherId} = require('../../main/services/batchService');
 const {getByStudentId} = require('../../main/services/batchService');
 const studentService = require('../../main/services/studentService');
+const {getStudentByIdWithBatchName} = require('../../main/services/studentService');
 const db = require('../../main/db/dynamodb');
 const {GetItemCommand} = require('@aws-sdk/client-dynamodb');
 const {UpdateItemCommand} = require('@aws-sdk/client-dynamodb');
