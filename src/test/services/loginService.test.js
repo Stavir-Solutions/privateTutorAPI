@@ -22,10 +22,14 @@ const loginService = require('../../main/services/loginService');
 const {getTeacherById} = require("../../main/services/teacherService");
 const {getStudentById} = require("../../main/services/studentService");
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
-const {teacherService} = require("../../main/services/teacherService");
+const teacherService = require("../../main/services/teacherService");
+const studentService = require("../../main/services/studentService");
 const {buildSuccessResponse, buildErrorMessage} = require("../../main/routes/responseUtils");
 const responseUtils = require("../../main/routes/responseUtils");
 const {TokenType, UserType} = require("../../main/common/types");
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const dynamoDB = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+
 describe('getTeacherIfPasswordMatches', () => {
     let dbStub;
 
@@ -364,45 +368,69 @@ describe('validateToken', () => {
         expect(jwtStub.calledOnce).to.be.true;
         expect(jwtStub.calledWith(token, mockPublicKey)).to.be.true;
     });
-});
-
-describe('generateTokenForTeacherFromRefreshToken', function () {
+});describe('generateTokenForTeacherFromRefreshToken', function () {
     let res, payload, refreshToken;
 
     beforeEach(function () {
         res = {
-            status: sinon.stub().returnsThis(), json: sinon.stub()
+            status: sinon.stub().returnsThis(),
+            json: sinon.stub(),
         };
 
-        payload = {id: 'teacher123'};
+        payload = { id: 'teacher-id' };
         refreshToken = 'nonRefreshToken';
-        sinon.stub(teacherService, 'getTeacherById');
+
+        sinon.stub(teacherService, 'getTeacherById').resolves({
+            id: 'teacher-id',
+            userName: 'username',
+        });
         sinon.stub(responseUtils, 'buildErrorMessage');
         sinon.stub(responseUtils, 'buildSuccessResponse');
         sinon.stub(loginService, 'generateAccessToken').resolves('newAccessToken');
-        sinon.stub(loginService, 'buildTeacherPayload').returns({id: 'teacher-id', userName: 'username '});
+        sinon.stub(loginService, 'buildTeacherPayload').returns({
+            id: 'teacher-id',
+            userName: 'username',
+        });
+
+        // Set environment variables for region
+        process.env.AWS_REGION = 'mock-region';
     });
 
     afterEach(function () {
         sinon.restore();
     });
+
     it('should return new access token if teacher exists', async function () {
-        teacherService.getTeacherById.resolves({id: 'teacher-id', userName: 'username'});
         await loginService.generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
 
-        expect(responseUtils.buildSuccessResponse.calledWith(res, 200, {
-            token: 'newAccessToken', refreshToken: refreshToken
-        })).to.be.true;
+        expect(responseUtils.buildSuccessResponse.calledOnce).to.be.true;
+        expect(
+            responseUtils.buildSuccessResponse.calledWith(res, 200, {
+                token: 'newAccessToken',
+                refreshToken: refreshToken,
+            })
+        ).to.be.true;
     });
 
     it('should return error if teacher does not exist', async function () {
-        getTeacherById.resolves(null);
+        teacherService.getTeacherById.resolves(null);
 
         await loginService.generateTokenForTeacherFromRefreshToken(payload, res, refreshToken);
 
-        expect(responseUtils.buildErrorMessage.calledWith(res, 401, 'Invalid refreshToken, teach does not exist', payload.id)).to.be.true;
+        expect(responseUtils.buildErrorMessage.calledOnce).to.be.true;
+        expect(
+            responseUtils.buildErrorMessage.calledWith(
+                res,
+                401,
+                'Invalid refreshToken, teach does not exist',
+                payload.id
+            )
+        ).to.be.true;
     });
+
+  
 });
+
 describe('generateTokenForStudentFromRefreshToken', function () {
     let res, payload, refreshToken;
 
@@ -411,7 +439,7 @@ describe('generateTokenForStudentFromRefreshToken', function () {
         res = {
             status: sinon.stub().returnsThis(), json: sinon.stub()
         };
-        payload = {id: 'student123'};
+        payload = {id: 'student-id'};
         refreshToken = 'nonRefreshToken';
         sinon.stub(studentService, 'getStudentById');
         sinon.stub(responseUtils, 'buildErrorMessage');
@@ -425,7 +453,7 @@ describe('generateTokenForStudentFromRefreshToken', function () {
     });
 
     it('should return new access token if student exists', async function () {
-        getStudentById.resolves({id: 'student-id', userName: 'username'});
+        studentService.getStudentById.resolves({id: 'student-id', userName: 'username'});
 
         await loginService.generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
 
@@ -434,7 +462,7 @@ describe('generateTokenForStudentFromRefreshToken', function () {
         })).to.be.true;
     });
     it('should return error if student does not exist', async function () {
-        getStudentById.resolves(null);
+       studentService. getStudentById.resolves(null);
 
         await loginService.generateTokenForStudentFromRefreshToken(payload, res, refreshToken);
 
