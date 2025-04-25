@@ -8,6 +8,12 @@ const getFileLocation = (userType, userId, uploadType, uploadId, fileName) => {
             fileLocation = `teachers/${userId}/notes/${uploadId}/${fileName}`;
         } else if (uploadType === 'assignments') {
             fileLocation = `teachers/${userId}/assignments/${uploadId}/${fileName}`;
+        } else if (uploadType === 'fees') {
+            fileLocation = `teachers/${userId}/fees/${uploadId}/${fileName}`;
+        } else if (uploadType === 'messages') {
+            fileLocation = `teachers/${userId}/messages/${uploadId}/${fileName}`;
+        } else if (uploadType === 'profile') {
+            fileLocation = `teachers/${userId}/profile/${uploadId}/${fileName}`;
         } else {
             throw new Error('Invalid upload type for teacher');
         }
@@ -16,6 +22,12 @@ const getFileLocation = (userType, userId, uploadType, uploadId, fileName) => {
             fileLocation = `students/${userId}/notes/${uploadId}/${fileName}`;
         } else if (uploadType === 'assignments') {
             fileLocation = `students/${userId}/assignments/${uploadId}/${fileName}`;
+        } else if (uploadType === 'fees') {
+            fileLocation = `students/${userId}/fees/${uploadId}/${fileName}`;
+        } else if (uploadType === 'messages') {
+            fileLocation = `students/${userId}/messages/${uploadId}/${fileName}`;
+        } else if (uploadType === 'profile') {
+            fileLocation = `students/${userId}/profile/${uploadId}/${fileName}`;
         } else {
             throw new Error('Invalid upload type for student');
         }
