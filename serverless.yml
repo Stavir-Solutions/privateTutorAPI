@@ -204,3 +204,6 @@ functions:
       - http:
           path: /login/refresh
           method: get
+      - http:
+          path: /login/reset-password/{userId}/{userType}
+          method: post

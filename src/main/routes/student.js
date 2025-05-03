@@ -22,7 +22,7 @@ const studentSchema = Joi.object({
         'string.max': 'Password must not exceed 20 characters.',
         'string.pattern.name': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
     }),
-    email: Joi.string().email().optional().messages({ 'string.email': 'Email must be a valid email address.' }),
+    email: Joi.string().email().required().messages({ 'string.email': 'Email must be a valid email address.' }),
     age: Joi.number().integer().optional().messages({
         'number.base': 'Age must be a number.',
     }),
