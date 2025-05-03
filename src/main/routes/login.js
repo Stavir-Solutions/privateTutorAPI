@@ -1,5 +1,5 @@
 const express = require('express');
-const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
+const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
 const {
     getTeacherIfPasswordMatches,
     getStudentIfPasswordMatches,
@@ -16,7 +16,7 @@ const { REFRESH_TOKEN_HEADER } = require('../common/config');
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
-
+const { resetPasswordRequest} = require('../services/loginService');
 
 const loginSchema = Joi.object({
     userName: Joi.string().alphanum().required(), password: Joi.string().required()
@@ -24,7 +24,7 @@ const loginSchema = Joi.object({
 
 router.post('/teacher', async (req, res) => {
     console.log(JSON.stringify(req.body))
-    const {error} = loginSchema.validate(req.body);
+    const { error } = loginSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
@@ -46,7 +46,7 @@ router.post('/teacher', async (req, res) => {
 
 router.post('/student', async (req, res) => {
     console.log(JSON.stringify(req.body))
-    const {error} = loginSchema.validate(req.body);
+    const { error } = loginSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
@@ -80,5 +80,20 @@ router.get("/refresh", async (req, res) => {
 
     return await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 });
-
+router.post('/reset-password/:userId/:userType', async (req, res) => {
+    const { userId, userType } = req.params;
+  
+    if (!userId || !userType) {
+      return buildErrorMessage(res, 400, 'Missing userId or userType');
+    }
+  
+    try {
+      const result = await resetPasswordRequest(userId, userType);
+      buildSuccessResponse(res, 200, result);
+    } catch (err) {
+      console.error(err);
+      return buildErrorMessage(res, 500, 'Internal Server Error');
+    }
+  });
+  
 module.exports = router;

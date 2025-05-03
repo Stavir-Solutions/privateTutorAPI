@@ -45,7 +45,7 @@ const teacherSchema = Joi.object({
     profilePicUrl: Joi.string().uri().optional().messages({
         'string.uri': 'Profile picture URL must be a valid URI.'
     }),
-    email: Joi.string().email().optional().messages({
+    email: Joi.string().email().required().messages({
         'string.email': 'Email must be a valid email address.'
     }),
     phoneNumber: Joi.string().pattern(/^[0-9]{10}$/).required().messages({

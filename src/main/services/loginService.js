@@ -1,6 +1,6 @@
 const db = require('../db/dynamodb');
 const jwt = require('jsonwebtoken');
-const {ScanCommand} = require('@aws-sdk/client-dynamodb');
+const {ScanCommand,PutItemCommand,GetItemCommand} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 const {TokenType, UserType} = require("../common/types");
 const {getTeacherById} = require("./teacherService");
@@ -8,6 +8,12 @@ const {buildErrorMessage, buildSuccessResponse} = require("../routes/responseUti
 const {getStudentById} = require("./studentService");
 const {ACCESS_TOKEN_VALIDITY_SECONDS} = require('../common/config');
 const {REFRESH_TOKEN_VALIDITY_SECONDS} = require('../common/config');
+const { sendEmail } = require('../utils/emailUtils'); // Implement this
+
+const TEACHER_TABLE = 'teachers';
+const STUDENT_TABLE = 'students';
+const RESET_REQUEST_TABLE = 'PasswordResetRequests'
+
 
 async function getTeacherIfPasswordMatches(userName, password) {
     let scanParams = {
@@ -168,6 +174,70 @@ async function generateNewTokenFromRefreshToken(payload, res, refreshToken) {
         return buildErrorMessage(res, 401, 'Invalid refreshToken, login again');
     }
 }
+async function getUserFromTable(userId, userType) {
+    let user = null;
+  
+    if (userType === 'TEACHER') {
+      const teacherParams = {
+        TableName: TEACHER_TABLE,
+        Key: { id: { S: userId } },
+      };
+      const teacherData = await db.send(new GetItemCommand(teacherParams));
+      if (teacherData.Item) {
+        user = unmarshall(teacherData.Item);
+      }
+    } else if (userType === 'STUDENT') {
+      const studentParams = {
+        TableName: STUDENT_TABLE,
+        Key: { id: { S: userId } },
+      };
+      const studentData = await db.send(new GetItemCommand(studentParams));
+      if (studentData.Item) {
+        user = unmarshall(studentData.Item);
+      }
+    }
+  
+    if (!user) {
+      throw new Error(`${userType} not found for userId: ${userId}`);
+    }
+  
+    return user;
+  }
+  
+  async function resetPasswordRequest(userId, userType) {
+    try {
+      const user = await getUserFromTable(userId, userType);
+  
+      if (!user.email) {
+        throw new Error('User email not found');
+      }
+  
+      const requestId = uuidv4();
+  
+      const insertParams = {
+        TableName: RESET_REQUEST_TABLE,
+        Item: marshall({
+          userId,
+          userType,
+          requestId,
+          status: 'pending',
+        }),
+      };
+  
+      await db.send(new PutItemCommand(insertParams));
+  
+      const resetLink = `https://base-url/login/reset-password?request-id=${requestId}`;
+      const emailSubject = 'Password Reset Request';
+      const emailBody = `Click here to reset your password: ${resetLink}`;
+  
+      await sendEmail(user.email, emailSubject, emailBody);
+  
+      return { message: 'Password reset link sent to email' };
+    } catch (err) {
+      console.error('Error in resetPasswordRequest:', err.message);
+      throw err;
+    }
+  }
 
 module.exports = {
     getTeacherIfPasswordMatches,
@@ -182,5 +252,6 @@ module.exports = {
     generateNewTokenFromRefreshToken,
     decodeToken,
     generateTokenForStudentFromRefreshToken,
-    generateTokenForTeacherFromRefreshToken
+    generateTokenForTeacherFromRefreshToken,
+    resetPasswordRequest
 }

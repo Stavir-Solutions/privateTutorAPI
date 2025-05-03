@@ -22,7 +22,7 @@ const studentSchema = Joi.object({
         'string.max': 'Password must not exceed 20 characters.',
         'string.pattern.name': 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
     }),
-    email: Joi.string().email().optional().messages({ 'string.email': 'Email must be a valid email address.' }),
+    email: Joi.string().email().required().messages({ 'string.email': 'Email must be a valid email address.' }),
     age: Joi.number().integer().optional().messages({
         'number.base': 'Age must be a number.',
     }),
@@ -147,5 +147,19 @@ router.delete('/:id', async (req, res) => {
     console.log('deleted student {}', req.params.id);
 });
 
-
+router.get('/deadlines', async (req, res) => {
+    const { studentId, batchId } = req.query;
+  
+    if (!studentId || !batchId) {
+      return res.status(400).json({ message: 'Student ID and Batch ID are required' });
+    }
+  
+    try {
+      const deadlines = await studentService.getDeadlines(studentId, batchId);
+      res.status(200).json(deadlines);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
 module.exports = router;
