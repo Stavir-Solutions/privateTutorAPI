@@ -95,7 +95,7 @@ router.post('/reset-password/:userName/:userType', async (req, res) => {
         return buildErrorMessage(res, 500, 'user email not found ');
     }
 });
-router.get('/password/:requestId', async (req, res) => {
+router.get('/reset-password/:requestId', async (req, res) => {
     const requestId = req.params.requestId;
 
     if (!requestId) {

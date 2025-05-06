@@ -245,7 +245,7 @@ async function resetPasswordRequest(userName, userType) {
 
         await db.send(new PutItemCommand(insertParams));
 
-        const resetLink = `${process.env.base_url}/reset-password/${requestId}`;
+        const resetLink = `${process.env.base_url}/login/reset-password/${requestId}`;
         const emailSubject = 'Password Reset Request';
         const emailBody = `Click here to reset your password: ${resetLink}`;
 
@@ -321,7 +321,6 @@ async function resetPasswordWithRequestId(requestId) {
     await sendEmail(user.email, 'Your new password', `Your new password is: ${newPassword}`);
 
 
-    // 6. Delete reset request
     const deleteParams = {
         TableName: RESET_REQUEST_TABLE,
         Key: marshall({'request-id': requestId})
