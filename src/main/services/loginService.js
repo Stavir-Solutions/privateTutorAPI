@@ -22,7 +22,6 @@ const TEACHER_TABLE = 'Teachers';
 const STUDENT_TABLE = 'Students';
 const RESET_REQUEST_TABLE = 'PasswordResetRequests';
 
-const  RESET_BASE_URL= process.env.RESET_BASE_URL;
 
 async function getTeacherIfPasswordMatches(userName, password) {
     let scanParams = {
@@ -246,7 +245,7 @@ async function resetPasswordRequest(userName, userType) {
 
         await db.send(new PutItemCommand(insertParams));
 
-        const resetLink = `${RESET_BASE_URL}/login/reset-password/${requestId}`;
+        const resetLink = `${process.env.RESET_BASE_URL}/login/reset-password/${requestId}`;
         const emailSubject = 'Password Reset Request';
         const emailBody = `Click here to reset your password: ${resetLink}`;
 
