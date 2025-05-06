@@ -4,8 +4,8 @@ const nodemailer = require('nodemailer');
 const transporter = nodemailer.createTransport({
     service: 'gmail', // You can use any SMTP service, for Gmail it's 'gmail'
     auth: {
-        user: process.env.username,  // Replace with your email
-        pass: process.env.apppassword,  // Use an App Password if 2FA is enabled
+        user: process.env.USERNAME,  // Replace with your email
+        pass: process.env.APPPASSWORD,  // Use an App Password if 2FA is enabled
     },
 });
 
