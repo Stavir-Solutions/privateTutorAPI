@@ -20,8 +20,9 @@ const crypto = require('crypto');
 
 const TEACHER_TABLE = 'Teachers';
 const STUDENT_TABLE = 'Students';
-const RESET_REQUEST_TABLE = 'PasswordResetRequests'
+const RESET_REQUEST_TABLE = 'PasswordResetRequests';
 
+const  RESET_BASE_URL= process.env.RESET_BASE_URL;
 
 async function getTeacherIfPasswordMatches(userName, password) {
     let scanParams = {
