@@ -12,11 +12,11 @@ const {
     validateToken,
     generateNewTokenFromRefreshToken
 } = require('../services/loginService');
-const { REFRESH_TOKEN_HEADER } = require('../common/config');
+const {REFRESH_TOKEN_HEADER} = require('../common/config');
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
-
+const {resetPasswordRequest, resetPasswordWithRequestId} = require('../services/loginService');
 
 const loginSchema = Joi.object({
     userName: Joi.string().alphanum().required(), password: Joi.string().required()
@@ -79,6 +79,35 @@ router.get("/refresh", async (req, res) => {
     }
 
     return await generateNewTokenFromRefreshToken(payload, res, refreshToken);
+});
+router.get('/new-password/:userName/:userType', async (req, res) => {
+    const {userName, userType} = req.params;
+
+    if (!userName || !userType) {
+        return buildErrorMessage(res, 400, 'Missing userName or userType');
+    }
+
+    try {
+        const result = await resetPasswordRequest(userName, userType);
+        buildSuccessResponse(res, 200, result);
+    } catch (err) {
+        console.error(err);
+        return buildErrorMessage(res, 500, 'user email not found ');
+    }
+});
+router.get('/reset-password/:requestId', async (req, res) => {
+    const requestId = req.params.requestId;
+
+    if (!requestId) {
+        return res.status(400).json({error: 'Missing requestId'});
+    }
+
+    try {
+        const result = await resetPasswordWithRequestId(requestId);
+        res.json(result);
+    } catch (err) {
+        res.status(400).json({error: err.message});
+    }
 });
 
 module.exports = router;
