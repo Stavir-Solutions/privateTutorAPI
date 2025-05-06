@@ -7,18 +7,13 @@ const {
     UpdateItemCommand,
     DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
-const {
-    ScanCommand,
-    PutItemCommand,
-    GetItemCommand,
-    UpdateItemCommand,
-    DeleteItemCommand
-} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 const {TokenType, UserType} = require("../common/types");
 const {getTeacherById} = require("./teacherService");
 const {buildErrorMessage, buildSuccessResponse} = require("../routes/responseUtils");
 const {getStudentById} = require("./studentService");
+const {getTeacherByUserName,updateTeacherPassword} = require("./teacherService");
+const {getStudentByUserName,updateStudentPassword} = require("./studentService");
 const {ACCESS_TOKEN_VALIDITY_SECONDS} = require('../common/config');
 const {REFRESH_TOKEN_VALIDITY_SECONDS} = require('../common/config');
 const {sendEmail} = require('../utils/emailUtils'); // Implement this
@@ -43,7 +38,6 @@ async function getTeacherIfPasswordMatches(userName, password) {
 
     if (null == teacher) {
         console.log("Incorrect userName or password")
-        console.log("Incorrect userName or password")
         return null;
     } else {
         return teacher;
@@ -64,7 +58,6 @@ async function getStudentIfPasswordMatches(userName, password) {
     const student = result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
 
     if (null == student) {
-        console.log("Incorrect userName or password")
         console.log("Incorrect userName or password")
         return null;
     } else {
@@ -195,35 +188,17 @@ async function generateNewTokenFromRefreshToken(payload, res, refreshToken) {
 async function getUserFromTable(userName, userType) {
 
     if (userType === 'TEACHER') {
-        const teacherParams = {
-            TableName: TEACHER_TABLE,
-            FilterExpression: 'userName = :userName',
-            ExpressionAttributeValues: {
-                ':userName': {S: userName},
-            },
-        };
-
-        const result = await db.send(new ScanCommand(teacherParams));
-        if (result.Items && result.Items.length > 0) {
-            user = unmarshall(result.Items[0]);
-        } else {
-            throw new Error(`TEACHER not found for userName: ${userName}`);
+        try {
+            user = await getTeacherByUserName(userName);
+        } catch (error) {
+            throw new Error(`Error fetching teacher: ${error.message}`);
         }
     } else if (userType === 'STUDENT') {
-        const studentParams = {
-            TableName: STUDENT_TABLE,
-            FilterExpression: 'userName = :userName',
-            ExpressionAttributeValues: {
-                ':userName': {S: userName},
-            },
-        };
-
-        const result = await db.send(new ScanCommand(studentParams));
-        if (result.Items && result.Items.length > 0) {
-            user = unmarshall(result.Items[0]);
-        } else {
-            throw new Error(`STUDENT not found for userName: ${userName}`);
-        }
+        try {
+            user = await getStudentByUserName(userName);
+        } catch (error) {
+            throw new Error(`Error fetching student: ${error.message}`);
+        }   
     } else {
         throw new Error(`Invalid userType: ${userType}`);
     }
@@ -284,57 +259,22 @@ async function resetPasswordWithRequestId(requestId) {
     const user = await getUserFromTable(userName, userType);
 
     const newPassword = generateRandomPassword(8);
-
-    let tableName;
-
-    if (userType === 'TEACHER') {
-        tableName = TEACHER_TABLE;
-    } else if (userType === 'STUDENT') {
-        tableName = STUDENT_TABLE;
-    } else {
-        throw new Error('Invalid userType');
-    }
-    const getUserIdParams = {
-        TableName: tableName,
-        FilterExpression: "#userName = :userName",
-        ExpressionAttributeNames: {
-            "#userName": "userName"
-        },
-        ExpressionAttributeValues: {
-            ":userName": {S: user.userName}
-        }
-    };
-
-    const result = await db.send(new ScanCommand(getUserIdParams));
-
-    if (!result.Items || result.Items.length === 0) {
-        throw new Error("User not found");
-    }
-
-    const userId = result.Items[0].id.S;
-    console.log("Fetched User ID:", userId);
-
-    const updateParams = {
-        TableName: tableName,
-        Key: {id: {S: userId}},
-        UpdateExpression: "SET password = :newPassword",
-        ExpressionAttributeValues: {
-            ":newPassword": {S: newPassword}
-        }
-    };
-
-
-    await db.send(new UpdateItemCommand(updateParams));
-    console.log("Password updated successfully");
-
+if (userType === 'TEACHER') {
+    const teacher = await getTeacherByUserName(user.userName);
+    await updateTeacherPassword(teacher.id, newPassword);
+} else if (userType === 'STUDENT') {
+    const student = await getStudentByUserName(user.userName);
+    await updateStudentPassword(student.id, newPassword);
+} else {
+    throw new Error('Invalid userType');
+}
     await sendEmail(user.email, 'Your new password', `Your new password is: ${newPassword}`);
-
 
     const deleteParams = {
         TableName: RESET_REQUEST_TABLE,
         Key: marshall({'request-id': requestId})
     };
-    console.log(`New password for user ${userId}: ${newPassword}`);
+    console.log(`New password for user : ${newPassword}`);
 
     await db.send(new DeleteItemCommand(deleteParams));
 
@@ -361,9 +301,6 @@ module.exports = {
     generateNewTokenFromRefreshToken,
     decodeToken,
     generateTokenForStudentFromRefreshToken,
-    generateTokenForTeacherFromRefreshToken,
-    resetPasswordRequest,
-    resetPasswordWithRequestId
     generateTokenForTeacherFromRefreshToken,
     resetPasswordRequest,
     resetPasswordWithRequestId

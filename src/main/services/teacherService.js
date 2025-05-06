@@ -47,7 +47,7 @@ async function update(teacherId, teacherFields) {
     try {
         const data = await db.send(new UpdateItemCommand(params));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
-        return data.Attributes? unmarshall(data.Attributes): {};
+        return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
         console.error('Unable to update teacher. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
@@ -103,6 +103,36 @@ async function deleteById(teacherId) {
     }
 }
 
+const getTeacherByUserName = async (userName) => {
+    const teacherParams = {
+        TableName: tableName,
+        FilterExpression: 'userName = :userName',
+        ExpressionAttributeValues: {
+            ':userName': {S: userName},
+        },
+    };
 
-module.exports = {create, getTeacherById, getAll, deleteById, update}
+    const result = await db.send(new ScanCommand(teacherParams));
+    if (result.Items && result.Items.length > 0) {
+        return unmarshall(result.Items[0]);
+    } else {
+        throw new Error(`TEACHER not found for userName: ${userName}`);
+    }
+};
+
+async function updateTeacherPassword(teacherId, newPassword) {
+    const params = {
+        TableName: tableName,
+        Key: {id: {S: teacherId}},
+        UpdateExpression: "SET password = :newPassword",
+        ExpressionAttributeValues: {
+            ":newPassword": {S: newPassword}
+        }
+    };
+
+    await db.send(new UpdateItemCommand(params));
+    console.log("Teacher password updated successfully");
+}
+
+module.exports = {create, getTeacherById, getAll, deleteById, update, getTeacherByUserName, updateTeacherPassword};
 
