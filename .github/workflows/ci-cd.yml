@@ -29,7 +29,10 @@ jobs:
           echo "JWT_PRIVATE_KEY=${{ secrets.JWT_PRIVATE_KEY }}" >> .env
           echo "JWT_PUBLIC_KEY=${{ secrets.JWT_PUBLIC_KEY }}" >> .env
           echo "DEEPLINK_BASE_URL=${{ secrets.DEEPLINK_BASE_URL }}" >> .env
-
+          echo "RESET_BASE_URL=${{ secrets.RESET_BASE_URL }}" >> .env
+          echo "USERNAME=${{ secrets.USERNAME }}" >> .env
+          echo "APPPASSWORD=${{ secrets.APPPASSWORD }}" >> .env
+          
         shell: bash
         env:
           ACCESS_KEY: ${{ secrets.ACCESS_KEY }}
