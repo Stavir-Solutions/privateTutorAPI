@@ -80,7 +80,7 @@ router.get("/refresh", async (req, res) => {
 
     return await generateNewTokenFromRefreshToken(payload, res, refreshToken);
 });
-router.post('/reset-password/:userName/:userType', async (req, res) => {
+router.get('/new-password/:userName/:userType', async (req, res) => {
     const {userName, userType} = req.params;
 
     if (!userName || !userType) {

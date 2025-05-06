@@ -38,7 +38,7 @@ functions:
           method: get
       - http:
           path: /batches/student/{studentId}
-          method: get          
+          method: get
       - http:
           path: /batches/{id}
           method: get
@@ -53,7 +53,7 @@ functions:
           method: patch
       - http:
           path: /batches/{batchId}/student/{studentId}
-          method: delete           
+          method: delete
       - http:
           path: /batches/{id}
           method: delete
@@ -98,7 +98,7 @@ functions:
           method: get
       - http:
           path: /fee-records/batches/{batchId}
-          method: get          
+          method: get
       - http:
           path: /fee-records/{id}
           method: get
@@ -148,35 +148,35 @@ functions:
           path: /notifications/students/{studentId}
           method: get
       - http:
-           path: /notes
-           method: post
-      -  http:
-           path: /notes/batch/{batchId}
-           method: get
+          path: /notes
+          method: post
       - http:
-           path: /notes/student/{id}
-           method: get
+          path: /notes/batch/{batchId}
+          method: get
       - http:
-           path: /notes/{id}
-           method: put 
+          path: /notes/student/{id}
+          method: get
       - http:
-           path: /notes/{id}
-           method: delete          
+          path: /notes/{id}
+          method: put
       - http:
-           path: /tests
-           method: post
+          path: /notes/{id}
+          method: delete
       - http:
-           path: /tests/batches/{batchId}
-           method: get
-      - http:        
-           path: /tests/{id}
-           method: get
-      - http:    
-           path: /tests/{id}
-           method: put
-      - http:           
-           path: /tests/{id}
-           method: delete
+          path: /tests
+          method: post
+      - http:
+          path: /tests/batches/{batchId}
+          method: get
+      - http:
+          path: /tests/{id}
+          method: get
+      - http:
+          path: /tests/{id}
+          method: put
+      - http:
+          path: /tests/{id}
+          method: delete
       - http:
           path: /test-results
           method: post
@@ -205,8 +205,8 @@ functions:
           path: /login/refresh
           method: get
       - http:
-          path: /login/reset-password/{userName}/{userType}
-          method: post
+          path: /login/new-password/{userName}/{userType}
+          method: get
       - http:
           path: /login/reset-password/{requestId}
           method: get    
