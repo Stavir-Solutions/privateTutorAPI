@@ -209,4 +209,7 @@ functions:
           method: get
       - http:
           path: /login/reset-password/{requestId}
-          method: get    
+          method: get
+      - http:
+          path: /users/name/{name}/type/{Type}
+          method: get
