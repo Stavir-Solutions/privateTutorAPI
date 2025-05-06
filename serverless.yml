@@ -205,7 +205,7 @@ functions:
           path: /login/refresh
           method: get
       - http:
-          path: /login/reset-password/{userName}/{userType}
+          path: /login/new-password/{userName}/{userType}
           method: post
       - http:
           path: /login/reset-password/{requestId}
