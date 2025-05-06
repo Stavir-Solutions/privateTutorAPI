@@ -1,4 +1,4 @@
-const { toStudentEntity } = require('../db/mappers/studentMapper');
+const {toStudentEntity} = require('../db/mappers/studentMapper');
 const db = require('../db/dynamodb');
 const {
     PutItemCommand,
@@ -8,7 +8,7 @@ const {
     DeleteItemCommand,
     BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
-const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
+const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
 
 const tableName = "Students";
@@ -39,15 +39,15 @@ async function updateStudent(studentId, studentFields) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
         if (Array.isArray(value)) {
-            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
+            expressionAttributeValues[`:${key}`] = {L: value.map(item => marshall(item, {convertEmptyValues: true}))};
         } else {
-            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
+            expressionAttributeValues[`:${key}`] = marshall(value, {convertEmptyValues: true});
         }
     }
 
     const params = {
         TableName: tableName,
-        Key: marshall({ id: studentId }),
+        Key: marshall({id: studentId}),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
@@ -64,15 +64,16 @@ async function updateStudent(studentId, studentFields) {
         throw err;
     }
 }
+
 async function getBatchIdNamePairs(batchIds) {
     if (batchIds.length === 0) return [];
 
     const batchParams = {
         RequestItems: {
             [batchesTable]: {
-                Keys: batchIds.map(id => marshall({ id })),
+                Keys: batchIds.map(id => marshall({id})),
                 ProjectionExpression: "#batchId, #batchName",
-                ExpressionAttributeNames: { "#batchId": "id", "#batchName": "name" },
+                ExpressionAttributeNames: {"#batchId": "id", "#batchName": "name"},
             },
         },
     };
@@ -84,13 +85,14 @@ async function getBatchIdNamePairs(batchIds) {
         return (batchData.Responses?.[batchesTable] || []).map(item => unmarshall(item));
     } catch (err) {
         console.error("Error fetching batch names:", err);
-        return batchIds.map(id => ({ id, name: "Unknown Batch" }));
+        return batchIds.map(id => ({id, name: "Unknown Batch"}));
     }
 }
+
 async function getStudentById(studentId) {
     const params = {
         TableName: tableName,
-        Key: marshall({ id: studentId }),
+        Key: marshall({id: studentId}),
     };
 
     try {
@@ -118,15 +120,16 @@ async function getStudentByIdWithBatchName(studentId) {
         throw err;
     }
 }
+
 async function getBatchIdNamePairs(batchIds) {
     if (batchIds.length === 0) return [];
 
     const batchParams = {
         RequestItems: {
             [batchesTable]: {
-                Keys: batchIds.map(id => marshall({ id })),
+                Keys: batchIds.map(id => marshall({id})),
                 ProjectionExpression: "#batchId, #batchName",
-                ExpressionAttributeNames: { "#batchId": "id", "#batchName": "name" },
+                ExpressionAttributeNames: {"#batchId": "id", "#batchName": "name"},
             },
         },
     };
@@ -138,7 +141,7 @@ async function getBatchIdNamePairs(batchIds) {
         return (batchData.Responses?.[batchesTable] || []).map(item => unmarshall(item));
     } catch (err) {
         console.error("Error fetching batch names:", err);
-        return batchIds.map(id => ({ id, name: "Unknown Batch" }));
+        return batchIds.map(id => ({id, name: "Unknown Batch"}));
     }
 }
 
@@ -149,7 +152,7 @@ async function getByBatchId(batchId) {
         TableName: tableName,
         FilterExpression: "contains(batches, :batchId)",
         ExpressionAttributeValues: {
-            ':batchId': { S: batchId },
+            ':batchId': {S: batchId},
         },
     };
 
@@ -190,7 +193,7 @@ async function getByBatchId(batchId) {
                 student.batches = student.batches.map(batch => {
                     const batchId = typeof batch === "string" ? batch : batch.id;
                     const batchInfo = batchIdNamePairs.find(b => b.id === batchId);
-                    return batchInfo ? batchInfo : { id: batchId, name: "Unknown Batch" };
+                    return batchInfo ? batchInfo : {id: batchId, name: "Unknown Batch"};
                 });
             }
         });
@@ -202,6 +205,7 @@ async function getByBatchId(batchId) {
         throw err;
     }
 }
+
 async function getAll() {
     const params = {
         TableName: tableName,
@@ -240,7 +244,7 @@ async function getAll() {
                 student.batches = student.batches.map(batch => {
                     const batchId = typeof batch === "string" ? batch : batch.id;
                     const batchInfo = batchIdNamePairs.find(b => b.id === batchId);
-                    return batchInfo ? batchInfo : { id: batchId, name: "Unknown Batch" };
+                    return batchInfo ? batchInfo : {id: batchId, name: "Unknown Batch"};
                 });
             }
         });
@@ -251,9 +255,10 @@ async function getAll() {
         throw err;
     }
 }
+
 async function deleteById(studentId) {
     const params = {
-        TableName: tableName, Key: marshall({ id: studentId }),
+        TableName: tableName, Key: marshall({id: studentId}),
     };
 
     try {
@@ -266,7 +271,47 @@ async function deleteById(studentId) {
     }
 }
 
+const getStudentByUserName = async (userName) => {
+    const studentParams = {
+        TableName: tableName,
+        FilterExpression: 'userName = :userName',
+        ExpressionAttributeValues: {
+            ':userName': {S: userName},
+        },
+    };
+
+    const result = await db.send(new ScanCommand(studentParams));
+    if (result.Items && result.Items.length > 0) {
+        return unmarshall(result.Items[0]);
+    } else {
+        throw new Error(`STUDENT not found for userName: ${userName}`);
+    }
+};
+
+async function updateStudentPassword(studentId, newPassword) {
+    const params = {
+        TableName: tableName,
+        Key: {id: {S: studentId}},
+        UpdateExpression: "SET password = :newPassword",
+        ExpressionAttributeValues: {
+            ":newPassword": {S: newPassword}
+        }
+    };
+
+    await db.send(new UpdateItemCommand(params));
+    console.log("Student password updated successfully");
+}
 
 
-module.exports = { createStudent, getStudentById, getAll, deleteById, updateStudent, getByBatchId,getStudentByIdWithBatchName }
+module.exports = {
+    createStudent,
+    getStudentById,
+    getAll,
+    deleteById,
+    updateStudent,
+    getByBatchId,
+    getStudentByIdWithBatchName,
+    getStudentByUserName,
+    updateStudentPassword
+}
 
