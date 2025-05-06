@@ -7,6 +7,13 @@ const {
     UpdateItemCommand,
     DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
+const {
+    ScanCommand,
+    PutItemCommand,
+    GetItemCommand,
+    UpdateItemCommand,
+    DeleteItemCommand
+} = require('@aws-sdk/client-dynamodb');
 const {marshall, unmarshall} = require('@aws-sdk/util-dynamodb');
 const {TokenType, UserType} = require("../common/types");
 const {getTeacherById} = require("./teacherService");
@@ -36,6 +43,7 @@ async function getTeacherIfPasswordMatches(userName, password) {
 
     if (null == teacher) {
         console.log("Incorrect userName or password")
+        console.log("Incorrect userName or password")
         return null;
     } else {
         return teacher;
@@ -56,6 +64,7 @@ async function getStudentIfPasswordMatches(userName, password) {
     const student = result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
 
     if (null == student) {
+        console.log("Incorrect userName or password")
         console.log("Incorrect userName or password")
         return null;
     } else {
@@ -352,6 +361,9 @@ module.exports = {
     generateNewTokenFromRefreshToken,
     decodeToken,
     generateTokenForStudentFromRefreshToken,
+    generateTokenForTeacherFromRefreshToken,
+    resetPasswordRequest,
+    resetPasswordWithRequestId
     generateTokenForTeacherFromRefreshToken,
     resetPasswordRequest,
     resetPasswordWithRequestId
