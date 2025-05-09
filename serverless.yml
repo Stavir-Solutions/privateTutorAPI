@@ -211,5 +211,10 @@ functions:
           path: /login/reset-password/{requestId}
           method: get
       - http:
-          path: /users/name/{name}/type/{Type}
+          path: /students/userName/{userName}
           method: get
+      - http:
+          path: /teachers/userName/{userName}
+          method: get
+       
+

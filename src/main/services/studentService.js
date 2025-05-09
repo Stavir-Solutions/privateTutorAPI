@@ -14,7 +14,31 @@ const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 const tableName = "Students";
 const batchesTable = "Batches";
 
+async function isStudentuserNameTaken(userName, excludeId = null) {
+    const params = {
+        TableName: tableName,
+        FilterExpression: 'userName = :userName',
+        ExpressionAttributeValues: {
+            ':userName': {S: userName},
+        },
+    };
+
+    const result = await db.send(new ScanCommand(params));
+    if (result.Items && result.Items.length > 0) {
+        const item = unmarshall(result.Items[0]);
+        if (!excludeId || item.id !== excludeId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 async function createStudent(student) {
+    if (await isStudentuserNameTaken(student.userName)) {
+        const error = new Error("userName already exists");
+        error.statusCode = 409;
+        throw error;
+    }
     let studentEntity = toStudentEntity(student);
     console.log('converted to entity ', studentEntity);
 
@@ -30,6 +54,11 @@ async function createStudent(student) {
 
 
 async function updateStudent(studentId, studentFields) {
+    if (studentFields.userName && await isStudentuserNameTaken(studentFields.userName, studentId)) {
+        const error = new Error("userName already exists");
+        error.statusCode = 409;
+        throw error;
+    }
     const updateExpression = [];
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
@@ -302,6 +331,24 @@ async function updateStudentPassword(studentId, newPassword) {
     console.log("Student password updated successfully");
 }
 
+const getStudentByUsername = async (userName) => {
+
+    const studentParams = {
+        TableName: tableName,
+        FilterExpression: 'userName = :userName',
+        ExpressionAttributeValues: {
+            ':userName': {S: userName},
+        },
+    };
+
+    try {
+        const result = await db.send(new ScanCommand(studentParams));
+        return result.Items && result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
+    } catch (err) {
+        console.error('Error fetching student by userName:', err);
+        throw new Error('Error fetching teacher');
+    }
+};
 
 module.exports = {
     createStudent,
@@ -312,6 +359,6 @@ module.exports = {
     getByBatchId,
     getStudentByIdWithBatchName,
     getStudentByUserName,
-    updateStudentPassword
+    updateStudentPassword,
+    getStudentByUsername,
 }
-

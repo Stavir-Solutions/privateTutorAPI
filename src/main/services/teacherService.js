@@ -8,7 +8,31 @@ const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
 const tableName = "Teachers";
 
+async function isTeacheruserNameTaken(userName, excludeId = null) {
+    const params = {
+        TableName: tableName,
+        FilterExpression: 'userName = :userName',
+        ExpressionAttributeValues: {
+            ':userName': {S: userName},
+        },
+    };
+
+    const result = await db.send(new ScanCommand(params));
+    if (result.Items && result.Items.length > 0) {
+        const item = unmarshall(result.Items[0]);
+        if (!excludeId || item.id !== excludeId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 async function create(teacher) {
+    if (await isTeacheruserNameTaken(teacher.userName)) {
+        const error = new Error("userName already exists");
+        error.statusCode = 409;
+        throw error;
+    }
     let teacherEntity = toTeacherEntity(teacher);
     console.log('converted to entity ', teacherEntity);
     await db.send(new PutItemCommand(teacherEntity, function (err, data) {
@@ -22,6 +46,11 @@ async function create(teacher) {
 }
 
 async function update(teacherId, teacherFields) {
+    if (teacherFields.userName && await isTeacheruserNameTaken(teacherFields.userName, teacherId)) {
+        const error = new Error("userName already exists");
+        error.statusCode = 409;
+        throw error;
+    }
     const updateExpression = [];
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
@@ -103,7 +132,7 @@ async function deleteById(teacherId) {
     }
 }
 
-const getTeacherByUserName = async (userName) => {
+const getTeacherByuserName = async (userName) => {
     const teacherParams = {
         TableName: tableName,
         FilterExpression: 'userName = :userName',
@@ -134,5 +163,35 @@ async function updateTeacherPassword(teacherId, newPassword) {
     console.log("Teacher password updated successfully");
 }
 
-module.exports = {create, getTeacherById, getAll, deleteById, update, getTeacherByUserName, updateTeacherPassword};
+const getTeacherByUsername = async (userName) => {
+
+    const studentParams = {
+        TableName: tableName,
+        FilterExpression: 'userName = :userName',
+        ExpressionAttributeValues: {
+            ':userName': {S: userName},
+        },
+    };
+
+    try {
+        const result = await db.send(new ScanCommand(studentParams));
+        return result.Items && result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
+    } catch (err) {
+        console.error('Error fetching teacher by userName:', err);
+        throw new Error('Error fetching teacher');
+    }
+};
+
+
+module.exports = {
+    create,
+    getTeacherById,
+    getAll,
+    deleteById,
+    update,
+    getTeacherByuserName,
+    updateTeacherPassword,
+    isTeacheruserNameTaken,
+    getTeacherByUsername
+};
 
