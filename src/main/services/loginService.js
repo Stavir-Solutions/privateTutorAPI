@@ -229,7 +229,7 @@ async function resetPasswordRequest(userName, userType) {
 
         await db.send(new PutItemCommand(insertParams));
 
-        const resetLink = `${process.env.base_url}/login/reset-password/${requestId}`;
+        const resetLink = `${process.env.RESET_BASE_URL}/login/reset-password/${requestId}`;
         const emailSubject = 'Password Reset Request';
         const emailBody = `Click here to reset your password: ${resetLink}`;
 
