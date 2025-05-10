@@ -6,7 +6,7 @@ const {
     getAll,
     deleteById,
     update,
-    getTeacherByUsername
+    getTeacherByUserName
 } = require('../services/teacherService');
 const {validateToken} = require('../services/loginService')
 const authMiddleware = require('../middleware/authMiddleware');
@@ -205,7 +205,7 @@ router.get('/userName/:userName', async (req, res) => {
     const {userName} = req.params;
 
     try {
-        const user = await getTeacherByUsername(userName);
+        const user = await getTeacherByUserName(userName);
 
         if (user) {
             return res.status(200).json({message: ` ${userName} exist`});

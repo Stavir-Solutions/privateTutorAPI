@@ -14,7 +14,6 @@ const test = require('./src/main/routes/test');
 const testResult = require('./src/main/routes/testResult');
 const notifications = require('./src/main/routes/notification');
 const signup = require('./src/main/routes/signup');
-const user = require('./src/main/routes/user');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const {required} = require('joi');
@@ -45,7 +44,6 @@ index.use('/tests', test)
 index.use('/test-results', testResult)
 index.use('/notifications', notifications)
 index.use('/signup', signup)
-index.use('/users', user)
 index.get('/', (req, res) => {
     res.send('{"name":"Private tutor apis"}');
 });

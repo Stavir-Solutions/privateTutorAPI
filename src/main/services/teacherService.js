@@ -132,22 +132,28 @@ async function deleteById(teacherId) {
     }
 }
 
-const getTeacherByuserName = async (userName) => {
-    const teacherParams = {
+async function getTeacherByUserName(userName, throwIfNotFound = false) {
+    const params = {
         TableName: tableName,
         FilterExpression: 'userName = :userName',
         ExpressionAttributeValues: {
-            ':userName': {S: userName},
-        },
+            ':userName': {S: userName}
+        }
     };
 
-    const result = await db.send(new ScanCommand(teacherParams));
+    const result = await db.send(new ScanCommand(params));
+
     if (result.Items && result.Items.length > 0) {
         return unmarshall(result.Items[0]);
     } else {
-        throw new Error(`TEACHER not found for userName: ${userName}`);
+        if (throwIfNotFound) {
+            throw new Error(`TEACHER not found for userName: ${userName}`);
+        } else {
+            return null;
+        }
     }
-};
+}
+
 
 async function updateTeacherPassword(teacherId, newPassword) {
     const params = {
@@ -163,25 +169,6 @@ async function updateTeacherPassword(teacherId, newPassword) {
     console.log("Teacher password updated successfully");
 }
 
-const getTeacherByUsername = async (userName) => {
-
-    const studentParams = {
-        TableName: tableName,
-        FilterExpression: 'userName = :userName',
-        ExpressionAttributeValues: {
-            ':userName': {S: userName},
-        },
-    };
-
-    try {
-        const result = await db.send(new ScanCommand(studentParams));
-        return result.Items && result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
-    } catch (err) {
-        console.error('Error fetching teacher by userName:', err);
-        throw new Error('Error fetching teacher');
-    }
-};
-
 
 module.exports = {
     create,
@@ -189,9 +176,8 @@ module.exports = {
     getAll,
     deleteById,
     update,
-    getTeacherByuserName,
+    getTeacherByUserName,
     updateTeacherPassword,
     isTeacheruserNameTaken,
-    getTeacherByUsername
 };
 

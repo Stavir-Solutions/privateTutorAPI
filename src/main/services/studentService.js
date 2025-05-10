@@ -300,22 +300,27 @@ async function deleteById(studentId) {
     }
 }
 
-const getStudentByUserName = async (userName) => {
-    const studentParams = {
+async function getStudentByUserName(userName, throwIfNotFound = false) {
+    const params = {
         TableName: tableName,
         FilterExpression: 'userName = :userName',
         ExpressionAttributeValues: {
-            ':userName': {S: userName},
-        },
+            ':userName': {S: userName}
+        }
     };
 
-    const result = await db.send(new ScanCommand(studentParams));
+    const result = await db.send(new ScanCommand(params));
+
     if (result.Items && result.Items.length > 0) {
         return unmarshall(result.Items[0]);
     } else {
-        throw new Error(`STUDENT not found for userName: ${userName}`);
+        if (throwIfNotFound) {
+            throw new Error(`STUDENT not found for userName: ${userName}`);
+        } else {
+            return null;
+        }
     }
-};
+}
 
 async function updateStudentPassword(studentId, newPassword) {
     const params = {
@@ -331,24 +336,6 @@ async function updateStudentPassword(studentId, newPassword) {
     console.log("Student password updated successfully");
 }
 
-const getStudentByUsername = async (userName) => {
-
-    const studentParams = {
-        TableName: tableName,
-        FilterExpression: 'userName = :userName',
-        ExpressionAttributeValues: {
-            ':userName': {S: userName},
-        },
-    };
-
-    try {
-        const result = await db.send(new ScanCommand(studentParams));
-        return result.Items && result.Items.length > 0 ? unmarshall(result.Items[0]) : null;
-    } catch (err) {
-        console.error('Error fetching student by userName:', err);
-        throw new Error('Error fetching teacher');
-    }
-};
 
 module.exports = {
     createStudent,

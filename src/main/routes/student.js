@@ -8,7 +8,7 @@ const {
     getByBatchId,
     createStudent,
     getStudentByIdWithBatchName,
-    getStudentByUsername
+    getStudentByUserName
 } = require('../services/studentService');
 
 
@@ -182,7 +182,7 @@ router.get('/userName/:userName', async (req, res) => {
     const {userName} = req.params;
 
     try {
-        const user = await getStudentByUsername(userName);
+        const user = await getStudentByUserName(userName);
 
         if (user) {
             return res.status(200).json({message: ` ${userName} exist`});
