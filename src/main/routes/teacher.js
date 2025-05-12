@@ -1,7 +1,14 @@
 const express = require('express');
-const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
-const { create, getTeacherById, getAll, deleteById, update } = require('../services/teacherService');
-const { validateToken } = require('../services/loginService')
+const {buildSuccessResponse, buildErrorMessage} = require('./responseUtils');
+const {
+    create,
+    getTeacherById,
+    getAll,
+    deleteById,
+    update,
+    getTeacherByUserName
+} = require('../services/teacherService');
+const {validateToken} = require('../services/loginService')
 const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
@@ -10,12 +17,12 @@ router.use(express.json());
 router.use(authMiddleware);
 
 const teacherSchema = Joi.object({
-    firstName: Joi.string().optional().messages({ 'string.max': 'First name should not exceed 50 characters.' }),
-    lastName: Joi.string().optional().messages({ 'string.max': 'Last name should not exceed 50 characters' }),
+    firstName: Joi.string().optional().messages({'string.max': 'First name should not exceed 50 characters.'}),
+    lastName: Joi.string().optional().messages({'string.max': 'Last name should not exceed 50 characters'}),
     userName: Joi.string().alphanum().min(3).max(30).required().messages({
-        'string.alphanum': 'Username must be alphanumeric.',
-        'string.min': 'Username must be at least 3 characters long.',
-        'string.max': 'Username must not exceed 30 characters.'
+        'string.alphanum': 'userName must be alphanumeric.',
+        'string.min': 'userName must be at least 3 characters long.',
+        'string.max': 'userName must not exceed 30 characters.'
     }),
     password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+={}:;,.<>?`~|-]*$')).required().messages({
         'string.min': 'Password must be at least 6 characters long.',
@@ -68,12 +75,12 @@ const teacherSchema = Joi.object({
 
 
 const teacherUpdateSchema = Joi.object({
-    firstName: Joi.string().optional().messages({ 'string.max': 'First name should not exceed 50 characters.' }),
-    lastName: Joi.string().optional().messages({ 'string.max': 'Last name should not exceed 50 characters.' }),
+    firstName: Joi.string().optional().messages({'string.max': 'First name should not exceed 50 characters.'}),
+    lastName: Joi.string().optional().messages({'string.max': 'Last name should not exceed 50 characters.'}),
     userName: Joi.string().alphanum().min(3).max(30).optional().messages({
-        'string.alphanum': 'Username must be alphanumeric.',
-        'string.min': 'Username must be at least 3 characters long.',
-        'string.max': 'Username must not exceed 30 characters.'
+        'string.alphanum': 'userName must be alphanumeric.',
+        'string.min': 'userName must be at least 3 characters long.',
+        'string.max': 'userName must not exceed 30 characters.'
     }),
     password: Joi.string().min(6).max(20).pattern(new RegExp('^[a-zA-Z0-9!@#$%^&*()_+={}:;,.<>?`~|-]*$')).optional().messages({
         'string.min': 'Password must be at least 6 characters long.',
@@ -146,29 +153,44 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     console.log(JSON.stringify(req.body))
-    const { error } = teacherSchema.validate(req.body);
+    const {error} = teacherSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
     }
-    console.log('creating teacher {}', req.body);
-    let teacherId = await create(req.body)
-    buildSuccessResponse(res, 200, '{"id":"' + teacherId + '"}')
-    console.log('created teacher {}', teacherId);
+    try {
+        console.log('creating teacher {}', req.body);
+        let teacherId = await create(req.body)
+        buildSuccessResponse(res, 200, '{"id":"' + teacherId + '"}')
+        console.log('created teacher {}', teacherId);
+    } catch (err) {
+        if (err.message === 'userName already exists') {
+            return buildErrorMessage(res, 409, 'Username already exists');
+        }
+    }
 });
-
 
 /* API to update the teacher */
 router.put('/:id', async (req, res) => {
-    const { error } = teacherUpdateSchema.validate(req.body);
+    const {error} = teacherUpdateSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
         return buildErrorMessage(res, 400, error.details[0].message);
     }
-    console.log('updating teacher {}', req.body);
-    let updateResult = await update(req.params.id, req.body);
-    buildSuccessResponse(res, 200, updateResult)
-    console.log('updated teacher {}', req.params.id);
+    try {
+        console.log('updating teacher {}', req.body);
+        let updateResult = await update(req.params.id, req.body);
+        buildSuccessResponse(res, 200, updateResult)
+        console.log('updated teacher {}', req.params.id);
+
+    } catch (err) {
+        {
+            if (err.message === 'userName already exists') {
+                return buildErrorMessage(res, 409, 'Username already exists');
+            }
+        }
+    }
+
 });
 
 router.delete('/:id', (req, res) => {
@@ -176,6 +198,24 @@ router.delete('/:id', (req, res) => {
     let response = deleteById(req.params.id);
     buildSuccessResponse(res, 200, response)
     console.log('deleted teacher {}', req.params.id);
+});
+
+router.get('/userName/:userName', async (req, res) => {
+
+    const {userName} = req.params;
+
+    try {
+        const user = await getTeacherByUserName(userName);
+
+        if (user) {
+            return res.status(200).json({message: ` ${userName} exist`});
+        }
+        return res.status(404).json({message: ` ${userName} does not exist`});
+
+    } catch (err) {
+        console.error('Error checking teacher userName:', err);
+        return res.status(500).json({error: 'Internal server error'});
+    }
 });
 
 
