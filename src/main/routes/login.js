@@ -92,7 +92,7 @@ router.get('/new-password/:userName/:userType', async (req, res) => {
         buildSuccessResponse(res, 200, result);
     } catch (err) {
         console.error(err);
-        return buildErrorMessage(res, 500, 'user email not found ');
+        return buildErrorMessage(res, 500, 'userName not found ');
     }
 });
 router.get('/reset-password/:requestId', async (req, res) => {
