@@ -211,7 +211,7 @@ async function resetPasswordRequest(userName, userType) {
         const user = await getUserFromTable(userName, userType);
 
         if (!user.email) {
-            throw new Error('User email not found');
+            throw new Error('UserName not found');
         }
 
         const requestId = generateUUID();
