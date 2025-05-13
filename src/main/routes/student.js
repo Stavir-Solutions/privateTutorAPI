@@ -16,7 +16,6 @@ const router = express.Router();
 const Joi = require('joi');
 const authMiddleware = require("../middleware/authMiddleware");
 router.use(express.json());
-router.use(authMiddleware);
 
 const studentSchema = Joi.object({
     firstName: Joi.string().max(50).optional().messages({'string.max': 'First name should not exceed 50 characters.'}),
@@ -105,25 +104,25 @@ const studentUpdateSchema = Joi.object({
 ).unknown(false);
 
 var student = '{' + '  "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",\n' + '  "firstName": "Jane",\n' + ' "username": "JaneDoe",\n' + '  "password: "password123",\n' + '  "email": ""jane.doe@example.com"",\n' + '   "lastName": "Doe",\n' + '  "age": 16,\n' + '  "addressLine1": "456 Elm St",\n' + '  "addressCity": "Othertown",\n' + '  "addressState": "Otherstate",\n' + '  "pinCode": 654321,\n' + '  "profilePicUrl": "http://example.com/profile.jpg",\n' + '  "gender": "female",\n' + '  "parent1Name": "John Doe",\n' + '  "parent1Phone": "9876543210",\n' + '  "parent1Email": "john.doe@example.com",\n' + '  "parent2Name": "Mary Doe",\n' + '  "parent2Phone": "0123456789",\n' + '  "parent2Email": "mary.doe@example.com"' + '}';
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     students = await getAll(req.params.id);
     console.log('students ', students);
     buildSuccessResponse(res, 200, students);
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
     student = await getStudentByIdWithBatchName(req.params.id);
     console.log('student by id ', student);
     buildSuccessResponse(res, 200, student);
 });
 
-router.get('/batch/:batchId', async (req, res) => {
+router.get('/batch/:batchId', authMiddleware, async (req, res) => {
     const students = await getByBatchId(req.params.batchId);
     console.log('get students by batch ', req.params.batchId)
     buildSuccessResponse(res, 200, students);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     console.log(JSON.stringify(req.body))
     const {error} = studentSchema.validate(req.body);
     if (error) {
@@ -148,7 +147,7 @@ router.post('/', async (req, res) => {
 
 
 /* API to update the student */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     const {error} = studentUpdateSchema.validate(req.body);
     if (error) {
         console.log('Validation error:', error);
@@ -170,7 +169,7 @@ router.put('/:id', async (req, res) => {
 
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
     console.log('Deleting student with id {}', req.params.id);
     let response = deleteById(req.params.id);
     buildSuccessResponse(res, 200, response)
