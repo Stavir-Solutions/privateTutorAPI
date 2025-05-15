@@ -102,6 +102,7 @@ router.post('/teachers', async (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('creating teacher {}', req.body);
+    try {
     let teacherId = await create(req.body)
     buildSuccessResponse(res, 200, {
         token: await generateAccessToken(buildTeacherPayload(req.body, teacherId)),
@@ -109,6 +110,16 @@ router.post('/teachers', async (req, res) => {
     });
 
     console.log('created teacher {}', teacherId);
+} catch (err) {
+    console.error('Create teacher error:', err.message);
+
+    // Respond based on error content
+    if (err.message.includes('userName already exists')) {
+        return buildErrorMessage(res, 400, 'Username already exists');
+    }
+    return buildErrorMessage(res, 500, 'Internal server error');
+}
+
 });
 
 
@@ -120,6 +131,7 @@ router.post('/students', async (req, res) => {
         return buildErrorMessage(res, 400, error.details[0].message);
     }
     console.log('creating student {}', req.body);
+    try{
     let studentId = await createStudent(req.body)
     buildSuccessResponse(res, 200, {
         token: await generateAccessToken(buildStudentPayload(req.body, studentId)),
@@ -127,6 +139,18 @@ router.post('/students', async (req, res) => {
     });
 
     console.log('created student {}', studentId);
+} catch (err) {
+    console.error('Create teacher error:', err.message);
+
+    // Respond based on error content
+    if (err.message.includes('userName already exists')) {
+        return buildErrorMessage(res, 400, 'Username already exists');
+    }
+
+    // Fallback for unexpected errors
+    return buildErrorMessage(res, 500, 'Internal server error');
+}
 });
+
 
 module.exports = router;
