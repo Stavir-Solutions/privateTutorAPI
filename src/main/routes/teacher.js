@@ -14,7 +14,6 @@ const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
 const Joi = require('joi');
 router.use(express.json());
-router.use(authMiddleware);
 
 const teacherSchema = Joi.object({
     firstName: Joi.string().optional().messages({'string.max': 'First name should not exceed 50 characters.'}),
@@ -131,7 +130,7 @@ const teacherUpdateSchema = Joi.object({
 
 }).or('firstName', 'lastName', 'userName', 'password', 'age', 'gender', 'addressLine1', 'addressCity', 'addressState', 'pinCode', 'profilePicUrl', 'phoneNumber', 'upiId', 'accountNumber', 'accountName', 'ifscCode').unknown(false);
 
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const token = req.header('Authorization')?.split(' ')[1];
     let isValid = await validateToken(token);
     console.log('isValid ', isValid);
@@ -144,14 +143,14 @@ router.get('/', async (req, res) => {
     buildSuccessResponse(res, 200, teachers);
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authMiddleware, async (req, res) => {
     teacher = await getTeacherById(req.params.id);
     console.log('teacher by id ', teacher);
     buildSuccessResponse(res, 200, teacher);
 });
 
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     console.log(JSON.stringify(req.body))
     const {error} = teacherSchema.validate(req.body);
     if (error) {
@@ -171,7 +170,7 @@ router.post('/', async (req, res) => {
 });
 
 /* API to update the teacher */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authMiddleware, async (req, res) => {
     const {error} = teacherUpdateSchema.validate(req.body);
     if (error) {
         console.log('error: {}', error);
@@ -193,7 +192,7 @@ router.put('/:id', async (req, res) => {
 
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', authMiddleware, (req, res) => {
     console.log('Deleting teacher with id {}', req.params.id);
     let response = deleteById(req.params.id);
     buildSuccessResponse(res, 200, response)
