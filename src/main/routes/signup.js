@@ -142,12 +142,10 @@ router.post('/students', async (req, res) => {
 } catch (err) {
     console.error('Create teacher error:', err.message);
 
-    // Respond based on error content
     if (err.message.includes('userName already exists')) {
         return buildErrorMessage(res, 400, 'Username already exists');
     }
 
-    // Fallback for unexpected errors
     return buildErrorMessage(res, 500, 'Internal server error');
 }
 });
