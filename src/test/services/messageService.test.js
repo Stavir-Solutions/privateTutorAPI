@@ -144,21 +144,29 @@ describe('create', () => {
         // Given
 
         const messageId = 'message-id';
-        let message = {"subject": "Homework Submission",
-            "content": "Please find my attached homework for review.",
-            "sender": "student@example.com",
-            "receiver": "teacher@example.com",
-            "batchId": "batch-12345",
-            "studentId": "student-67890",
-            "timestamp": "2025-03-10T10:30:00.000Z",
+        let message = { 
+            "subject": "Important Announcement",
+            "content": "There will be a meeting tomorrow at 10 AM in the main hall.",
+            "batchId": "batch123",
+            "studentId": "student123",
+            "sender": "admin123",
+            "senderType": "admin",
+            "senderName": "Admin User",
+            "receiver": "student123",
+            "receiverType": "student",
+            "receiverName": "John Doe",
+            "timestamp": new Date().toISOString(),
             "attachmentUrls": [
-                "https://example.com/homework1.pdf",
-                "https://example.com/homework2.pdf"
+                "https://example.com/attachment1.pdf",
+                "https://example.com/attachment2.jpg"
             ],
+            
             "replies": [
                 {
                     "content": "Thanks for submitting your homework. I'll review it soon.",
-                    "sender": "teacher@example.com",
+                   "sender": "student123",
+                    "senderType": "student",
+                    "senderName": "John Doe",
                     "timestamp": "2025-03-10T12:00:00.000Z",
                     "attachmentUrls": [
                         "https://example.com/graded-homework.pdf"
