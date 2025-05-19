@@ -67,6 +67,9 @@ functions:
           path: /students/batch/{batchId}
           method: get
       - http:
+          path: /students/{studentId}/batch/{batchId}/timeline
+          method: get   
+      - http:
           path: /students
           method: post
       - http:

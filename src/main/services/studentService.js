@@ -334,8 +334,46 @@ async function updateStudentPassword(studentId, newPassword) {
     await db.send(new UpdateItemCommand(params));
     console.log("Student password updated successfully");
 }
+function getTimelineData(studentId, batchId) {
+    if (studentId === '2523e365-cb6a-41d9-bd70-872c774ef49a' && batchId === '331aa850-9a2d-4924-90ef-0e0c6bf2f3cd') {
+      return [
+        {
+          id: '2523e365-cb6a-41d9-bd70-872c774e123a',
+          type: 'assignment',
+          message: 'Math Assignment 1 is reaching its deadline 2024-01-15T23:59:59.999Z',
+          deeplink: 'https://example.com/assignment/2523e365-cb6a-41d9-bd70-872c774e123a',
+        },
+        {
+          id: 'a23434567-89ab-cdef-1234-569abcdef0',
+          type: 'assignment',
+          message: 'Science Assignment 2 is reaching its deadline 2024-01-22T23:59:59.999Z',
+          deeplink: 'https://example.com/assignment/a23434567-89ab-cdef-1234-569abcdef0',
 
+        },
+        {
+          id: '4523e365-cb6a-41d9-bd70-872c774ef49a',
+          type: 'feerecord',
+          amount: 1500,
+          paymentDate: '2024-12-25T12:34:56.789Z',
+          message: 'Fee payment is due on 2024-12-31T23:59:59.999Z',
+          deeplink: 'https://example.com/fee-payment/4523e365-cb6a-41d9-bd70-872c774ef49a',
+        },
+        {
+          id: '67823e35-cb6a-41d9-bd70-872c774ef49a',
+          type: 'feerecord',
+          amount: 1500,
+          paymentDate: '2025-01-25T14:00:00.000Z',
+          message: 'Fee payment is due on 2025-01-31T23:59:59.999Z',
+          deeplink: 'https://example.com/fee-payment/67823e35-cb6a-41d9-bd70-872c774ef49a',
 
+        }
+    ];
+    }
+  
+    return [];
+  }
+  
+  
 module.exports = {
     createStudent,
     getStudentById,
@@ -346,4 +384,5 @@ module.exports = {
     getStudentByIdWithBatchName,
     getStudentByUserName,
     updateStudentPassword,
+    getTimelineData
 }
