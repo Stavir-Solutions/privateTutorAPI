@@ -192,17 +192,22 @@ router.get('/userName/:userName', async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-router.get('/:studentId/batch/:batchId/timeline',authMiddleware, (req, res) => {
-    const { studentId, batchId } = req.params;
-    const timeline = getTimelineData(studentId, batchId);
-    const response = {
-      studentId,
-      batchId,
-      timeline
-    };
+router.get('/:studentId/batch/:batchId/timeline', authMiddleware, async (req, res) => {
+    try {
+      const { studentId, batchId } = req.params;
+      const timeline = await getTimelineData(studentId, batchId);
   
-    buildSuccessResponse(res, 200, response);
+      const response = {
+        studentId,
+        batchId,
+        timeline,
+      };
+  
+      buildSuccessResponse(res, 200, response);
+    } catch (error) {
+      console.error('Error fetching timeline:', error);
+      buildErrorResponse(res, 500, 'Failed to fetch timeline');
+    }
   });
-
-module.exports = router;
+  
+  module.exports = router;
