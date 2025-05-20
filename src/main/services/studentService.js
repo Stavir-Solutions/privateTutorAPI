@@ -340,26 +340,26 @@ function getTimelineData(studentId, batchId) {
         {
           id: '2523e365-cb6a-41d9-bd70-872c774e123a',
           type: 'assignment',
-          message: 'Math Assignment 1 is reaching its deadline 2024-01-15T23:59:59.999Z',
+          message: 'Math Assignment 1 is reaching its deadline 2024-01-15',
           deeplink: 'https://example.com/assignment/2523e365-cb6a-41d9-bd70-872c774e123a',
         },
         {
           id: 'a23434567-89ab-cdef-1234-569abcdef0',
           type: 'assignment',
-          message: 'Science Assignment 2 is reaching its deadline 2024-01-22T23:59:59.999Z',
+          message: 'Science Assignment 2 is reaching its deadline 2024-01-22',
           deeplink: 'https://example.com/assignment/a23434567-89ab-cdef-1234-569abcdef0',
 
         },
         {
           id: '4523e365-cb6a-41d9-bd70-872c774ef49a',
           type: 'feerecord',
-          message: 'Fee payment is due on 2024-12-31T23:59:59.999Z',
+          message: 'Fee payment is due on 2024-12-31',
           deeplink: 'https://example.com/fee-payment/4523e365-cb6a-41d9-bd70-872c774ef49a',
         },
         {
           id: '67823e35-cb6a-41d9-bd70-872c774ef49a',
           type: 'feerecord',
-          message: 'Fee payment is due on 2025-01-31T23:59:59.999Z',
+          message: 'Fee payment is due on 2025-01-31',
           deeplink: 'https://example.com/fee-payment/67823e35-cb6a-41d9-bd70-872c774ef49a',
 
         }
