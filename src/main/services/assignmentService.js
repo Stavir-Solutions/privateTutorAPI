@@ -162,7 +162,26 @@ async function deleteById(assignmentId) {
         throw err;
     }
 }
+async function getexpireAssignments(batchId, studentId, days = 10) {
+    try {
+        const allAssignments = await getByBatchIdAndStudentId(batchId, studentId);
+        const todayStr = new Date().toISOString().split('T')[0]; 
+        
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + days);
+        const futureDateStr = futureDate.toISOString().split('T')[0]; 
+        
+        return allAssignments.filter(item => {
+            const submissionDateStr = new Date(item.submissionDate).toISOString().split('T')[0];
+            return submissionDateStr >= todayStr && submissionDateStr <= futureDateStr;
+        });
+    } catch (err) {
+        console.error('Error filtering valid assignments:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
 
 
-module.exports = {create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId}
+
+module.exports = {create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId,getexpireAssignments}
 

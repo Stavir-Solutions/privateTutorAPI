@@ -9,10 +9,10 @@ const {
     BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
-const {generateUUID} = require("../db/UUIDGenerator");
+const { generateUUID } = require("../db/UUIDGenerator");
 
-const{getByBatchIdAndStudentId:getAssignments} = require('./assignmentService');
-const { getByBatchIdAndStudentId:getFees } = require('./feeRecordService');
+const { getexpireAssignments } = require('./assignmentService');
+const { getexpireFeeRecords } = require('./feeRecordService');
 const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Students";
@@ -341,25 +341,23 @@ async function updateStudentPassword(studentId, newPassword) {
 async function getTimelineData(studentId, batchId) {
     try {
         console.log('Fetching assignments for:', { batchId, studentId });
-        const assignmentsData = await getAssignments(batchId, studentId);
+        const assignmentsData = await getexpireAssignments(batchId, studentId);
         console.log('Assignments fetched:', assignmentsData);
 
-        const assignments = assignmentsData .map(data => {
-                const dateOnly = new Date(data.submissionDate).toISOString().split('T')[0];
-                return {
-                    id: generateUUID(),
-                    type: 'assignment',
-                    message: `${data.title} is reaching its deadline on ${dateOnly}`,
-                    deeplink: `${DEEPLINK_BASE_URL}/assignments/${data.id}`,
-                };
-            });
+        const assignments = assignmentsData.map(data => {
+            const dateOnly = new Date(data.submissionDate).toISOString().split('T')[0];
+            return {
+                id: generateUUID(),
+                type: 'assignment',
+                message: `${data.title} is reaching its deadline on ${dateOnly}`,
+                deeplink: `${DEEPLINK_BASE_URL}/assignments/${data.id}`,
+            };
+        });
 
-        const feesData = await getFees(batchId, studentId);
+        const feesData = await getexpireFeeRecords(batchId, studentId);
         console.log('Fees fetched:', feesData);
 
-        const fees = feesData
-            .filter(data => data.status === 'pending')
-            .map(data => {
+        const fees = feesData.map(data => {
                 const paymentDate = new Date(data.paymentDate).toISOString().split('T')[0];
                 const dueDate = new Date(data.dueDate).toISOString().split('T')[0];
                 return {
@@ -380,8 +378,8 @@ async function getTimelineData(studentId, batchId) {
     }
 }
 
-  
-  
+
+
 module.exports = {
     createStudent,
     getStudentById,

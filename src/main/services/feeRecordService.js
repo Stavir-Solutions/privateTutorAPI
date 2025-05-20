@@ -8,6 +8,7 @@ const {
     DeleteItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
+const { getexpireAssignments } = require('./assignmentService');
 
 
 const tableName = "FeeRecords";
@@ -130,6 +131,30 @@ async function deleteById(feeRecordId) {
     }
 }
 
+async function getexpireFeeRecords(batchId, studentId, days = 10) {
+    try {
+        const allFeeRecords = await getByBatchIdAndStudentId(batchId, studentId);
+        console.log("all fee records", allFeeRecords);
+        const todayStr = new Date().toISOString().split('T')[0];  
+        
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + days);
+        const futureDateStr = futureDate.toISOString().split('T')[0]; 
+        
+        return allFeeRecords.filter(record => {
+            const dueDateStr = new Date(record.dueDate).toISOString().split('T')[0];
+            console.log("due date", dueDateStr);
+            return (
+                dueDateStr >= todayStr &&
+                dueDateStr <= futureDateStr &&
+                record.status === 'pending'
+            );
+        });
+    } catch (err) {
+        console.error('Error filtering fee records:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
 
-module.exports = {create, getByBatchIdAndStudentId ,getbyBatchId, getById, deleteById, updateFeeRecord}
+module.exports = {create, getByBatchIdAndStudentId ,getbyBatchId, getById, deleteById, updateFeeRecord, getexpireFeeRecords}
 
