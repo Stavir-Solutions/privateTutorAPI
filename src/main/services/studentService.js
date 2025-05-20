@@ -353,16 +353,12 @@ function getTimelineData(studentId, batchId) {
         {
           id: '4523e365-cb6a-41d9-bd70-872c774ef49a',
           type: 'feerecord',
-          amount: 1500,
-          paymentDate: '2024-12-25T12:34:56.789Z',
           message: 'Fee payment is due on 2024-12-31T23:59:59.999Z',
           deeplink: 'https://example.com/fee-payment/4523e365-cb6a-41d9-bd70-872c774ef49a',
         },
         {
           id: '67823e35-cb6a-41d9-bd70-872c774ef49a',
           type: 'feerecord',
-          amount: 1500,
-          paymentDate: '2025-01-25T14:00:00.000Z',
           message: 'Fee payment is due on 2025-01-31T23:59:59.999Z',
           deeplink: 'https://example.com/fee-payment/67823e35-cb6a-41d9-bd70-872c774ef49a',
 
