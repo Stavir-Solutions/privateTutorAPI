@@ -1,6 +1,6 @@
 const express = require('express');
 const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
-const {createStudent,
+const { createStudent,
     getStudentById,
     getAll,
     deleteById,
@@ -8,7 +8,7 @@ const {createStudent,
     getByBatchId,
     getStudentByIdWithBatchName,
     getStudentByUserName,
-    getTimelineData,} = require('../services/studentService');
+    getTimelineData, } = require('../services/studentService');
 
 
 const router = express.Router();
@@ -194,20 +194,20 @@ router.get('/userName/:userName', async (req, res) => {
 });
 router.get('/:studentId/batch/:batchId/timeline', authMiddleware, async (req, res) => {
     try {
-      const { studentId, batchId } = req.params;
-      const timeline = await getTimelineData(studentId, batchId);
-  
-      const response = {
-        studentId,
-        batchId,
-        timeline,
-      };
-  
-      buildSuccessResponse(res, 200, response);
+        const { studentId, batchId } = req.params;
+        const timeline = await getTimelineData(studentId, batchId);
+
+        const response = {
+            studentId,
+            batchId,
+            timeline,
+        };
+
+        buildSuccessResponse(res, 200, response);
     } catch (error) {
-      console.error('Error fetching timeline:', error);
-      buildErrorResponse(res, 500, 'Failed to fetch timeline');
+        console.error('Error fetching timeline:', error);
+        buildErrorMessage(res, 500, 'Failed to fetch timeline');
     }
-  });
-  
-  module.exports = router;
+});
+
+module.exports = router;

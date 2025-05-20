@@ -163,24 +163,35 @@ async function deleteById(assignmentId) {
     }
 }
 async function getexpireAssignments(batchId, studentId, days = 10) {
-    try {
-        const allAssignments = await getByBatchIdAndStudentId(batchId, studentId);
-        const todayStr = new Date().toISOString().split('T')[0]; 
-        
-        const futureDate = new Date();
-        futureDate.setDate(futureDate.getDate() + days);
-        const futureDateStr = futureDate.toISOString().split('T')[0]; 
-        
-        return allAssignments.filter(item => {
-            const submissionDateStr = new Date(item.submissionDate).toISOString().split('T')[0];
-            return submissionDateStr >= todayStr && submissionDateStr <= futureDateStr;
-        });
-    } catch (err) {
-        console.error('Error filtering valid assignments:', JSON.stringify(err, null, 2));
-        throw err;
-    }
-}
+   try {
+    const today = new Date().toISOString().split('T')[0];
+    
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+    const params = {
+        TableName: tableName,
+        FilterExpression: "batchId = :batchId AND studentId = :studentId AND submissionDate BETWEEN :today AND :futureDate",
+        ExpressionAttributeValues: {
+            ':batchId': marshall(batchId),
+            ':studentId': marshall(studentId),
+            ':today': {S: today},
+            ':futureDate': {S: futureDateStr}
+        },
+    };
 
+        
+            const result = await db.send(new ScanCommand(params));
+            const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
+    
+            console.log('Filtered fee records:', items);
+            return items;
+        } catch (err) {
+            console.error('Error fetching filtered fee records from DB:', JSON.stringify(err, null, 2));
+            throw err;
+        }
+    }
+    
 
 
 module.exports = {create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId,getexpireAssignments}
