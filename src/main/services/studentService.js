@@ -9,7 +9,11 @@ const {
     BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
+const { generateUUID } = require("../db/UUIDGenerator");
 
+const { getexpireAssignments } = require('./assignmentService');
+const { getexpireFeeRecords } = require('./feeRecordService');
+const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Students";
 const batchesTable = "Batches";
@@ -334,42 +338,49 @@ async function updateStudentPassword(studentId, newPassword) {
     await db.send(new UpdateItemCommand(params));
     console.log("Student password updated successfully");
 }
-function getTimelineData(studentId, batchId) {
-    if (studentId === '2523e365-cb6a-41d9-bd70-872c774ef49a' && batchId === '331aa850-9a2d-4924-90ef-0e0c6bf2f3cd') {
-      return [
-        {
-          id: '2523e365-cb6a-41d9-bd70-872c774e123a',
-          type: 'assignment',
-          message: 'Math Assignment 1 is reaching its deadline 2024-01-15',
-          deeplink: 'https://example.com/assignment/2523e365-cb6a-41d9-bd70-872c774e123a',
-        },
-        {
-          id: 'a23434567-89ab-cdef-1234-569abcdef0',
-          type: 'assignment',
-          message: 'Science Assignment 2 is reaching its deadline 2024-01-22',
-          deeplink: 'https://example.com/assignment/a23434567-89ab-cdef-1234-569abcdef0',
+async function getTimelineData(studentId, batchId) {
+    try {
+        console.log('Fetching assignments for:', { batchId, studentId });
+        const assignmentsData = await getexpireAssignments(batchId, studentId);
+        console.log('Assignments fetched:', assignmentsData);
 
-        },
-        {
-          id: '4523e365-cb6a-41d9-bd70-872c774ef49a',
-          type: 'feerecord',
-          message: 'Fee payment is due on 2024-12-31',
-          deeplink: 'https://example.com/fee-payment/4523e365-cb6a-41d9-bd70-872c774ef49a',
-        },
-        {
-          id: '67823e35-cb6a-41d9-bd70-872c774ef49a',
-          type: 'feerecord',
-          message: 'Fee payment is due on 2025-01-31',
-          deeplink: 'https://example.com/fee-payment/67823e35-cb6a-41d9-bd70-872c774ef49a',
+        const assignments = assignmentsData.map(data => {
+            const dateOnly = new Date(data.submissionDate).toISOString().split('T')[0];
+            return {
+                id: generateUUID(),
+                type: 'assignment',
+                message: `${data.title} is reaching its deadline on ${dateOnly}`,
+                deeplink: `${DEEPLINK_BASE_URL}/assignments/${data.id}`,
+            };
+        });
 
-        }
-    ];
+        const feesData = await getexpireFeeRecords(batchId, studentId);
+        console.log('Fees fetched:', feesData);
+
+
+        const fees = feesData.map(data => {
+                const paymentDate = new Date(data.paymentDate).toISOString().split('T')[0];
+                const dueDate = new Date(data.dueDate).toISOString().split('T')[0];
+                return {
+                    id: generateUUID(),
+                    type: 'feerecord',
+                    message: `Your fee of ₹${data.amount} is due on ${dueDate} and the payment date was ${paymentDate}.`,
+                    deeplink: `${DEEPLINK_BASE_URL}/fees/${data.id}`,
+                };
+            });
+
+        const timeline = [...assignments, ...fees];
+        console.log('Timeline:', timeline);
+
+        return timeline;
+    } catch (err) {
+        console.error('Error fetching timeline data:', JSON.stringify(err, null, 2));
+        throw err;
     }
-  
-    return [];
-  }
-  
-  
+}
+
+
+
 module.exports = {
     createStudent,
     getStudentById,
