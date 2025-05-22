@@ -349,6 +349,7 @@ async function getTimelineData(studentId, batchId) {
             return {
                 id: generateUUID(),
                 type: 'assignment',
+                LastDate: dateOnly,
                 message: `${data.title} is reaching its deadline on ${dateOnly}`,
                 deeplink: `${DEEPLINK_BASE_URL}/assignments/${data.id}`,
             };
@@ -364,6 +365,7 @@ async function getTimelineData(studentId, batchId) {
                 return {
                     id: generateUUID(),
                     type: 'feerecord',
+                    LastDate: dueDate,
                     message: `Your fee of ₹${data.amount} is due on ${dueDate} and the payment date was ${paymentDate}.`,
                     deeplink: `${DEEPLINK_BASE_URL}/fees/${data.id}`,
                 };
