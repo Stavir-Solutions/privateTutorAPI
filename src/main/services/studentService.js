@@ -357,6 +357,7 @@ async function getTimelineData(studentId, batchId) {
         const feesData = await getexpireFeeRecords(batchId, studentId);
         console.log('Fees fetched:', feesData);
 
+
         const fees = feesData.map(data => {
                 const paymentDate = new Date(data.paymentDate).toISOString().split('T')[0];
                 const dueDate = new Date(data.dueDate).toISOString().split('T')[0];
