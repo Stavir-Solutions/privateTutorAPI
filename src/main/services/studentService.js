@@ -13,7 +13,6 @@ const { generateUUID } = require("../db/UUIDGenerator");
 
 const { getexpireAssignments } = require('./assignmentService');
 const { getexpireFeeRecords } = require('./feeRecordService');
-const { date } = require('joi');
 const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Students";
