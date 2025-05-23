@@ -162,8 +162,6 @@ async function deleteById(assignmentId) {
         throw err;
     }
 }
-    
-
 
 module.exports = {create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId}
 

@@ -1,6 +1,6 @@
 const express = require('express');
 const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
-const {createStudent,
+const { createStudent,
     getStudentById,
     getAll,
     deleteById,
@@ -8,7 +8,7 @@ const {createStudent,
     getByBatchId,
     getStudentByIdWithBatchName,
     getStudentByUserName,
-    getTimelineData,} = require('../services/studentService');
+    getTimelineData, } = require('../services/studentService');
 
 
 const router = express.Router();

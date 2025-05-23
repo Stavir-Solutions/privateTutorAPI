@@ -9,7 +9,6 @@ const {
 } = require('@aws-sdk/client-dynamodb');
 const {unmarshall, marshall} = require('@aws-sdk/util-dynamodb');
 
-
 const tableName = "FeeRecords";
 
 async function create(feeRecord) {
@@ -127,9 +126,44 @@ async function deleteById(feeRecordId) {
     } catch (err) {
         console.error('Unable to delete feeRecord. Error JSON:', JSON.stringify(err, null, 2));
         throw err;
+    }}
+
+async function getexpireFeeRecords(batchId, studentId, days = 10) {
+    try {
+        const today = new Date();
+        const futureDate = new Date();
+        futureDate.setDate(today.getDate() + days);
+        const futureDateStr = futureDate.toISOString().split('T')[0];
+
+        const params = {
+            TableName: 'FeeRecords',
+            FilterExpression: '#batchId = :batchId AND #studentId = :studentId AND #status = :pending AND #dueDate <= :future',
+
+            ExpressionAttributeNames: {
+                '#batchId': 'batchId',
+                '#studentId': 'studentId',
+                '#status': 'status',
+                '#dueDate': 'dueDate'
+            },
+            ExpressionAttributeValues: {
+                ':batchId': { S: batchId },
+                ':studentId': { S: studentId },
+                ':pending': { S: 'pending' },
+                ':future': { S: futureDateStr }
+            }
+        };
+
+        const result = await db.send(new ScanCommand(params));
+        const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
+
+        console.log('Filtered fee records:', items);
+        return items;
+    } catch (err) {
+        console.error('Error fetching filtered fee records from DB:', JSON.stringify(err, null, 2));
+        throw err;
     }
 }
 
 
-module.exports = {create, getByBatchIdAndStudentId ,getbyBatchId, getById, deleteById, updateFeeRecord}
+module.exports = {create, getByBatchIdAndStudentId ,getbyBatchId, getById, deleteById, updateFeeRecord, getexpireFeeRecords}
 

@@ -9,7 +9,9 @@ const {
     BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
+
 const {generateUUID}= require('../db/UUIDGenerator');
+
 const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Students";
@@ -338,6 +340,7 @@ async function updateStudentPassword(studentId, newPassword) {
     console.log("Student password updated successfully");
 }
 
+
 async function getexpireAssignments(batchId, studentId, days = 10) {
    try {
     console.log('Fetching assignments for:', { batchId, studentId });
@@ -449,6 +452,7 @@ async function getTimelineData(studentId, batchId) {
         throw err;
     }
 }
+
 
 
 module.exports = {
