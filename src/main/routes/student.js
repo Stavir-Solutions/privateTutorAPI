@@ -193,16 +193,21 @@ router.get('/userName/:userName', async (req, res) => {
     }
 });
 
-router.get('/:studentId/batch/:batchId/timeline',authMiddleware, (req, res) => {
-    const { studentId, batchId } = req.params;
-    const timeline = getTimelineData(studentId, batchId);
-    const response = {
-      studentId,
-      batchId,
-      timeline
-    };
-  
-    buildSuccessResponse(res, 200, response);
-  });
+router.get('/:studentId/batch/:batchId/timeline', authMiddleware, async (req, res) => {
+    try {
+        const { studentId, batchId } = req.params;
+        const timeline = await getTimelineData(studentId, batchId);
 
+        const response = {
+            studentId,
+            batchId,
+            timeline,
+        };
+
+        buildSuccessResponse(res, 200, response);
+    } catch (error) {
+        console.error('Error fetching timeline:', error);
+        buildErrorMessage(res, 500, 'Failed to fetch timeline');
+    }
+});
 module.exports = router;

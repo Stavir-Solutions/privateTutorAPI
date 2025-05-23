@@ -9,10 +9,13 @@ const {
     BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
-
+const {generateUUID}= require('../db/UUIDGenerator');
+const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Students";
 const batchesTable = "Batches";
+const assigmentsTable = "Assignments";
+const feeRecordsTable = "FeeRecords";
 
 async function isStudentuserNameTaken(userName, excludeId = null) {
     const params = {
@@ -334,42 +337,120 @@ async function updateStudentPassword(studentId, newPassword) {
     await db.send(new UpdateItemCommand(params));
     console.log("Student password updated successfully");
 }
-function getTimelineData(studentId, batchId) {
-    if (studentId === '2523e365-cb6a-41d9-bd70-872c774ef49a' && batchId === '331aa850-9a2d-4924-90ef-0e0c6bf2f3cd') {
-      return [
-        {
-          id: '2523e365-cb6a-41d9-bd70-872c774e123a',
-          type: 'assignment',
-          message: 'Math Assignment 1 is reaching its deadline 2024-01-15T23:59:59.999Z',
-          deeplink: 'https://example.com/assignment/2523e365-cb6a-41d9-bd70-872c774e123a',
-        },
-        {
-          id: 'a23434567-89ab-cdef-1234-569abcdef0',
-          type: 'assignment',
-          message: 'Science Assignment 2 is reaching its deadline 2024-01-22T23:59:59.999Z',
-          deeplink: 'https://example.com/assignment/a23434567-89ab-cdef-1234-569abcdef0',
 
+async function getexpireAssignments(batchId, studentId, days = 10) {
+   try {
+    console.log('Fetching assignments for:', { batchId, studentId });
+    const today = new Date().toISOString().split('T')[0];
+    
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+    const params = {
+        TableName: assigmentsTable,
+        FilterExpression: "batchId = :batchId AND studentId = :studentId AND submissionDate BETWEEN :today AND :futureDate",
+        ExpressionAttributeValues: {
+            ':batchId': marshall(batchId),
+            ':studentId': marshall(studentId),
+            ':today': {S: today},
+            ':futureDate': {S: futureDateStr}
         },
-        {
-          id: '4523e365-cb6a-41d9-bd70-872c774ef49a',
-          type: 'feerecord',
-          message: 'Fee payment is due on 2024-12-31T23:59:59.999Z',
-          deeplink: 'https://example.com/fee-payment/4523e365-cb6a-41d9-bd70-872c774ef49a',
-        },
-        {
-          id: '67823e35-cb6a-41d9-bd70-872c774ef49a',
-          type: 'feerecord',
-          message: 'Fee payment is due on 2025-01-31T23:59:59.999Z',
-          deeplink: 'https://example.com/fee-payment/67823e35-cb6a-41d9-bd70-872c774ef49a',
+    };
 
+        
+            const result = await db.send(new ScanCommand(params));
+            const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
+    
+            console.log('Filtered assignments:', items);
+            return items;
+        } catch (err) {
+            console.error('Error fetching filtered assignment from DB:', JSON.stringify(err, null, 2));
+            throw err;
         }
-    ];
     }
-  
-    return [];
-  }
-  
-  
+    
+
+async function getexpireFeeRecords(batchId, studentId, days = 10) {
+    try {
+        const today = new Date();
+        const futureDate = new Date();
+        futureDate.setDate(today.getDate() + days);
+        const futureDateStr = futureDate.toISOString().split('T')[0];
+
+        const params = {
+            TableName: feeRecordsTable,
+            FilterExpression: '#batchId = :batchId AND #studentId = :studentId AND #status = :pending AND #dueDate <= :future',
+
+            ExpressionAttributeNames: {
+                '#batchId': 'batchId',
+                '#studentId': 'studentId',
+                '#status': 'status',
+                '#dueDate': 'dueDate'
+            },
+            ExpressionAttributeValues: {
+                ':batchId': { S: batchId },
+                ':studentId': { S: studentId },
+                ':pending': { S: 'pending' },
+                ':future': { S: futureDateStr }
+            }
+        };
+
+        const result = await db.send(new ScanCommand(params));
+        const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
+
+        console.log('Filtered fee records:', items);
+        return items;
+    } catch (err) {
+        console.error('Error fetching filtered fee records from DB:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
+
+
+async function getTimelineData(studentId, batchId) {
+    try {
+        console.log('Fetching assignments for:', { batchId, studentId });
+        const assignmentsData = await getexpireAssignments(batchId, studentId);
+        console.log('Assignments fetched:', assignmentsData);
+
+        const assignments = assignmentsData.map(data => {
+            const dateOnly = new Date(data.submissionDate).toISOString().split('T')[0];
+            return {
+                id: generateUUID(),
+                type: 'assignment',
+                LastDate: dateOnly,
+                message: `${data.title} is reaching its deadline on ${dateOnly}`,
+                deeplink: `${DEEPLINK_BASE_URL}/assignments/${data.id}`,
+            };
+        });
+
+        const feesData = await getexpireFeeRecords(batchId, studentId);
+        console.log('Fees fetched:', feesData);
+
+
+        const fees = feesData.map(data => {
+                const paymentDate = new Date(data.paymentDate).toISOString().split('T')[0];
+                const dueDate = new Date(data.dueDate).toISOString().split('T')[0];
+                return {
+                    id: generateUUID(),
+                    type: 'feerecord',
+                    LastDate: dueDate,
+                    message: `Your fee of ₹${data.amount} is due on ${dueDate} and the payment date was ${paymentDate}.`,
+                    deeplink: `${DEEPLINK_BASE_URL}/fees/${data.id}`,
+                };
+            });
+
+        const timeline = [...assignments, ...fees];
+        console.log('Timeline:', timeline);
+
+        return timeline;
+    } catch (err) {
+        console.error('Error fetching timeline data:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
+
+
 module.exports = {
     createStudent,
     getStudentById,
