@@ -192,6 +192,7 @@ router.get('/userName/:userName', async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 router.get('/:studentId/batch/:batchId/timeline', authMiddleware, async (req, res) => {
     try {
         const { studentId, batchId } = req.params;
@@ -209,5 +210,4 @@ router.get('/:studentId/batch/:batchId/timeline', authMiddleware, async (req, re
         buildErrorMessage(res, 500, 'Failed to fetch timeline');
     }
 });
-
 module.exports = router;

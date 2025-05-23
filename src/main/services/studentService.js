@@ -9,14 +9,15 @@ const {
     BatchGetItemCommand
 } = require('@aws-sdk/client-dynamodb');
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
-const { generateUUID } = require("../db/UUIDGenerator");
 
-const { getexpireAssignments } = require('./assignmentService');
-const { getexpireFeeRecords } = require('./feeRecordService');
+const {generateUUID}= require('../db/UUIDGenerator');
+
 const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
 const tableName = "Students";
 const batchesTable = "Batches";
+const assigmentsTable = "Assignments";
+const feeRecordsTable = "FeeRecords";
 
 async function isStudentuserNameTaken(userName, excludeId = null) {
     const params = {
@@ -338,6 +339,77 @@ async function updateStudentPassword(studentId, newPassword) {
     await db.send(new UpdateItemCommand(params));
     console.log("Student password updated successfully");
 }
+
+
+async function getexpireAssignments(batchId, studentId, days = 10) {
+   try {
+    console.log('Fetching assignments for:', { batchId, studentId });
+    const today = new Date().toISOString().split('T')[0];
+    
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + days);
+    const futureDateStr = futureDate.toISOString().split('T')[0];
+    const params = {
+        TableName: assigmentsTable,
+        FilterExpression: "batchId = :batchId AND studentId = :studentId AND submissionDate BETWEEN :today AND :futureDate",
+        ExpressionAttributeValues: {
+            ':batchId': marshall(batchId),
+            ':studentId': marshall(studentId),
+            ':today': {S: today},
+            ':futureDate': {S: futureDateStr}
+        },
+    };
+
+        
+            const result = await db.send(new ScanCommand(params));
+            const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
+    
+            console.log('Filtered assignments:', items);
+            return items;
+        } catch (err) {
+            console.error('Error fetching filtered assignment from DB:', JSON.stringify(err, null, 2));
+            throw err;
+        }
+    }
+    
+
+async function getexpireFeeRecords(batchId, studentId, days = 10) {
+    try {
+        const today = new Date();
+        const futureDate = new Date();
+        futureDate.setDate(today.getDate() + days);
+        const futureDateStr = futureDate.toISOString().split('T')[0];
+
+        const params = {
+            TableName: feeRecordsTable,
+            FilterExpression: '#batchId = :batchId AND #studentId = :studentId AND #status = :pending AND #dueDate <= :future',
+
+            ExpressionAttributeNames: {
+                '#batchId': 'batchId',
+                '#studentId': 'studentId',
+                '#status': 'status',
+                '#dueDate': 'dueDate'
+            },
+            ExpressionAttributeValues: {
+                ':batchId': { S: batchId },
+                ':studentId': { S: studentId },
+                ':pending': { S: 'pending' },
+                ':future': { S: futureDateStr }
+            }
+        };
+
+        const result = await db.send(new ScanCommand(params));
+        const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
+
+        console.log('Filtered fee records:', items);
+        return items;
+    } catch (err) {
+        console.error('Error fetching filtered fee records from DB:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
+
+
 async function getTimelineData(studentId, batchId) {
     try {
         console.log('Fetching assignments for:', { batchId, studentId });

@@ -1,6 +1,6 @@
 const {toAssignmentEntity} = require('../db/mappers/assignmentMapper');
 const {getById: getBatchById} = require('./batchService');
-const {getByBatchId: getBatchStudents} = require('./studentService');
+const {getByBatchId:getBatchStudents} = require('./studentService');
 const {NotificationType} = require('../common/types');
 const db = require('../db/dynamodb');
 const {
@@ -27,7 +27,7 @@ async function sendAssignmentNotification(assignment, assignmentId) {
 
         const students = await getBatchStudents(batchId);
         console.log("Batch Students:", students);
-        recipients = students.map(student => ({id: studentId, type: "STUDENT"}));
+        recipients = students.map(student => ({id: student.id, type: "STUDENT"}));
     } else if (studentId) {
         recipients.push({id: studentId, type: "STUDENT"});
     }
@@ -162,37 +162,6 @@ async function deleteById(assignmentId) {
         throw err;
     }
 }
-async function getexpireAssignments(batchId, studentId, days = 10) {
-   try {
-    const today = new Date().toISOString().split('T')[0];
-    
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + days);
-    const futureDateStr = futureDate.toISOString().split('T')[0];
-    const params = {
-        TableName: tableName,
-        FilterExpression: "batchId = :batchId AND studentId = :studentId AND submissionDate BETWEEN :today AND :futureDate",
-        ExpressionAttributeValues: {
-            ':batchId': marshall(batchId),
-            ':studentId': marshall(studentId),
-            ':today': {S: today},
-            ':futureDate': {S: futureDateStr}
-        },
-    };
 
-        
-            const result = await db.send(new ScanCommand(params));
-            const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
-    
-            console.log('Filtered fee records:', items);
-            return items;
-        } catch (err) {
-            console.error('Error fetching filtered fee records from DB:', JSON.stringify(err, null, 2));
-            throw err;
-        }
-    }
-    
-
-
-module.exports = {create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId,getexpireAssignments}
+module.exports = {create, getByBatchIdAndStudentId, getById, deleteById, updateAssignment, getByBatchId}
 
