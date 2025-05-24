@@ -16,7 +16,7 @@ const notesSchema = Joi.object({
     listUrls: Joi.array().items(Joi.string().uri()).optional().messages({ 'string.uri': 'Attachment URLs must be valid URIs.' }),
     studentId: Joi.string().optional().messages({ 'string.guid': 'Student ID must be a valid UUID.' }),
     batchId: Joi.string().required().messages({ 'string.guid': 'Batch ID must be a valid UUID.' }),
-    content: Joi.string().required().messages({ 'string.base': 'Content must be a string.' }),
+    content: Joi.string().optional().messages({ 'string.base': 'Content must be a string.' }),
 });
 
 const notesUpdateSchema = Joi.object({
