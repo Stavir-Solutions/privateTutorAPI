@@ -19,8 +19,8 @@ const feeRecordCreateSchema = Joi.object({
     batchId: Joi.string().guid().required().messages({ 'string.guid': 'Batch ID must be a valid UUID.' }),
     studentId: Joi.string().guid().required().messages({ 'string.guid': 'Student ID must be a valid UUID.' }),
     dueDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Due date must be a valid date.' }),
-    paymentDate: Joi.string().custom(dateValidator).required().messages({ 'date.base': 'Payment date must be a valid date.' }),
-    month: Joi.string().max(50).required().messages({ 'string.max': 'Month should not exceed 50 characters.' }),
+    paymentDate: Joi.string().custom(dateValidator).optional().messages({ 'date.base': 'Payment date must be a valid date.' }),
+    month: Joi.string().max(50).optional().messages({ 'string.max': 'Month should not exceed 50 characters.' }),
     amount: Joi.number().required().messages({ 'number.base': 'Amount must be a number.' }),
     status: Joi.string().valid(...Object.values(FeeRecordStatus)).required().messages({
         'any.only': `Status must be one of the following: ${Object.values(FeeRecordStatus).join(', ')}`
