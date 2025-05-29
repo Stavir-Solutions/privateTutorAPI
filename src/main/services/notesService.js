@@ -32,7 +32,7 @@ async function sendNotesNotification(notes, notesId) {
         
         const students = await getBatchStudents(batchId);
         console.log("Batch Students:", students);
-        recipients = students.map(student => ({id: id, type: "STUDENT"}));
+        recipients = students.map(student => ({id: student.id, type: "STUDENT"}));
 
     }else if (studentId) {
         recipients.push({ id: studentId, type: "STUDENT" });
