@@ -349,18 +349,18 @@ async function getexpireAssignments(batchId, studentId, days = 10) {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + days);
     const futureDateStr = futureDate.toISOString().split('T')[0];
-    const params = {
-        TableName: assigmentsTable,
-        FilterExpression: "batchId = :batchId AND studentId = :studentId AND submissionDate BETWEEN :today AND :futureDate",
-        ExpressionAttributeValues: {
-            ':batchId': marshall(batchId),
-            ':studentId': marshall(studentId),
-            ':today': {S: today},
-            ':futureDate': {S: futureDateStr}
-        },
-    };
+  const params = {
+  TableName: assigmentsTable,
+  FilterExpression: "batchId = :batchId AND (studentId = :studentId OR  attribute_not_exists(studentId)) AND submissionDate BETWEEN :today AND :futureDate",
+ 
+  ExpressionAttributeValues: {
+    ":batchId": { S: batchId },
+    ":studentId": { S: studentId },
+    ":today": { S: today },
+    ":futureDate": { S: futureDateStr }
+  }
+};
 
-        
             const result = await db.send(new ScanCommand(params));
             const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
     
@@ -396,8 +396,9 @@ async function getexpireFeeRecords(batchId, studentId, days = 10) {
                 ':pending': { S: 'pending' },
                 ':future': { S: futureDateStr }
             }
+            
         };
-
+console.log('Fetching fee records for:', { batchId, studentId, futureDateStr });
         const result = await db.send(new ScanCommand(params));
         const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
 
