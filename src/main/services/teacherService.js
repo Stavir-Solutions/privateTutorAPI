@@ -43,18 +43,17 @@ async function create(teacher) {
         }
     }));
     return unmarshall(teacherEntity.Item).id;
-}async function update(teacherId, teacherFields) {
+}
+async function update(teacherId, teacherFields) {
     const getParams = {
         TableName: tableName,
         Key: marshall({ id: teacherId }),
         ProjectionExpression: 'userName',
     };
 
-    // Step 1: Fetch current userName
     const currentData = await db.send(new GetItemCommand(getParams));
     const currentUserName = currentData.Item ? unmarshall(currentData.Item).userName : null;
 
-    // Step 2: Validate new userName only if it's edited AND different
     const isUserNameInPayload = Object.prototype.hasOwnProperty.call(teacherFields, 'userName');
     const newUserName = teacherFields.userName;
 
@@ -63,11 +62,10 @@ async function create(teacher) {
         if (isTaken) {
             const error = new Error('userName already exists');
             error.statusCode = 409;
-            throw error; // ❌ Throw error, do not update anything
+            throw error; 
         }
     }
 
-    // Step 3: Build update expression for all fields
     const updateExpression = [];
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
@@ -100,7 +98,6 @@ async function create(teacher) {
         throw err;
     }
 }
-
 
 async function getTeacherById(teacherId) {
     const params = {

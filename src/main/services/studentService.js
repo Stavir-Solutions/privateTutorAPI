@@ -10,7 +10,7 @@ const {
 } = require('@aws-sdk/client-dynamodb');
 const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 
-const {generateUUID}= require('../db/UUIDGenerator');
+const { generateUUID } = require('../db/UUIDGenerator');
 
 const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
@@ -59,7 +59,7 @@ async function createStudent(student) {
 
 async function updateStudent(studentId, studentFields) {
     const getParams = {
-        TableName: tableName, 
+        TableName: tableName,
         Key: marshall({ id: studentId }),
         ProjectionExpression: 'userName',
     };
@@ -71,7 +71,7 @@ async function updateStudent(studentId, studentFields) {
     const newUserName = studentFields.userName;
 
     if (isUserNameInPayload && newUserName !== currentUserName) {
-        const isTaken = await isStudentuserNameTaken(newUserName, studentId); 
+        const isTaken = await isStudentuserNameTaken(newUserName, studentId);
         if (isTaken) {
             const error = new Error('userName already exists');
             error.statusCode = 409;
@@ -93,7 +93,7 @@ async function updateStudent(studentId, studentFields) {
         return { message: 'No fields were updated. Payload was empty.' };
     }
 
-    const updateParams = {
+    const Params = {
         TableName: tableName,
         Key: marshall({ id: studentId }),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
@@ -103,8 +103,8 @@ async function updateStudent(studentId, studentFields) {
     };
 
     try {
-        const data = await db.send(new UpdateItemCommand(updateParams));
-        console.log('Student update succeeded:', JSON.stringify(data, null, 2));
+        const data = await db.send(new UpdateItemCommand(Params));
+        console.log('update succeeded:', JSON.stringify(data, null, 2));
         return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
         console.error('Unable to update student. Error JSON:', JSON.stringify(err, null, 2));
@@ -355,36 +355,36 @@ async function updateStudentPassword(studentId, newPassword) {
 
 
 async function getexpireAssignments(batchId, studentId, days = 10) {
-   try {
-    console.log('Fetching assignments for:', { batchId, studentId });
-    const today = new Date().toISOString().split('T')[0];
-    
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + days);
-    const futureDateStr = futureDate.toISOString().split('T')[0];
-    const params = {
-        TableName: assigmentsTable,
-        FilterExpression: "batchId = :batchId AND studentId = :studentId AND submissionDate BETWEEN :today AND :futureDate",
-        ExpressionAttributeValues: {
-            ':batchId': marshall(batchId),
-            ':studentId': marshall(studentId),
-            ':today': {S: today},
-            ':futureDate': {S: futureDateStr}
-        },
-    };
+    try {
+        console.log('Fetching assignments for:', { batchId, studentId });
+        const today = new Date().toISOString().split('T')[0];
 
-        
-            const result = await db.send(new ScanCommand(params));
-            const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
-    
-            console.log('Filtered assignments:', items);
-            return items;
-        } catch (err) {
-            console.error('Error fetching filtered assignment from DB:', JSON.stringify(err, null, 2));
-            throw err;
-        }
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + days);
+        const futureDateStr = futureDate.toISOString().split('T')[0];
+        const params = {
+            TableName: assigmentsTable,
+            FilterExpression: "batchId = :batchId AND studentId = :studentId AND submissionDate BETWEEN :today AND :futureDate",
+            ExpressionAttributeValues: {
+                ':batchId': marshall(batchId),
+                ':studentId': marshall(studentId),
+                ':today': { S: today },
+                ':futureDate': { S: futureDateStr }
+            },
+        };
+
+
+        const result = await db.send(new ScanCommand(params));
+        const items = result.Items ? result.Items.map(item => unmarshall(item)) : [];
+
+        console.log('Filtered assignments:', items);
+        return items;
+    } catch (err) {
+        console.error('Error fetching filtered assignment from DB:', JSON.stringify(err, null, 2));
+        throw err;
     }
-    
+}
+
 
 async function getexpireFeeRecords(batchId, studentId, days = 10) {
     try {
@@ -445,16 +445,16 @@ async function getTimelineData(studentId, batchId) {
 
 
         const fees = feesData.map(data => {
-                const paymentDate = new Date(data.paymentDate).toISOString().split('T')[0];
-                const dueDate = new Date(data.dueDate).toISOString().split('T')[0];
-                return {
-                    id: generateUUID(),
-                    type: 'feerecord',
-                    LastDate: dueDate,
-                    message: `Your fee of ₹${data.amount} is due on ${dueDate} and the payment date was ${paymentDate}.`,
-                    deeplink: `${DEEPLINK_BASE_URL}/fees/${data.id}`,
-                };
-            });
+            const paymentDate = new Date(data.paymentDate).toISOString().split('T')[0];
+            const dueDate = new Date(data.dueDate).toISOString().split('T')[0];
+            return {
+                id: generateUUID(),
+                type: 'feerecord',
+                LastDate: dueDate,
+                message: `Your fee of ₹${data.amount} is due on ${dueDate} and the payment date was ${paymentDate}.`,
+                deeplink: `${DEEPLINK_BASE_URL}/fees/${data.id}`,
+            };
+        });
 
         const timeline = [...assignments, ...fees];
         console.log('Timeline:', timeline);
