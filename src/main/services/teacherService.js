@@ -46,10 +46,25 @@ async function create(teacher) {
 }
 
 async function update(teacherId, teacherFields) {
-    if (teacherFields.userName && await isTeacheruserNameTaken(teacherFields.userName, teacherId)) {
-        const error = new Error("userName already exists");
-        error.statusCode = 409;
-        throw error;
+   const getParams = {
+        TableName: tableName,
+        Key: marshall({ id: teacherId }),
+        ProjectionExpression: 'userName',
+    };
+
+    const currentData = await db.send(new GetItemCommand(getParams));
+    const currentUserName = currentData.Item && currentData.Item.userName ? currentData.Item.userName.S : null;
+
+    const isUserNameInPayload = Object.prototype.hasOwnProperty.call(teacherFields, 'userName');
+    const newUserName = teacherFields.userName;
+
+    if (isUserNameInPayload && newUserName !== currentUserName) {
+        const isTaken = await isTeacheruserNameTaken(newUserName, teacherId);
+        if (isTaken) {
+            const error = new Error('userName already exists');
+            error.statusCode = 409;
+            throw error;
+        }
     }
     const updateExpression = [];
     const expressionAttributeNames = {};
