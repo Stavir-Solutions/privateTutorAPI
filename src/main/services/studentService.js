@@ -56,13 +56,27 @@ async function createStudent(student) {
     }));
     return unmarshall(studentEntity.Item).id;
 }
-
-
 async function updateStudent(studentId, studentFields) {
-    if (studentFields.userName && await isStudentuserNameTaken(studentFields.userName, studentId)) {
-        const error = new Error("userName already exists");
-        error.statusCode = 409;
-        throw error;
+    const getParams = {
+        TableName: tableName,
+        Key: marshall({ id: studentId }),
+        ProjectionExpression: 'userName',
+    };
+
+    const currentData = await db.send(new GetItemCommand(getParams));
+const currentUserName = currentData.Item && currentData.Item.userName ? currentData.Item.userName.S : null;
+
+
+    const isUserNameInPayload = Object.prototype.hasOwnProperty.call(studentFields, 'userName');
+    const newUserName = studentFields.userName;
+
+    if (isUserNameInPayload && newUserName !== currentUserName) {
+        const isTaken = await isStudentuserNameTaken(newUserName, studentId);
+        if (isTaken) {
+            const error = new Error('userName already exists');
+            error.statusCode = 409;
+            throw error;
+        }
     }
     const updateExpression = [];
     const expressionAttributeNames = {};
