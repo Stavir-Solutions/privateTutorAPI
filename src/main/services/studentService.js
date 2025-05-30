@@ -57,29 +57,43 @@ async function createStudent(student) {
     return unmarshall(studentEntity.Item).id;
 }
 
-
 async function updateStudent(studentId, studentFields) {
-    if (studentFields.userName && await isStudentuserNameTaken(studentFields.userName, studentId)) {
-        const error = new Error("userName already exists");
-        error.statusCode = 409;
-        throw error;
+    const getParams = {
+        TableName: tableName, 
+        Key: marshall({ id: studentId }),
+        ProjectionExpression: 'userName',
+    };
+
+    const currentData = await db.send(new GetItemCommand(getParams));
+    const currentUserName = currentData.Item ? unmarshall(currentData.Item).userName : null;
+
+    const isUserNameInPayload = Object.prototype.hasOwnProperty.call(studentFields, 'userName');
+    const newUserName = studentFields.userName;
+
+    if (isUserNameInPayload && newUserName !== currentUserName) {
+        const isTaken = await isStudentuserNameTaken(newUserName, studentId); 
+        if (isTaken) {
+            const error = new Error('userName already exists');
+            error.statusCode = 409;
+            throw error;
+        }
     }
+
     const updateExpression = [];
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
 
-    console.log("Updating student fields", studentFields);
     for (const [key, value] of Object.entries(studentFields)) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
-        if (Array.isArray(value)) {
-            expressionAttributeValues[`:${key}`] = { L: value.map(item => marshall(item, { convertEmptyValues: true })) };
-        } else {
-            expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
-        }
+        expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
     }
 
-    const params = {
+    if (updateExpression.length === 0) {
+        return { message: 'No fields were updated. Payload was empty.' };
+    }
+
+    const updateParams = {
         TableName: tableName,
         Key: marshall({ id: studentId }),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
@@ -88,10 +102,9 @@ async function updateStudent(studentId, studentFields) {
         ReturnValues: 'UPDATED_NEW',
     };
 
-    console.log('update params ', JSON.stringify(params, null, 2));
     try {
-        const data = await db.send(new UpdateItemCommand(params));
-        console.log('Update succeeded:', JSON.stringify(data, null, 2));
+        const data = await db.send(new UpdateItemCommand(updateParams));
+        console.log('Student update succeeded:', JSON.stringify(data, null, 2));
         return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
         console.error('Unable to update student. Error JSON:', JSON.stringify(err, null, 2));

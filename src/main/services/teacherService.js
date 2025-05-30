@@ -43,38 +43,56 @@ async function create(teacher) {
         }
     }));
     return unmarshall(teacherEntity.Item).id;
-}
+}async function update(teacherId, teacherFields) {
+    const getParams = {
+        TableName: tableName,
+        Key: marshall({ id: teacherId }),
+        ProjectionExpression: 'userName',
+    };
 
-async function update(teacherId, teacherFields) {
-    if (teacherFields.userName && await isTeacheruserNameTaken(teacherFields.userName, teacherId)) {
-        const error = new Error("userName already exists");
-        error.statusCode = 409;
-        throw error;
+    // Step 1: Fetch current userName
+    const currentData = await db.send(new GetItemCommand(getParams));
+    const currentUserName = currentData.Item ? unmarshall(currentData.Item).userName : null;
+
+    // Step 2: Validate new userName only if it's edited AND different
+    const isUserNameInPayload = Object.prototype.hasOwnProperty.call(teacherFields, 'userName');
+    const newUserName = teacherFields.userName;
+
+    if (isUserNameInPayload && newUserName !== currentUserName) {
+        const isTaken = await isTeacheruserNameTaken(newUserName, teacherId);
+        if (isTaken) {
+            const error = new Error('userName already exists');
+            error.statusCode = 409;
+            throw error; // ❌ Throw error, do not update anything
+        }
     }
+
+    // Step 3: Build update expression for all fields
     const updateExpression = [];
     const expressionAttributeNames = {};
     const expressionAttributeValues = {};
 
-    console.log("Updating teacher fields", teacherFields);
     for (const [key, value] of Object.entries(teacherFields)) {
         updateExpression.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
-        expressionAttributeValues[`:${key}`] = marshall(value, {convertEmptyValues: true});
-
+        expressionAttributeValues[`:${key}`] = marshall(value, { convertEmptyValues: true });
     }
 
-    const params = {
+    if (updateExpression.length === 0) {
+        return { message: 'No fields were updated. Payload was empty.' };
+    }
+
+    const updateParams = {
         TableName: tableName,
-        Key: marshall({id: teacherId}),
+        Key: marshall({ id: teacherId }),
         UpdateExpression: `SET ${updateExpression.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
-        ReturnValues: 'UPDATED_NEW'
+        ReturnValues: 'UPDATED_NEW',
     };
 
-    console.log('update params ', params)
     try {
-        const data = await db.send(new UpdateItemCommand(params));
+        const data = await db.send(new UpdateItemCommand(updateParams));
         console.log('Update succeeded:', JSON.stringify(data, null, 2));
         return data.Attributes ? unmarshall(data.Attributes) : {};
     } catch (err) {
@@ -82,6 +100,7 @@ async function update(teacherId, teacherFields) {
         throw err;
     }
 }
+
 
 async function getTeacherById(teacherId) {
     const params = {
