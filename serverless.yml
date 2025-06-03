@@ -157,11 +157,14 @@ functions:
           path: /notes/batch/{batchId}
           method: get
       - http:
-          path: /notes/student/{id}
+          path: /notes/student/{studentId}
           method: get
       - http:
           path: /notes/{id}
           method: put
+      - http:
+          path: /notes/{id}
+          method: get      
       - http:
           path: /notes/{id}
           method: delete

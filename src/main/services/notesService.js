@@ -11,8 +11,6 @@ const { unmarshall, marshall } = require('@aws-sdk/util-dynamodb');
 const { NotificationType } = require('../common/types');
 const { sendNotification } = require("./notificationService");
 const { getById: getBatchById } = require('./batchService');
-const {getByBatchId:getBatchStudents} = require('./studentService');
-
 
 const DEEPLINK_BASE_URL = process.env.DEEPLINK_BASE_URL;
 
@@ -29,12 +27,9 @@ async function sendNotesNotification(notes, notesId) {
         const batchDetails = await getBatchById(batchId);
         console.log("Batch Details Retrieved:", batchDetails);
         batchName = batchDetails?.name || "Unknown Batch";
-        
-        const students = await getBatchStudents(batchId);
-        console.log("Batch Students:", students);
-        recipients = students.map(student => ({id: student.id, type: "STUDENT"}));
+    }
 
-    }else if (studentId) {
+    if (studentId) {
         recipients.push({ id: studentId, type: "STUDENT" });
     }
 
@@ -136,6 +131,21 @@ async function getByStudentId(studentId) {
     }
 }
 
+async function getById(notesId) {
+    const params = {
+        TableName: tableName,
+        Key: marshall({ id: notesId }),
+    };
+
+    try {
+        const data = await db.send(new GetItemCommand(params));
+        console.log('get by id result', data);
+        return data.Item ? unmarshall(data.Item) : {};
+    } catch (err) {
+        console.error('Unable to get notes. Error JSON:', JSON.stringify(err, null, 2));
+        throw err;
+    }
+}
 async function deleteById(notesId) {
     const params = {
         TableName: tableName,
@@ -153,4 +163,4 @@ async function deleteById(notesId) {
 }
 
 
-module.exports = { create, updateNotes, getByStudentId, deleteById, getByBatchId }
+module.exports = { create, updateNotes, getById,getByStudentId, deleteById, getByBatchId }
