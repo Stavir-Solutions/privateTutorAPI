@@ -28,7 +28,9 @@ async function sendNotesNotification(notes, notesId) {
         console.log("Batch Details Retrieved:", batchDetails);
         batchName = batchDetails?.name || "Unknown Batch";
     }
-
+       const students = await getBatchStudents(batchId);
+        console.log("Batch Students:", students);
+        recipients = students.map(student => ({id: student.id, type: "STUDENT"}));
     if (studentId) {
         recipients.push({ id: studentId, type: "STUDENT" });
     }
@@ -163,4 +165,4 @@ async function deleteById(notesId) {
 }
 
 
-module.exports = { create, updateNotes, getById,getByStudentId, deleteById, getByBatchId }
+module.exports = { create, updateNotes, getById, getByStudentId, deleteById, getByBatchId }
