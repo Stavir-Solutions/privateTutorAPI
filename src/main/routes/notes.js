@@ -1,9 +1,9 @@
 const express = require('express');
 const { buildSuccessResponse, buildErrorMessage } = require('./responseUtils');
 const Joi = require('joi');
-const { create, updateNotes, getByStudentId, deleteById, getByBatchId } = require('../services/notesService');
+const { create, updateNotes, getByStudentId, getById, deleteById, getByBatchId } = require('../services/notesService');
 const authMiddleware = require("../middleware/authMiddleware");
-const {dateValidator} = require("../common/dateValidator");
+const { dateValidator } = require("../common/dateValidator");
 
 
 const router = express.Router();
@@ -68,6 +68,11 @@ router.put('/:id', async (req, res) => {
     console.log('updated notes {}', req.params.id);
 });
 
+router.get('/:id', async (req, res) => {
+    const notes = await getById(req.params.id);
+    console.log('Notes by id ', notes);
+    buildSuccessResponse(res, 200, notes);
+});
 router.delete('/:id', (req, res) => {
     console.log('Deleting notes with id {}', req.params.id);
     let response = deleteById(req.params.id);
