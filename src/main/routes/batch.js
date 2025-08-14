@@ -15,7 +15,7 @@ const batchSchema = Joi.object({
     course: Joi.string().max(50).optional().messages({ 'string.max': 'Course should not exceed 50 characters.', }),
     subject: Joi.string().max(50).optional().messages({ 'string.max': 'Subject should not exceed 50 characters.', }),
     description: Joi.string().max(1000).optional().messages({ 'string.max': 'Description should not exceed 1000 characters.', }),
-    paymentFrequency: Joi.string().max(20).required().messages({ 'string.max': 'Payment frequency should not exceed 20 characters.', }),
+    paymentFrequency: Joi.string().max(20).optional().messages({ 'string.max': 'Payment frequency should not exceed 20 characters.', }),
     paymentAmount: Joi.number().required().messages({ 'number.base': 'Payment amount must be a number.', }),
     paymentDayOfMonth: Joi.number().integer().min(1).max(30).optional().messages({
         'number.min': 'Payment day of month must be at least 1.',
